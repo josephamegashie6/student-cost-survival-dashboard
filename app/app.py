@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import plotly.express as px
 st.title("International Student Cost Survival Dashboard")
 data = pd.read_csv("data/student_costs.csv")
 st.subheader("Monthly Cost Data")
@@ -51,6 +52,28 @@ elif status == "Break-even":
     st.warning("Financial Status: BREAK-EVEN — Survival is possible but with no buffer.")
 else:
     st.error("Financial Status: DEFICIT — Survival requires borrowing or external support.")
+
+#graph_codes
+st.subheader("Income vs Expenses")
+
+comparison_df = pd.DataFrame({
+    "Category": ["Total Income", "Total Expenses"],
+    "Amount": [total_income, total_expenses]
+})
+
+fig = px.bar(
+    comparison_df,
+    x="Category",
+    y="Amount",
+    text="Amount",
+    title="Monthly Income vs Essential Expenses"
+)
+
+fig.update_traces(texttemplate="$%{text:,.0f}", textposition="outside")
+fig.update_layout(yaxis_title="USD", xaxis_title="", uniformtext_minsize=8, uniformtext_mode="hide")
+
+st.plotly_chart(fig, use_container_width=True)
+
 
 
 
