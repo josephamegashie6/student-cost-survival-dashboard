@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+
 st.title("International Student Cost Survival Dashboard")
 data = pd.read_csv("data/student_costs.csv")
 
@@ -12,6 +13,11 @@ month = st.sidebar.selectbox(
 )
 
 selected = data[(data["city"] == city) & (data["month"] == month)].copy()
+city_data = data[data["city"] == city].copy()
+
+if selected.empty:
+    st.error("No data found for the selected City and Month.")
+    st.stop()
 
 st.subheader("Monthly Cost Data")
 st.dataframe(selected)
@@ -26,13 +32,6 @@ expense_columns = [
   "phone_internet",
   "misc_basic"]
 
-selected["total_expenses"] = selected[expense_columns).sum(axis=1)
-selected["balance"] = selected["total_income"] - selected["total_expenses']
-
-st.subheader("Financial_Summary")
-st.dataframe(selected[["city", "month", "total_income", "total_expenses", "balance", "status"]])
-
-selected["balance"] = selected["total_income"] - selected["total_expenses']
 def financial_status(balance): 
     if balance > 0:
         return "Surplus"
@@ -41,9 +40,20 @@ def financial_status(balance):
     else:
         return "Deficit"
 
+selected["total_expenses"] = selected[expense_columns].sum(axis=1)
+selected["balance"] = selected["total_income"] - selected["total_expenses"]
 selected["status"] = selected["balance"].apply(financial_status)
 
+city_data["total_income"] = city_data["campus_job_income"] + city_data["stipend_income"]
+city_data["total_expenses"] = city_data[expense_columns].sum(axis=1)
+city_data["balance"] = city_data["total_income"] - city_data["total_expenses"]
+city_data["status"] = city_data["balance"].apply(financial_status)
+
+st.subheader("Financial Summary")
+st.dataframe(selected[["city", "month", "total_income", "total_expenses", "balance", "status"]])
+
 st.subheader("Key Financial Indicators")
+
 
 total_income = selected["total_income"].iloc[0]
 total_expenses = selected["total_expenses"].iloc[0]
@@ -89,7 +99,7 @@ st.subheader("Expense Breakdown")
 
 expense_breakdown = pd.DataFrame({
     "Expense": expense_columns,
-    "Amount": [data[col].iloc[0] for col in expense_columns]
+    "Amount": [selected[col].iloc[0] for col in expense_columns]
 })
 
 fig2 = px.bar(
