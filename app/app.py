@@ -5,6 +5,9 @@ import plotly.express as px
 st.title("International Student Cost Survival Dashboard")
 data = pd.read_csv("data/student_costs.csv")
 
+data["month_dt"] = pd.to_datetime(data["month"], format="%Y-%m")
+
+
 st.sidebar.header("Filters")
 city = st.sidebar.selectbox("City", sorted(data["city"].unique()))
 month = st.sidebar.selectbox(
@@ -114,6 +117,26 @@ fig2.update_traces(texttemplate="$%{text:,.0f}", textposition="outside")
 fig2.update_layout(yaxis_title="USD", xaxis_title="", uniformtext_minsize=8, uniformtext_mode="hide")
 
 st.plotly_chart(fig2, use_container_width=True)
+
+#balance_trend_chart
+st.subheader("Balance Trend Over Time")
+
+city_trend = city_data.copy()
+city_trend["month_dt"] = pd.to_datetime(city_trend["month"], format="%Y-%m")
+
+city_trend = city_trend.sort_values("month_dt")
+
+fig3 = px.line(
+    city_trend,
+    x="month_dt",
+    y="balance",
+    markers=True,
+    title=f"Monthly Balance Trend - {city}"
+)
+
+fig3.update_layout(xaxis_title="Month", yaxis_title="Balance (USD)")
+st.plotly_chart(fig3, use_container_width=True)
+
 
 
 
