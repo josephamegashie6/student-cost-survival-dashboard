@@ -74,6 +74,28 @@ fig.update_layout(yaxis_title="USD", xaxis_title="", uniformtext_minsize=8, unif
 
 st.plotly_chart(fig, use_container_width=True)
 
+#expenses_breakdown
+st.subheader("Expense Breakdown")
+
+expense_breakdown = pd.DataFrame({
+    "Expense": expense_columns,
+    "Amount": [data[col].iloc[0] for col in expense_columns]
+})
+
+fig2 = px.bar(
+    expense_breakdown,
+    x="Expense",
+    y="Amount",
+    text="Amount",
+    title="Monthly Essential Expense Breakdown"
+)
+
+fig2.update_traces(texttemplate="$%{text:,.0f}", textposition="outside")
+fig2.update_layout(yaxis_title="USD", xaxis_title="", uniformtext_minsize=8, uniformtext_mode="hide")
+
+st.plotly_chart(fig2, use_container_width=True)
+
+
 
 
 
