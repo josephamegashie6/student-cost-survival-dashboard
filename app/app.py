@@ -23,7 +23,13 @@ if selected.empty:
     st.stop()
 
 st.subheader("Monthly Cost Data")
-st.dataframe(selected)
+input_cols = [
+    "city", "month",
+    "campus_job_income", "stipend_income",
+    "rent", "utilities", "food", "transport",
+    "phone_internet", "misc_basic"
+]
+st.dataframe(selected[input_cols])
 
 #calculation
 selected["total_income"] = selected["campus_job_income"] + selected["stipend_income"]
@@ -53,10 +59,22 @@ city_data["balance"] = city_data["total_income"] - city_data["total_expenses"]
 city_data["status"] = city_data["balance"].apply(financial_status)
 
 st.subheader("Financial Summary")
-st.dataframe(selected[["city", "month", "total_income", "total_expenses", "balance", "status"]])
+
+summary = selected[["city", "month", "total_income", "total_expenses", "balance", "status"]].copy()
+
+for col in ["total_income", "total_expenses", "balance"]:
+    summary[col] = summary[col].map(lambda x: f"${x:,.0f}")
+
+st.dataframe(summary)
+csv = selected.to_csv(index=False).encode("utf-8")
+st.download_button(
+    label="Download selected month as CSV",
+    data=csv,
+    file_name=f"{city}_{month}_student_costs.csv",
+    mime="text/csv"
+)
 
 st.subheader("Key Financial Indicators")
-
 
 total_income = selected["total_income"].iloc[0]
 total_expenses = selected["total_expenses"].iloc[0]
@@ -121,10 +139,7 @@ st.plotly_chart(fig2, use_container_width=True)
 #balance_trend_chart
 st.subheader("Balance Trend Over Time")
 
-city_trend = city_data.copy()
-city_trend["month_dt"] = pd.to_datetime(city_trend["month"], format="%Y-%m")
-
-city_trend = city_trend.sort_values("month_dt")
+city_trend = city_data.sort_values("month_dt")
 
 fig3 = px.line(
     city_trend,
