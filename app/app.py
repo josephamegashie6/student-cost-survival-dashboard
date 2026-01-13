@@ -3,11 +3,21 @@ import streamlit as st
 import plotly.express as px
 st.title("International Student Cost Survival Dashboard")
 data = pd.read_csv("data/student_costs.csv")
+
+st.sidebar.header("Filters")
+city = st.sidebar.selectbox("City", sorted(data["city"].unique()))
+month = st.sidebar.selectbox(
+    "Month",
+    sorted(data.loc[data["city"] == city, "month"].unique())
+)
+
+selected = data[(data["city"] == city) & (data["month"] == month)].copy()
+
 st.subheader("Monthly Cost Data")
-st.dataframe(data)
+st.dataframe(selected)
 
 #calculation
-data["total_income"] = data["campus_job_income"] + data["stipend_income"]
+selected["total_income"] = selected["campus_job_income"] + selected["stipend_income"]
 expense_columns = [
   "rent",
   "utilities",
@@ -16,13 +26,13 @@ expense_columns = [
   "phone_internet",
   "misc_basic"]
 
-data["total_expenses"] = data[expense_columns).sum(axis=1)
-data["balance"] = data["total_income"] - data["total_expenses']
+selected["total_expenses"] = selected[expense_columns).sum(axis=1)
+selected["balance"] = selected["total_income"] - selected["total_expenses']
 
 st.subheader("Financial_Summary")
-st.dataframe(data[["city", "month", "total_income", "total_expenses", "balance", "status"]])
+st.dataframe(selected[["city", "month", "total_income", "total_expenses", "balance", "status"]])
 
-data["balance"] = data["total_income"] - data["total_expenses']
+selected["balance"] = selected["total_income"] - selected["total_expenses']
 def financial_status(balance): 
     if balance > 0:
         return "Surplus"
@@ -31,14 +41,14 @@ def financial_status(balance):
     else:
         return "Deficit"
 
-data["status"] = data["balance"].apply(financial_status)
+selected["status"] = selected["balance"].apply(financial_status)
 
 st.subheader("Key Financial Indicators")
 
-total_income = data["total_income"].iloc[0]
-total_expenses = data["total_expenses"].iloc[0]
-balance = data["balance"].iloc[0]
-status = data["status"].iloc[0]
+total_income = selected["total_income"].iloc[0]
+total_expenses = selected["total_expenses"].iloc[0]
+balance = selected["balance"].iloc[0]
+status = selected["status"].iloc[0]
 
 col1, col2, col3 = st.columns(3)
 
