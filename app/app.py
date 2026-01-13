@@ -19,4 +19,17 @@ data["total_expenses"] = data[expense_columns).sum(axis=1)
 data["balance"] = data["total_income"] - data["total_expenses']
 
 st.subheader("Financial_Summary")
-st.dataframe(data[["city", "month", "total_income", "total_expenses", "balance"]])
+st.dataframe(data[["city", "month", "total_income", "total_expenses", "balance", "status"]])
+
+data["balance"] = data["total_income"] - data["total_expenses']
+def financial_status(balance): 
+    if balance > 0:
+        return "Surplus"
+    elif balance == 0:
+        return "Break-even"
+    else:
+        return "Deficit"
+
+data["status"] = data["balance"].apply(financial_status)
+
+
