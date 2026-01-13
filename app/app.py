@@ -32,4 +32,25 @@ def financial_status(balance):
 
 data["status"] = data["balance"].apply(financial_status)
 
+st.subheader("Key Financial Indicators")
+
+total_income = data["total_income"].iloc[0]
+total_expenses = data["total_expenses"].iloc[0]
+balance = data["balance"].iloc[0]
+status = data["status"].iloc[0]
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric("Total Income ($)", f"{total_income:,.0f}")
+col2.metric("Total Expenses ($)", f"{total_expenses:,.0f}")
+col3.metric("Balance ($)", f"{balance:,.0f}")
+
+if status == "Surplus":
+    st.success("Financial Status: SURPLUS — You are financially stable at baseline.")
+elif status == "Break-even":
+    st.warning("Financial Status: BREAK-EVEN — Survival is possible but with no buffer.")
+else:
+    st.error("Financial Status: DEFICIT — Survival requires borrowing or external support.")
+
+
 
