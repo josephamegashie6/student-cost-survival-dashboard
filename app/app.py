@@ -289,7 +289,7 @@ if page == "Calculator":
         
  # TAB 3: CITY COMPARE
 elif page == "City Compare":
-        data = safe_read_csv("data/student_costs.csv")
+    data = safe_read_csv("data/student_costs.csv")
     if data is None:
         st.error("Could not read data/student_costs.csv. Make sure the file path and name are correct.")
         st.stop()
