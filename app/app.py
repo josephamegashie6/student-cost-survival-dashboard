@@ -649,36 +649,46 @@ with tab3:
     st.dataframe(show, use_container_width=True, hide_index=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
+#result row manipulation
+if submitted:
+    # Monthly job income estimate
+    weekly_job_income = (wage * (hours_mon_fri + hours_sat)) + (wage * hours_sun * sunday_multiplier)
+    monthly_job_income = weekly_job_income * weeks_per_month
 
-# Download user input summary
-        result_row = {
-            "city": calc_city,
-            "min_wage": wage,
-            "weeks_per_month": weeks_per_month,
-            "hours_mon_fri": hours_mon_fri,
-            "hours_sat": hours_sat,
-            "hours_sun": hours_sun,
-            "sunday_multiplier": sunday_multiplier,
-            "monthly_job_income_est": monthly_job_income,
-            "stipend": stipend,
-            "total_income": total_income,
-            "total_expenses": total_expenses,
-            "balance": balance,
-            "status": status,
-            "rent": rent,
-            "utilities": utilities,
-            "food": food,
-            "transport": transport,
-            "phone_internet": phone_internet,
-            "misc_basic": misc_basic
-        }
-        out_df = pd.DataFrame([result_row])
-        csv = out_df.to_csv(index=False).encode("utf-8")
+    total_income = monthly_job_income + stipend
+    total_expenses = rent + utilities + food + transport + phone_internet + misc_basic
+    balance = total_income - total_expenses
+    status = financial_status(balance)
 
-        st.download_button(
-            label="⬇️ Download your calculation as CSV",
-            data=csv,
-            file_name=f"{calc_city}_calculator_result.csv",
-            mime="text/csv"
-        )
+    # Download user input summary
+    result_row = {
+        "city": calc_city,
+        "min_wage": wage,
+        "weeks_per_month": weeks_per_month,
+        "hours_mon_fri": hours_mon_fri,
+        "hours_sat": hours_sat,
+        "hours_sun": hours_sun,
+        "sunday_multiplier": sunday_multiplier,
+        "monthly_job_income_est": monthly_job_income,
+        "stipend": stipend,
+        "total_income": total_income,
+        "total_expenses": total_expenses,
+        "balance": balance,
+        "status": status,
+        "rent": rent,
+        "utilities": utilities,
+        "food": food,
+        "transport": transport,
+        "phone_internet": phone_internet,
+        "misc_basic": misc_basic
+    }
 
+    out_df = pd.DataFrame([result_row])
+    csv = out_df.to_csv(index=False).encode("utf-8")
+
+    st.download_button(
+        label="⬇️ Download your calculation as CSV",
+        data=csv,
+        file_name=f"{calc_city}_calculator_result.csv",
+        mime="text/csv"
+    )
