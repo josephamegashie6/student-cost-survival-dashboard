@@ -163,29 +163,29 @@ if page == "Calculator":
         submitted = st.form_submit_button("✅ Calculate")
 
     # ---------- RESULTS: only show after click ----------
-    if not submitted:
-        st.info(
-            "Fill the form above and click **Calculate** to see your budget, charts and download."
-        )
+if not submitted:
+    st.info("Fill the form above and click **Calculate** to see your budget, charts and download.")
+    st.stop()
 
-    else:
-        # Monthly job income estimate
-        weekly_job_income = (wage * (hours_mon_fri + hours_sat)) + (
-            wage * hours_sun * sunday_multiplier
-        )
-        monthly_job_income = weekly_job_income * weeks_per_month
+# Monthly job income estimate
+weekly_job_income = (wage * (hours_mon_fri + hours_sat)) + (
+    wage * hours_sun * sunday_multiplier
+)
+monthly_job_income = weekly_job_income * weeks_per_month
 
-        total_income = monthly_job_income + stipend
-        total_expenses = (
-            rent
-            + utilities
-            + food
-            + transport
-            + phone_internet
-            + misc_basic
-        )
-        balance = total_income - total_expenses
-        status = financial_status(balance)
+total_income = monthly_job_income + stipend
+total_expenses = (
+    rent
+    + utilities
+    + food
+    + transport
+    + phone_internet
+    + misc_basic
+)
+
+balance = total_income - total_expenses
+status = financial_status(balance)
+
 
         # Results cards
         st.markdown("<div class='section-card'>", unsafe_allow_html=True)
@@ -309,6 +309,7 @@ if page == "Calculator":
             data=csv,
             file_name=f"{calc_city}_calculator_result.csv",
             mime="text/csv",
+            key="calc_download_csv",   
         )
         
  # TAB 3: CITY COMPARE
@@ -479,8 +480,6 @@ elif page == "City Compare":
     st.dataframe(show, use_container_width=True, hide_index=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-#result row manipulation
-if submitted:
     # Monthly job income estimate
     weekly_job_income = (wage * (hours_mon_fri + hours_sat)) + (wage * hours_sun * sunday_multiplier)
     monthly_job_income = weekly_job_income * weeks_per_month
@@ -517,10 +516,11 @@ if submitted:
     csv = out_df.to_csv(index=False).encode("utf-8")
 
     st.download_button(
-        label="⬇️ Download your calculation as CSV",
+        label="⬇️ Download city summary",
         data=csv,
-        file_name=f"{calc_city}_calculator_result.csv",
-        mime="text/csv"
+        file_name="city_compare_summary.csv",
+        mime="text/csv",
+        key="city_compare_download_csv",
     )
 
 
