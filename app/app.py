@@ -11,20 +11,143 @@ st.set_page_config(
     layout="wide",
 )
 
+# Fake sidebar icons
+st.markdown("""
+<div class="fake-sidebar">
+  <div class="active">📊</div>
+  <div>📈</div>
+  <div>💵</div>
+  <div>🏠</div>
+  <div>⚙️</div>
+</div>
+""", unsafe_allow_html=True)
+
+# Top bar
+st.markdown("""
+<div class="top-bar">
+  <div class="top-left">
+    <div class="logo-box">SC</div>
+    <div>
+      <div class="top-title">Student Cost Survival</div>
+      <div style="font-size:0.8rem; opacity:0.7;">International Student Dashboard</div>
+    </div>
+  </div>
+  <div style="display:flex; align-items:center; gap:0.6rem;">
+    <span class="tag-pill">My City Plan</span>
+    <span style="font-size:0.9rem; opacity:0.7;">Last updated: today</span>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
+#the styling
+
 st.markdown("""
 <style>
-.block-container {padding-top: 1.2rem; max-width: 1200px;}
-h1, h2, h3 {margin-bottom: 0.4rem;}
-.section-card {
-    padding: 1rem 1.1rem;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 14px;
-    background: rgba(255,255,255,0.03);
-    margin-bottom: 0.8rem;
+.block-container {
+    padding-top: 1.0rem;
+    max-width: 1300px;
 }
+
+/* Top bar */
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.4rem 0.3rem 0.4rem;
+    margin-bottom: 0.4rem;
+}
+.top-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.logo-box {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #2563eb22;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+.top-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+.tag-pill {
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    background: #111827;
+    border: 1px solid #374151;
+}
+
+/* Sidebar icons (fake nav on left) */
+.fake-sidebar {
+    position: fixed;
+    left: 12px;
+    top: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    font-size: 1.1rem;
+    opacity: 0.85;
+}
+.fake-sidebar div {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #020617;
+    border: 1px solid #1f2933;
+}
+.fake-sidebar div.active {
+    background: #111827;
+    border-color: #f97316;
+}
+
+/* Generic card */
+.card {
+    padding: 0.75rem 0.9rem;
+    border-radius: 14px;
+    background: #020617;
+    border: 1px solid #1f2937;
+    margin-bottom: 0.6rem;
+}
+.card h3, .card h4 {
+    margin: 0 0 0.2rem 0;
+}
+
+/* KPI cards */
+.kpi-card {
+    padding: 0.65rem 0.8rem;
+    border-radius: 12px;
+    background: #020617;
+    border: 1px solid #1f2937;
+}
+.kpi-label {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+.kpi-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 0.15rem;
+}
+.kpi-sub {
+    font-size: 0.78rem;
+    opacity: 0.7;
+}
+
+/* Small note */
 .small-note {opacity: 0.75; font-size: 0.9rem;}
 </style>
 """, unsafe_allow_html=True)
+
 
 # -----------------------------
 # Minimum wage defaults (edit these)
@@ -65,7 +188,7 @@ st.title("International Student Cost Survival Dashboard")
 st.markdown("<div class='small-note'>Use the sample dashboard or switch to the calculator to enter your own numbers.</div>", unsafe_allow_html=True)
 st.markdown("</div>", unsafe_allow_html=True)
 
-tab1, tab2 = st.tabs(["📌 Sample Dashboard (CSV)", "🧮 Personal Calculator (Input)"])
+tab1, tab2, tab3 = st.tabs(["📌 Sample Dashboard (CSV)", "🧮 Personal Calculator (Input)", "🌍 City Compare"])
 
 # =========================================================
 # TAB 1: SAMPLE DASHBOARD
@@ -117,85 +240,125 @@ with tab1:
     city_data["balance"] = city_data["total_income"] - city_data["total_expenses"]
     city_data["status"] = city_data["balance"].apply(financial_status)
 
-    # Layout: Data + Summary side-by-side
-    left, right = st.columns([1.4, 1])
+  
+# KPI strip at top (like the template)
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.markdown("#### Overview")
 
-    with left:
-        st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-        st.subheader("Monthly Cost Data")
-        input_cols = ["city","month","campus_job_income","stipend_income"] + expense_columns
-        st.dataframe(selected[input_cols], use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+k1, k2, k3, k4 = st.columns(4)
+with k1:
+    st.markdown("<div class='kpi-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='kpi-label'>Monthly Income</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='kpi-value'>{money(total_income)}</div>", unsafe_allow_html=True)
+    st.markdown("<div class='kpi-sub'>Campus job + stipend</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    with right:
-        st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-        st.subheader("Key Indicators")
-        total_income = float(selected["total_income"].iloc[0])
-        total_expenses = float(selected["total_expenses"].iloc[0])
-        balance = float(selected["balance"].iloc[0])
-        status = selected["status"].iloc[0]
+with k2:
+    st.markdown("<div class='kpi-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='kpi-label'>Essential Expenses</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='kpi-value'>{money(total_expenses)}</div>", unsafe_allow_html=True)
+    st.markdown("<div class='kpi-sub'>Rent, utilities, food, etc.</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-        m1, m2, m3 = st.columns(3)
-        m1.metric("Income", money(total_income))
-        m2.metric("Expenses", money(total_expenses))
-        m3.metric("Balance", money(balance))
+with k3:
+    st.markdown("<div class='kpi-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='kpi-label'>Balance</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='kpi-value'>{money(balance)}</div>", unsafe_allow_html=True)
+    st.markdown("<div class='kpi-sub'>Income minus essentials</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-        if status == "Surplus":
-            st.success("SURPLUS — You have buffer after essentials.")
-        elif status == "Break-even":
-            st.warning("BREAK-EVEN — You’re surviving, but no buffer.")
-        else:
-            st.error("DEFICIT — You’ll likely need support or expense cuts.")
-        st.markdown("</div>", unsafe_allow_html=True)
+with k4:
+    st.markdown("<div class='kpi-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='kpi-label'>Status</div>", unsafe_allow_html=True)
+    color = "#22c55e" if status == "Surplus" else ("#eab308" if status == "Break-even" else "#ef4444")
+    st.markdown(f"<div class='kpi-value' style='color:{color};'>{status}</div>", unsafe_allow_html=True)
+    tip = "You have buffer after essentials." if status == "Surplus" else (
+        "You are surviving with no buffer." if status == "Break-even" else "You need support or cuts."
+    )
+    st.markdown(f"<div class='kpi-sub'>{tip}</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-        st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-        st.subheader("Download")
-        csv = selected.to_csv(index=False).encode("utf-8")
-        st.download_button(
-            label="Download selected month as CSV",
-            data=csv,
-            file_name=f"{city}_{month}_student_costs.csv",
-            mime="text/csv"
-        )
-        st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
-    # Charts row
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.subheader("Charts")
+# Second row: table on left, download + note on right
+row1_left, row1_right = st.columns([1.5, 1])
 
+with row1_left:
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.markdown("#### Monthly Cost Data")
+    input_cols = ["city","month","campus_job_income","stipend_income"] + expense_columns
+    st.dataframe(selected[input_cols], use_container_width=True, hide_index=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+with row1_right:
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.markdown("#### Download")
+    csv = selected.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        label="Download this month as CSV",
+        data=csv,
+        file_name=f"{city}_{month}_student_costs.csv",
+        mime="text/csv"
+    )
+    st.markdown("<div class='small-note'>Use this file for your own analysis or to compare cities.</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# Charts row
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.markdown("#### Charts")
+st.markdown("</div>", unsafe_allow_html=True)
+
+c_row1, c_row2 = st.container(), st.container()
+
+with c_row1:
     ch1, ch2 = st.columns(2)
-
     with ch1:
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
         comparison_df = pd.DataFrame({
             "Category": ["Total Income", "Total Expenses"],
             "Amount": [total_income, total_expenses]
         })
         fig = px.bar(comparison_df, x="Category", y="Amount", text="Amount",
-                     title="Monthly Income vs Essential Expenses")
+                     title="Income vs Essential Expenses")
         fig.update_traces(texttemplate="$%{text:,.0f}", textposition="outside")
         fig.update_layout(yaxis_title="USD", xaxis_title="")
         st.plotly_chart(fig, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
     with ch2:
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
         expense_breakdown = pd.DataFrame({
             "Expense": expense_columns,
             "Amount": [float(selected[col].iloc[0]) for col in expense_columns]
         })
-        fig2 = px.bar(expense_breakdown, x="Expense", y="Amount", text="Amount",
-                      title="Monthly Essential Expense Breakdown")
-        fig2.update_traces(texttemplate="$%{text:,.0f}", textposition="outside")
-        fig2.update_layout(yaxis_title="USD", xaxis_title="")
+        fig2 = px.pie(
+            expense_breakdown,
+            names="Expense",
+            values="Amount",
+            title="Expense Breakdown"
+        )
         st.plotly_chart(fig2, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    # Trend chart full width
-    city_data["month_dt"] = pd.to_datetime(city_data["month"], format="%Y-%m", errors="coerce")
-    city_trend = city_data.sort_values("month_dt")
-    fig3 = px.line(city_trend, x="month_dt", y="balance", markers=True,
-                   title=f"Monthly Balance Trend - {city}")
-    fig3.update_layout(xaxis_title="Month", yaxis_title="Balance (USD)")
-    st.plotly_chart(fig3, use_container_width=True)
+with c_row2:
+    ch3, ch4 = st.columns([2, 1])
+    with ch3:
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        city_data["month_dt"] = pd.to_datetime(city_data["month"], format="%Y-%m", errors="coerce")
+        city_trend = city_data.sort_values("month_dt")
+        fig3 = px.line(city_trend, x="month_dt", y="balance", markers=True,
+                       title=f"Monthly Balance Trend - {city}")
+        fig3.update_layout(xaxis_title="Month", yaxis_title="Balance (USD)")
+        st.plotly_chart(fig3, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    with ch4:
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.markdown("##### Quick View")
+        st.write(f"- Best month balance: {money(city_trend['balance'].max())}")
+        st.write(f"- Worst month balance: {money(city_trend['balance'].min())}")
+        st.write(f"- Average balance: {money(city_trend['balance'].mean())}")
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================================================
 # TAB 2: PERSONAL CALCULATOR (USER INPUT)
@@ -264,7 +427,7 @@ with tab2:
         status = financial_status(balance)
 
         # Results cards
-        st.markdown("<div class='section-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.subheader("Results")
 
         r1, r2, r3, r4 = st.columns([1, 1, 1, 1])
@@ -315,7 +478,179 @@ with tab2:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # Download user input summary
+# =========================================================
+# TAB 3: CITY COMPARE (GA-style cards)
+# =========================================================
+with tab3:
+    data = safe_read_csv("data/student_costs.csv")
+    if data is None:
+        st.error("Could not read data/student_costs.csv. Make sure the file path and name are correct.")
+        st.stop()
+
+    required_cols = {"city", "month", "campus_job_income", "stipend_income", "rent", "utilities", "food",
+                     "transport", "phone_internet", "misc_basic"}
+    missing = required_cols - set(data.columns)
+    if missing:
+        st.error(f"Your CSV is missing these columns: {sorted(list(missing))}")
+        st.stop()
+
+    # Prep
+    expense_columns = ["rent", "utilities", "food", "transport", "phone_internet", "misc_basic"]
+    data["month_dt"] = pd.to_datetime(data["month"], format="%Y-%m", errors="coerce")
+    data["total_income"] = data["campus_job_income"] + data["stipend_income"]
+    data["total_expenses"] = data[expense_columns].sum(axis=1)
+    data["balance"] = data["total_income"] - data["total_expenses"]
+    data["status"] = data["balance"].apply(financial_status)
+
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("City Compare")
+    st.markdown("<div class='small-note'>Compare cities across a selected month range using GA-style KPI tiles.</div>",
+                unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # Filters
+    min_dt = data["month_dt"].min()
+    max_dt = data["month_dt"].max()
+    if pd.isna(min_dt) or pd.isna(max_dt):
+        st.error("Month parsing failed. Ensure month column is in YYYY-MM format.")
+        st.stop()
+
+    cities = sorted(data["city"].dropna().unique().tolist())
+
+    f1, f2, f3 = st.columns([1.4, 1.3, 1.3])
+    with f1:
+        compare_cities = st.multiselect("Cities to compare", cities, default=cities[:2] if len(cities) >= 2 else cities)
+    with f2:
+        start_month = st.selectbox(
+            "Start month",
+            sorted(data["month"].unique()),
+            index=0
+        )
+    with f3:
+        end_month = st.selectbox(
+            "End month",
+            sorted(data["month"].unique()),
+            index=len(sorted(data["month"].unique())) - 1
+        )
+
+    if not compare_cities:
+        st.warning("Select at least one city.")
+        st.stop()
+
+    start_dt = pd.to_datetime(start_month, format="%Y-%m", errors="coerce")
+    end_dt = pd.to_datetime(end_month, format="%Y-%m", errors="coerce")
+
+    if pd.isna(start_dt) or pd.isna(end_dt):
+        st.error("Start/end month parsing failed. Use YYYY-MM.")
+        st.stop()
+
+    if start_dt > end_dt:
+        st.error("Start month cannot be after end month.")
+        st.stop()
+
+    filt = data[
+        (data["city"].isin(compare_cities)) &
+        (data["month_dt"] >= start_dt) &
+        (data["month_dt"] <= end_dt)
+    ].copy()
+
+    if filt.empty:
+        st.warning("No rows found for the selected cities and month range.")
+        st.stop()
+
+    # GA-style KPI tiles per city (Avg per month over the selected range)
+    summary = (
+        filt.groupby("city", as_index=False)
+            .agg(
+                avg_income=("total_income", "mean"),
+                avg_expenses=("total_expenses", "mean"),
+                avg_balance=("balance", "mean"),
+                months=("month", "nunique")
+            )
+    )
+
+    # Add "savings rate" style metric
+    summary["savings_rate"] = summary.apply(
+        lambda r: (r["avg_balance"] / r["avg_income"]) if r["avg_income"] else 0.0, axis=1
+    )
+
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.markdown("#### KPI Tiles (Average per month)")
+    cols = st.columns(min(4, len(summary)))  # up to 4 tiles in one row
+    for i, row in summary.iterrows():
+        col = cols[i % len(cols)]
+        with col:
+            st.markdown("<div class='kpi-card'>", unsafe_allow_html=True)
+            st.markdown(f"<div class='kpi-label'>{row['city']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='kpi-value'>{money(row['avg_balance'])}</div>", unsafe_allow_html=True)
+            st.markdown(
+                f"<div class='kpi-sub'>Avg income {money(row['avg_income'])} • Avg expenses {money(row['avg_expenses'])}</div>",
+                unsafe_allow_html=True
+            )
+            st.markdown(
+                f"<div class='kpi-sub'>Months: {int(row['months'])} • Savings rate: {row['savings_rate']*100:.1f}%</div>",
+                unsafe_allow_html=True
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # Charts: Balance trend + expense mix like GA donut
+    c1, c2 = st.columns([1.6, 1.0])
+
+    with c1:
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.markdown("#### Balance Trend (by city)")
+        trend = (
+            filt.groupby(["month_dt", "city"], as_index=False)
+                .agg(balance=("balance", "mean"))
+                .sort_values(["month_dt", "city"])
+        )
+        fig = px.line(trend, x="month_dt", y="balance", color="city", markers=True)
+        fig.update_layout(xaxis_title="Month", yaxis_title="Balance (USD)")
+        st.plotly_chart(fig, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with c2:
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.markdown("#### Expense Mix (selected range)")
+        exp_mix = (
+            filt.groupby("city", as_index=False)[expense_columns]
+                .sum()
+        )
+
+        # Choose which city to view the donut for
+        donut_city = st.selectbox("Donut city", compare_cities, index=0)
+        row = exp_mix[exp_mix["city"] == donut_city]
+        if not row.empty:
+            amounts = [float(row[col].iloc[0]) for col in expense_columns]
+            donut_df = pd.DataFrame({"Expense": expense_columns, "Amount": amounts})
+            fig2 = px.pie(donut_df, names="Expense", values="Amount", hole=0.55)
+            fig2.update_layout(title=f"{donut_city}: Total expenses by category")
+            st.plotly_chart(fig2, use_container_width=True)
+        else:
+            st.info("No expense data for donut.")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # Table comparison (GA-style “top cities” table)
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.markdown("#### Compare Table")
+    show = summary.sort_values("avg_balance", ascending=False).copy()
+    show["avg_income"] = show["avg_income"].round(0)
+    show["avg_expenses"] = show["avg_expenses"].round(0)
+    show["avg_balance"] = show["avg_balance"].round(0)
+    show["savings_rate"] = (show["savings_rate"] * 100).round(1)
+    show = show.rename(columns={
+        "avg_income": "Avg Income",
+        "avg_expenses": "Avg Expenses",
+        "avg_balance": "Avg Balance",
+        "months": "Months",
+        "savings_rate": "Savings Rate (%)"
+    })
+    st.dataframe(show, use_container_width=True, hide_index=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+# Download user input summary
         result_row = {
             "city": calc_city,
             "min_wage": wage,
@@ -346,9 +681,4 @@ with tab2:
             file_name=f"{calc_city}_calculator_result.csv",
             mime="text/csv"
         )
-
-
-
-
-
 
