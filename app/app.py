@@ -40,7 +40,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 #the styling
-
 st.markdown("""
 <style>
 .block-container {
@@ -149,9 +148,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# -----------------------------
-# Minimum wage defaults (edit these)
-# -----------------------------
+
+# Minimum wage defaults 
 CITY_MIN_WAGE = {
     "Saint Louis": 12.30,   # example placeholder (you can update)
     "Chicago": 15.80,
@@ -161,9 +159,8 @@ CITY_MIN_WAGE = {
 
 DEFAULT_CITY = "Saint Louis" if "Saint Louis" in CITY_MIN_WAGE else list(CITY_MIN_WAGE.keys())[0]
 
-# -----------------------------
+
 # Helpers
-# -----------------------------
 def financial_status(balance: float) -> str:
     if balance > 0:
         return "Surplus"
@@ -180,9 +177,8 @@ def safe_read_csv(path: str):
     except Exception:
         return None
 
-# -----------------------------
+
 # Title
-# -----------------------------
 st.markdown("<div class='section-card'>", unsafe_allow_html=True)
 st.title("International Student Cost Survival Dashboard")
 st.markdown("<div class='small-note'>Use the sample dashboard or switch to the calculator to enter your own numbers.</div>", unsafe_allow_html=True)
@@ -190,9 +186,8 @@ st.markdown("</div>", unsafe_allow_html=True)
 
 tab1, tab2, tab3 = st.tabs(["📌 Sample Dashboard (CSV)", "🧮 Personal Calculator (Input)", "🌍 City Compare"])
 
-# =========================================================
+
 # TAB 1: SAMPLE DASHBOARD
-# =========================================================
 with tab1:
     data = safe_read_csv("data/student_costs.csv")
 
@@ -324,12 +319,28 @@ with c_row1:
             "Category": ["Total Income", "Total Expenses"],
             "Amount": [total_income, total_expenses]
         })
-        fig = px.bar(comparison_df, x="Category", y="Amount", text="Amount",
-                     title="Income vs Essential Expenses")
-        fig.update_traces(texttemplate="$%{text:,.0f}", textposition="outside")
-        fig.update_layout(yaxis_title="USD", xaxis_title="")
-        st.plotly_chart(fig, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        fig = px.bar(
+    comparison_df,
+    x="Category",
+    y="Amount",
+    text="Amount",
+    title="Income vs Essential Expenses"
+)
+
+# Show labels above bars and keep them visible
+fig.update_traces(
+    texttemplate="$%{text:,.0f}",
+    textposition="outside",
+    cliponaxis=False          
+)
+
+# Add some headroom so labels are not cut off
+max_val = max(total_income, total_expenses)
+fig.update_yaxes(range=[0, max_val * 1.25])
+
+fig.update_layout(yaxis_title="USD", xaxis_title="")
+st.plotly_chart(fig, use_container_width=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
     with ch2:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -366,9 +377,8 @@ with c_row2:
         st.write(f"- Average balance: {money(city_trend['balance'].mean())}")
         st.markdown("</div>", unsafe_allow_html=True)
 
-# =========================================================
+
 # TAB 2: PERSONAL CALCULATOR (USER INPUT)
-# =========================================================
 with tab2:
     st.markdown("<div class='section-card'>", unsafe_allow_html=True)
     st.subheader("Enter your details (no constant rerun)")
@@ -484,9 +494,9 @@ with tab2:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-# =========================================================
-# TAB 3: CITY COMPARE (GA-style cards)
-# =========================================================
+
+# TAB 3: CITY COMPARE 
+
 with tab3:
     data = safe_read_csv("data/student_costs.csv")
     if data is None:
