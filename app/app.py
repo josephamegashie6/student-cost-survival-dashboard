@@ -240,6 +240,12 @@ with tab1:
     city_data["balance"] = city_data["total_income"] - city_data["total_expenses"]
     city_data["status"] = city_data["balance"].apply(financial_status)
 
+total_income = float(selected["total_income"].iat[0])
+total_expenses = float(selected["total_expenses"].iloc[0])
+balance = float(selected["balance"].iloc[0])
+status = selected["status"].iloc[0]
+
+
   
 # KPI strip at top (like the template)
 st.markdown("<div class='card'>", unsafe_allow_html=True)
