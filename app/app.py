@@ -380,59 +380,22 @@ with c_row2:
 
 # TAB 2: PERSONAL CALCULATOR (USER INPUT)
 with tab2:
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("Enter your details (no constant rerun)")
-    st.markdown("<div class='small-note'>Fill the form and click <b>Calculate</b>. We use City minimum wage to estimate job income.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='small-note'>Fill the form and click <b>Calculate</b>. "
+                "We use City minimum wage to estimate job income.</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Put inputs in a form so it only updates on button click
+    # --- FORM (inputs only) ---
     with st.form("calculator_form"):
-        top1, top2, top3 = st.columns([1.2, 1, 1])
-
-        with top1:
-            calc_city = st.selectbox("City", list(CITY_MIN_WAGE.keys()), index=list(CITY_MIN_WAGE.keys()).index(DEFAULT_CITY))
-        with top2:
-            min_wage = CITY_MIN_WAGE.get(calc_city, 15.0)
-            wage = st.number_input("Minimum wage ($/hour)", min_value=0.0, value=float(min_wage), step=0.25)
-        with top3:
-            # This is how many weeks per month on average
-            weeks_per_month = st.number_input("Weeks per month", min_value=3.0, max_value=5.0, value=4.33, step=0.01)
-
-        st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-        st.markdown("### Work hours (weekly)")
-        h1, h2, h3, h4 = st.columns(4)
-        with h1:
-            hours_mon_fri = st.number_input("Hours Mon–Fri (total)", min_value=0.0, value=20.0, step=1.0)
-        with h2:
-            hours_sat = st.number_input("Hours Saturday", min_value=0.0, value=0.0, step=1.0)
-        with h3:
-            hours_sun = st.number_input("Hours Sunday", min_value=0.0, value=0.0, step=1.0)
-        with h4:
-            sunday_multiplier = st.number_input("Sunday pay multiplier", min_value=1.0, value=1.0, step=0.25)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-        st.markdown("### Other monthly income")
-        stipend = st.number_input("Monthly stipend / support ($)", min_value=0.0, value=0.0, step=50.0)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-        st.markdown("### Monthly expenses")
-        e1, e2, e3 = st.columns(3)
-        with e1:
-            rent = st.number_input("Rent ($)", min_value=0.0, value=850.0, step=25.0)
-            utilities = st.number_input("Utilities ($)", min_value=0.0, value=120.0, step=10.0)
-        with e2:
-            food = st.number_input("Food ($)", min_value=0.0, value=350.0, step=10.0)
-            transport = st.number_input("Transport ($)", min_value=0.0, value=90.0, step=10.0)
-        with e3:
-            phone_internet = st.number_input("Phone/Internet ($)", min_value=0.0, value=60.0, step=10.0)
-            misc_basic = st.number_input("Misc basics ($)", min_value=0.0, value=130.0, step=10.0)
-        st.markdown("</div>", unsafe_allow_html=True)
-
+        # all your inputs here (city, wage, weeks_per_month, hours, expenses...)
+        # ...
         submitted = st.form_submit_button("✅ Calculate")
 
-    if submitted:
+    # --- RESULTS ONLY AFTER CLICK ---
+    if not submitted:
+        st.info("Fill the form above and click **Calculate** to see your budget, charts and download.")
+    else:
         # Monthly job income estimate
         weekly_job_income = (wage * (hours_mon_fri + hours_sat)) + (wage * hours_sun * sunday_multiplier)
         monthly_job_income = weekly_job_income * weeks_per_month
@@ -465,8 +428,8 @@ with tab2:
             st.error("DEFICIT — You’ll likely need support or expense cuts.")
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # Charts
-        st.markdown("<div class='section-card'>", unsafe_allow_html=True)
+        # Charts (only after submitted)
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.subheader("Charts")
 
         ch1, ch2 = st.columns(2)
@@ -475,9 +438,20 @@ with tab2:
                 "Category": ["Total Income", "Total Expenses"],
                 "Amount": [total_income, total_expenses]
             })
-            fig = px.bar(comparison_df, x="Category", y="Amount", text="Amount",
-                         title="Income vs Essential Expenses")
-            fig.update_traces(texttemplate="$%{text:,.0f}", textposition="outside")
+            fig = px.bar(
+                comparison_df,
+                x="Category",
+                y="Amount",
+                text="Amount",
+                title="Income vs Essential Expenses"
+            )
+            fig.update_traces(
+                texttemplate="$%{text:,.0f}",
+                textposition="outside",
+                cliponaxis=False,
+            )
+            max_val = max(total_income, total_expenses)
+            fig.update_yaxes(range=[0, max_val * 1.25])
             fig.update_layout(yaxis_title="USD", xaxis_title="")
             st.plotly_chart(fig, use_container_width=True)
 
@@ -486,13 +460,57 @@ with tab2:
                 "Expense": ["rent","utilities","food","transport","phone_internet","misc_basic"],
                 "Amount": [rent, utilities, food, transport, phone_internet, misc_basic]
             })
-            fig2 = px.bar(exp_df, x="Expense", y="Amount", text="Amount",
-                          title="Expense Breakdown")
-            fig2.update_traces(texttemplate="$%{text:,.0f}", textposition="outside")
+            fig2 = px.bar(
+                exp_df,
+                x="Expense",
+                y="Amount",
+                text="Amount",
+                title="Expense Breakdown"
+            )
+            fig2.update_traces(
+                texttemplate="$%{text:,.0f}",
+                textposition="outside",
+                cliponaxis=False,
+            )
+            max_exp = max(exp_df["Amount"])
+            fig2.update_yaxes(range=[0, max_exp * 1.25])
             fig2.update_layout(yaxis_title="USD", xaxis_title="")
             st.plotly_chart(fig2, use_container_width=True)
 
         st.markdown("</div>", unsafe_allow_html=True)
+
+        # Download user input summary (also only after submit)
+        result_row = {
+            "city": calc_city,
+            "min_wage": wage,
+            "weeks_per_month": weeks_per_month,
+            "hours_mon_fri": hours_mon_fri,
+            "hours_sat": hours_sat,
+            "hours_sun": hours_sun,
+            "sunday_multiplier": sunday_multiplier,
+            "monthly_job_income_est": monthly_job_income,
+            "stipend": stipend,
+            "total_income": total_income,
+            "total_expenses": total_expenses,
+            "balance": balance,
+            "status": status,
+            "rent": rent,
+            "utilities": utilities,
+            "food": food,
+            "transport": transport,
+            "phone_internet": phone_internet,
+            "misc_basic": misc_basic
+        }
+        out_df = pd.DataFrame([result_row])
+        csv = out_df.to_csv(index=False).encode("utf-8")
+
+        st.download_button(
+            label="⬇️ Download your calculation as CSV",
+            data=csv,
+            file_name=f"{calc_city}_calculator_result.csv",
+            mime="text/csv"
+        )
+
 
 
 # TAB 3: CITY COMPARE 
