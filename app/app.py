@@ -342,7 +342,7 @@ fig.update_layout(yaxis_title="USD", xaxis_title="")
 st.plotly_chart(fig, use_container_width=True)
 st.markdown("</div>", unsafe_allow_html=True)
 
-    with ch2:
+with ch2:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
         expense_breakdown = pd.DataFrame({
             "Expense": expense_columns,
