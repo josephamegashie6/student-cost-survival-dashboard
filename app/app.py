@@ -43,7 +43,7 @@ st.markdown("""
 # MAIN PAGE CONTENT
 # TAB 2: PERSONAL CALCULATOR (USER INPUT)
 if page == "Calculator":
-with tab2:
+    with tab2:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("Enter your details (no constant rerun)")
     st.markdown("<div class='small-note'>Fill the form and click <b>Calculate</b>. "
