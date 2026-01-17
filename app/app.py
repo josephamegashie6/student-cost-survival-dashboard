@@ -10,6 +10,30 @@ st.set_page_config(
     layout="wide",
 )
 
+CITY_MIN_WAGE = {
+    "Saint Louis": 12.30,
+    "Chicago": 15.80,
+    "New York City": 16.00,
+    "Los Angeles": 16.90,
+}
+DEFAULT_CITY = "Saint Louis"
+
+def financial_status(balance: float) -> str:
+    if balance > 0:
+        return "Surplus"
+    elif balance == 0:
+        return "Break-even"
+    return "Deficit"
+
+def money(x: float) -> str:
+    return f"${x:,.0f}"
+
+def safe_read_csv(path: str):
+    try:
+        return pd.read_csv(path)
+    except Exception:
+        return None
+
 # ✅ CSS styles
 st.markdown("""<style>...your css here...</style>""", unsafe_allow_html=True)
 
