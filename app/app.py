@@ -162,53 +162,55 @@ if page == "Calculator":
         # 🔘 form submit button – this must be INSIDE the form
         submitted = st.form_submit_button("✅ Calculate")
 
-    # ---------- RESULTS: only show after click ----------
+# ---------- RESULTS: only show after click ----------
 if not submitted:
-    st.info("Fill the form above and click **Calculate** to see your budget, charts and download.")
+    st.info(
+        "Fill the form above and click **Calculate** to see your budget, charts and download."
+    )
     st.stop()
 
-# Monthly job income estimate
-weekly_job_income = (wage * (hours_mon_fri + hours_sat)) + (
-    wage * hours_sun * sunday_multiplier
-)
-monthly_job_income = weekly_job_income * weeks_per_month
+else:
+    # Monthly job income estimate
+    weekly_job_income = (wage * (hours_mon_fri + hours_sat)) + (
+        wage * hours_sun * sunday_multiplier
+    )
+    monthly_job_income = weekly_job_income * weeks_per_month
 
-total_income = monthly_job_income + stipend
-total_expenses = (
-    rent
-    + utilities
-    + food
-    + transport
-    + phone_internet
-    + misc_basic
-)
+    total_income = monthly_job_income + stipend
+    total_expenses = (
+        rent
+        + utilities
+        + food
+        + transport
+        + phone_internet
+        + misc_basic
+    )
 
-balance = total_income - total_expenses
-status = financial_status(balance)
+    balance = total_income - total_expenses
+    status = financial_status(balance)
 
+    # ✅ Results cards (THIS MUST BE INDENTED)
+    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
+    st.subheader("Results")
 
-        # Results cards
-        st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-        st.subheader("Results")
+    r1, r2, r3, r4 = st.columns([1, 1, 1, 1])
+    r1.metric("City", calc_city)
+    r2.metric("Min wage", f"${wage:.2f}/hr")
+    r3.metric("Monthly job income (est.)", money(monthly_job_income))
+    r4.metric("Monthly stipend", money(stipend))
 
-        r1, r2, r3, r4 = st.columns([1, 1, 1, 1])
-        r1.metric("City", calc_city)
-        r2.metric("Min wage", f"${wage:,.2f}/hr")
-        r3.metric("Monthly job income (est.)", money(monthly_job_income))
-        r4.metric("Monthly stipend", money(stipend))
+    k1, k2, k3 = st.columns(3)
+    k1.metric("Total Income", money(total_income))
+    k2.metric("Total Expenses", money(total_expenses))
+    k3.metric("Balance", money(balance))
 
-        k1, k2, k3 = st.columns(3)
-        k1.metric("Total Income", money(total_income))
-        k2.metric("Total Expenses", money(total_expenses))
-        k3.metric("Balance", money(balance))
-
-        if status == "Surplus":
-            st.success("SURPLUS — You have buffer after essentials.")
-        elif status == "Break-even":
-            st.warning("BREAK-EVEN — You’re surviving, but no buffer.")
-        else:
-            st.error("DEFICIT — You’ll likely need support or expense cuts.")
-        st.markdown("</div>", unsafe_allow_html=True)
+if status == "Surplus":
+    st.success("SURPLUS – You have buffer after essentials.")
+elif status == "Break-even":
+    st.warning("BREAK-EVEN – You’re surviving, but no buffer.")
+else:
+    st.error("DEFICIT – You’ll likely need support or expense cuts.")
+    st.markdown("</div>", unsafe_allow_html=True)
 
         # Charts
         st.markdown("<div class='section-card'>", unsafe_allow_html=True)
