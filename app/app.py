@@ -44,11 +44,11 @@ st.markdown("""
 # TAB 2: PERSONAL CALCULATOR (USER INPUT)
 if page == "Calculator":
     with tab2:
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("Enter your details (no constant rerun)")
-    st.markdown("<div class='small-note'>Fill the form and click <b>Calculate</b>. "
-                "We use City minimum wage to estimate job income.</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.subheader("Enter your details (no constant rerun)")
+        st.markdown("<div class='small-note'>Fill the form and click <b>Calculate</b>. "
+                    "We use City minimum wage to estimate job income.</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # --- FORM (inputs only) ---
     with st.form("calculator_form"):
@@ -177,15 +177,14 @@ if page == "Calculator":
         
  # TAB 3: CITY COMPARE
 elif page == "City Compare":
-with tab3:
-    data = safe_read_csv("data/student_costs.csv")
+    with tab3:
+        data = safe_read_csv("data/student_costs.csv")
     if data is None:
         st.error("Could not read data/student_costs.csv. Make sure the file path and name are correct.")
         st.stop()
-
-    required_cols = {"city", "month", "campus_job_income", "stipend_income", "rent", "utilities", "food",
+        required_cols = {"city", "month", "campus_job_income", "stipend_income", "rent", "utilities", "food",
                      "transport", "phone_internet", "misc_basic"}
-    missing = required_cols - set(data.columns)
+        missing = required_cols - set(data.columns)
     if missing:
         st.error(f"Your CSV is missing these columns: {sorted(list(missing))}")
         st.stop()
