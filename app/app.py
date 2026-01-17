@@ -312,15 +312,15 @@ with ch1:
             key="calc_download_csv",   
         )
         
- # TAB 3: CITY COMPARE
+# TAB 3: CITY COMPARE
 elif page == "City Compare":
-    data = safe_read_csv("data/student_costs.csv")
-    if data is None:
-        st.error("Could not read data/student_costs.csv. Make sure the file path and name are correct.")
-        st.stop()
-        required_cols = {"city", "month", "campus_job_income", "stipend_income", "rent", "utilities", "food",
+data = safe_read_csv("data/student_costs.csv")
+if data is None:
+    st.error("Could not read data/student_costs.csv. Make sure the file path and name are correct.")
+    st.stop()
+    required_cols = {"city", "month", "campus_job_income", "stipend_income", "rent", "utilities", "food",
                      "transport", "phone_internet", "misc_basic"}
-        missing = required_cols - set(data.columns)
+    missing = required_cols - set(data.columns)
     if missing:
         st.error(f"Your CSV is missing these columns: {sorted(list(missing))}")
         st.stop()
