@@ -313,7 +313,7 @@ with ch1:
         )
         
 # TAB 3: CITY COMPARE
-elif page == "City Compare":
+    elif page == "City Compare":
 
     data = safe_read_csv("data/student_costs.csv")
 
