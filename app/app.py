@@ -4,9 +4,30 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-
-# If you use option_menu, keep this import too:
 from streamlit_option_menu import option_menu
+from datetime import date, timedelta
+
+# ---------------------------------------
+# SESSION DEFAULTS (GLOBAL SNAPSHOT)
+# ---------------------------------------
+if "status" not in st.session_state:
+    st.session_state["status"] = "Unknown"
+if "balance" not in st.session_state:
+    st.session_state["balance"] = 0.0
+if "context_city" not in st.session_state:
+    st.session_state["context_city"] = "-"
+
+# goal settings for "My Plan"
+if "goal_amount" not in st.session_state:
+    st.session_state["goal_amount"] = 1000.0
+if "goal_deadline" not in st.session_state:
+    st.session_state["goal_deadline"] = date.today() + timedelta(days=90)
+
+# City Compare sidebar controls
+if "compare_metric" not in st.session_state:
+    st.session_state["compare_metric"] = "Balance"
+if "month_preset" not in st.session_state:
+    st.session_state["month_preset"] = "All data"
 
 
 # =========================================================
@@ -98,10 +119,11 @@ def safe_read_csv(path: str):
         return None
 
 
-# =========================================================
-# 5) SIDEBAR NAVIGATION (this replaces tabs)
-# =========================================================
+# ---------------------------------------
+# SIDEBAR: NAV + SNAPSHOT + PAGE CONTROLS
+# ---------------------------------------
 with st.sidebar:
+    # Main nav
     st.markdown("### Student Cost Survival")
     page = option_menu(
         menu_title=None,
@@ -109,6 +131,73 @@ with st.sidebar:
         icons=["calculator", "globe2", "wallet2", "gear"],
         default_index=0,
     )
+
+    st.markdown("---")
+
+    # 🔍 Global snapshot (from last calculation)
+    st.markdown("#### My Snapshot")
+    status = st.session_state["status"]
+    balance = st.session_state["balance"]
+    city = st.session_state["context_city"]
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Status", status)
+    with col2:
+        st.metric("Balance / month", f"${balance:,.0f}")
+
+    st.caption(f"Based on last calculator run (city: {city})")
+
+    # Dynamic quick tips
+    if status == "Surplus":
+        st.success("Tip: Start building a buffer or short-term savings goal.")
+    elif status == "Break-even":
+        st.warning("Tip: Try to reduce one small category (food/misc) to build buffer.")
+    elif status == "Deficit":
+        st.error("Tip: Check rent + misc. Even $40 cut can flip you positive.")
+    else:
+        st.info("Run the Calculator to see your status.")
+
+    st.markdown("---")
+
+    # 🔁 Page-specific sidebar controls
+    if page == "City Compare":
+        st.markdown("#### Compare settings")
+
+        st.session_state["compare_metric"] = st.selectbox(
+            "Compare by",
+            ["Balance", "Rent pressure", "Food cost", "Transport cost"],
+            key="compare_metric",
+        )
+
+        st.session_state["month_preset"] = st.radio(
+            "Month range",
+            ["All data", "Last 3 months", "Last 6 months"],
+            key="month_preset",
+        )
+
+    elif page == "My Plan":
+        st.markdown("#### Savings goal")
+
+        st.session_state["goal_amount"] = st.number_input(
+            "Goal amount ($)",
+            min_value=0.0,
+            step=50.0,
+            value=st.session_state["goal_amount"],
+            key="goal_amount",
+        )
+
+        st.session_state["goal_deadline"] = st.date_input(
+            "Goal deadline",
+            value=st.session_state["goal_deadline"],
+            key="goal_deadline",
+        )
+
+        st.caption("Use the Calculator first so this plan can use your real balance.")
+
+    elif page == "Settings":
+        st.markdown("#### Preferences (future)")
+        st.info("Here you can later add currency, default weeks/month, wage presets, etc.")
 
 
 # =========================================================
@@ -211,6 +300,10 @@ if page == "Calculator":
         total_expenses = rent + utilities + food + transport + phone_internet + misc_basic
         balance = total_income - total_expenses
         status = financial_status(balance)
+        st.session_state["status"] = status
+        st.session_state["balance"] = float(balance)
+        st.session_state["context_city"] = calc_city
+    
 
         # Results cards
         st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -453,7 +546,60 @@ elif page == "City Compare":
 # ---------------------------------------------------------
 elif page == "My Plan":
     st.subheader("My Plan")
-    st.info("Savings goals, budgets, and plans coming soon.")
+
+    goal_amount = st.session_state["goal_amount"]
+    deadline = st.session_state["goal_deadline"]
+    monthly_balance = st.session_state["balance"]
+    today = date.today()
+
+    days_left = max((deadline - today).days, 1)
+    weeks_left = days_left / 7
+
+    # simple target: how much per week to hit the goal
+    weekly_target = goal_amount / weeks_left
+
+    st.markdown("#### Goal summary")
+    g1, g2, g3 = st.columns(3)
+    with g1:
+        st.metric("Goal", f"${goal_amount:,.0f}")
+    with g2:
+        st.metric("Weeks left", f"{weeks_left:,.1f}")
+    with g3:
+        st.metric("Target / week", f"${weekly_target:,.0f}")
+
+    st.markdown("---")
+
+    st.markdown("#### Am I on track?")
+
+    # Rough check: assume monthly_balance is what you can save per month
+    # Convert to weekly saving
+    weekly_from_balance = monthly_balance / 4.33 if monthly_balance else 0
+    delta = weekly_from_balance - weekly_target
+
+    if monthly_balance <= 0:
+        st.error(
+            "Your current budget is not saving anything. Use **Calculator** to move "
+            "from Deficit/Break-even to Surplus, then come back."
+        )
+    elif delta >= 0:
+        st.success(
+            f"Good! With your current budget you can hit the goal. "
+            f"Estimated weekly saving: ${weekly_from_balance:,.0f} "
+            f"(target is ${weekly_target:,.0f})."
+        )
+    else:
+        st.warning(
+            f"You're short by about ${abs(delta):,.0f} per week. "
+            "Try cutting one small category or adding a few work hours."
+        )
+
+    st.markdown("---")
+
+    st.markdown("#### Next actions")
+
+    st.write("- Re-run **Calculator** if your hours / rent change.")
+    st.write("- Use **City Compare** to see if another city gives a better balance.")
+    st.write("- Adjust your goal or deadline if the weekly target is unrealistic.")
 
 
 # ---------------------------------------------------------
