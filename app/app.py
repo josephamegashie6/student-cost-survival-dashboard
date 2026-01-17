@@ -314,18 +314,26 @@ with ch1:
         
 # TAB 3: CITY COMPARE
 elif page == "City Compare":
-data = safe_read_csv("data/student_costs.csv")
-if data is None:
-    st.error("Could not read data/student_costs.csv. Make sure the file path and name are correct.")
-    st.stop()
-    required_cols = {"city", "month", "campus_job_income", "stipend_income", "rent", "utilities", "food",
-                     "transport", "phone_internet", "misc_basic"}
+
+    data = safe_read_csv("data/student_costs.csv")
+
+    if data is None:
+        st.error("Could not read data/student_costs.csv. Make sure the file path and name are correct.")
+        st.stop()
+
+    required_cols = {
+        "city", "month", "campus_job_income", "stipend_income",
+        "rent", "utilities", "food", "transport",
+        "phone_internet", "misc_basic"
+    }
+
     missing = required_cols - set(data.columns)
+
     if missing:
         st.error(f"Your CSV is missing these columns: {sorted(list(missing))}")
         st.stop()
 
-    # Prep
+    st.subheader("City Comparison")
     expense_columns = ["rent", "utilities", "food", "transport", "phone_internet", "misc_basic"]
     data["month_dt"] = pd.to_datetime(data["month"], format="%Y-%m", errors="coerce")
     data["total_income"] = data["campus_job_income"] + data["stipend_income"]
