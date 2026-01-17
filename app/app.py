@@ -212,72 +212,70 @@ else:
     st.error("DEFICIT – You’ll likely need support or expense cuts.")
     st.markdown("</div>", unsafe_allow_html=True)
 
-        # Charts
-        st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-        st.subheader("Charts")
-
-        ch1, ch2 = st.columns(2)
-        with ch1:
-            comparison_df = pd.DataFrame(
-                {
-                    "Category": ["Total Income", "Total Expenses"],
-                    "Amount": [total_income, total_expenses],
-                }
-            )
-            fig = px.bar(
-                comparison_df,
-                x="Category",
-                y="Amount",
-                text="Amount",
-                title="Income vs Essential Expenses",
-            )
-            fig.update_traces(
-                texttemplate="$%{text:,.0f}",
-                textposition="outside",
-                cliponaxis=False,
-            )
-            max_val = max(total_income, total_expenses)
-            fig.update_yaxes(range=[0, max_val * 1.25])
-            fig.update_layout(yaxis_title="USD", xaxis_title="")
-            st.plotly_chart(fig, use_container_width=True)
-
-        with ch2:
-            exp_df = pd.DataFrame(
-                {
-                    "Expense": [
-                        "rent",
-                        "utilities",
-                        "food",
-                        "transport",
-                        "phone_internet",
-                        "misc_basic",
-                    ],
-                    "Amount": [
-                        rent,
-                        utilities,
-                        food,
-                        transport,
-                        phone_internet,
-                        misc_basic,
-                    ],
-                }
-            )
-            fig2 = px.bar(
-                exp_df,
-                x="Expense",
-                y="Amount",
-                text="Amount",
-                title="Expense Breakdown",
-            )
-            fig2.update_traces(
-                texttemplate="$%{text:,.0f}",
-                textposition="outside",
-                cliponaxis=False,
-            )
-            max_exp = max(exp_df["Amount"])
-            fig2.update_yaxes(range=[0, max_exp * 1.25])
-            fig2.update_layout(yaxis_title="USD", xaxis_title="")
-            st.plotly_chart(fig2, use_container_width=True)
+# Charts
+    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
+    st.subheader("Charts")
+    ch1, ch2 = st.columns(2)
+with ch1:
+    comparison_df = pd.DataFrame(
+        {
+            "Category": ["Total Income", "Total Expenses"],
+            "Amount": [total_income, total_expenses],
+        }
+    )
+    fig = px.bar(
+        comparison_df,
+        x="Category",
+        y="Amount",
+        text="Amount",
+        title="Income vs Essential Expenses",
+    )
+    fig.update_traces(
+        texttemplate="$%{text:,.0f}",
+        textposition="outside",
+        cliponaxis=False,
+    )
+    max_val = max(total_income, total_expenses)
+    fig.update_yaxes(range=[0, max_val * 1.25])
+    fig.update_layout(yaxis_title="USD", xaxis_title="")
+    st.plotly_chart(fig, use_container_width=True)
+    with ch2:
+        exp_df = pd.DataFrame(
+            {
+                "Expense": [
+                    "rent",
+                    "utilities",
+                    "food",
+                    "transport",
+                    "phone_internet",
+                    "misc_basic",
+                ],
+                "Amount": [
+                    rent,
+                    utilities,
+                    food,
+                    transport,
+                    phone_internet,
+                    misc_basic,
+                ],
+            }
+        )
+        fig2 = px.bar(
+            exp_df,
+            x="Expense",
+            y="Amount",
+            text="Amount",
+            title="Expense Breakdown",
+        )
+        fig2.update_traces(
+            texttemplate="$%{text:,.0f}",
+            textposition="outside",
+            cliponaxis=False,
+        )
+        max_exp = max(exp_df["Amount"])
+        fig2.update_yaxes(range=[0, max_exp * 1.25])
+        fig2.update_layout(yaxis_title="USD", xaxis_title="")
+        st.plotly_chart(fig2, use_container_width=True)
 
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -305,7 +303,7 @@ else:
         }
         out_df = pd.DataFrame([result_row])
         csv = out_df.to_csv(index=False).encode("utf-8")
-
+        
         st.download_button(
             label="⬇️ Download your calculation as CSV",
             data=csv,
