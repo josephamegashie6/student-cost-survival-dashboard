@@ -483,6 +483,8 @@ if page == "Calculator":
         c4.metric("Buffer (months)", f"{buffer_months:.1f}")
 
         # Interpretation
+    score = st.session_state.get("health_score", 0)
+
     if score >= 75:
         st.success("Excellent financial health. You are well-positioned.")
     elif score >= 55:
