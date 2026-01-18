@@ -427,17 +427,28 @@ if page == "Calculator":
             rent=rent,
             balance=balance
         )
-        st.session_state["health_score"] = health_score
+        # ✅ Save for later use (sidebar + charts + other pages)
+        st.session_state["total_income"] = float(total_income)
+        st.session_state["total_expenses"] = float(total_expenses)
+        st.session_state["balance"] = float(balance)
+
+        st.session_state["health_score"] = int(health_score)
         st.session_state["rent_ratio"] = score_breakdown["rent_ratio"]
         st.session_state["savings_rate"] = score_breakdown["savings_rate"]
-        st.session_state["buffer_months"] = score_breakdown["buffer_months"]
+        st.session_state["buffer_months"] = score_breakdown.get("buffer_months", 0)
         st.session_state["status"] = status
-        st.session_state["balance"] = float(balance)
         st.session_state["context_city"] = calc_city
 
         # Results cards
         st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.subheader("Results")
+
+        total_income = st.session_state.get("total_income")
+        total_expenses = st.session_state.get("total_expenses")
+
+    if total_income is None or total_expenses is None:
+        st.info("Run the Calculator to see charts.")
+        st.stop()
 
         r1, r2, r3, r4 = st.columns(4)
         r1.metric("City", calc_city)
