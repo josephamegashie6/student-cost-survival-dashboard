@@ -128,7 +128,7 @@ with st.sidebar:
     page = st.radio(
         "Navigate",
         ["Calculator", "City Compare", "My Plan", "Settings"],
-        index=["Calculator", "City Compare", "My Plan", "Settings"].index(page),
+        key="page",                    # streamlit remembers last selection
         label_visibility="collapsed",
     )
 
@@ -136,23 +136,24 @@ with st.sidebar:
     st.markdown("#### My Snapshot")
     st.write("Status:", st.session_state["status"])
     st.write("Balance / month:", f"${st.session_state['balance']:.0f}")
-    st.caption(f"Based on last calculator run (city: {st.session_state['context_city']})")
+    st.caption(
+        f"Based on last calculator run (city: {st.session_state['context_city']})"
+    )
 
     # 🔁 Page-specific sidebar controls
     if page == "City Compare":
         st.markdown("#### Compare settings")
 
-        # ✅ DO NOT assign to st.session_state here
         compare_metric = st.selectbox(
             "Compare by",
             ["Balance", "Rent pressure", "Food cost", "Transport cost"],
-            key="compare_metric",         # uses the default you set at the top
+            key="compare_metric",      # uses default from session_state
         )
 
         month_preset = st.radio(
             "Month range",
             ["All data", "Last 3 months", "Last 6 months"],
-            key="month_preset",           # uses the default you set at the top
+            key="month_preset",
         )
 
     elif page == "My Plan":
@@ -162,12 +163,12 @@ with st.sidebar:
             "Goal amount ($)",
             min_value=0.0,
             step=50.0,
-            key="goal_amount",            # starts from st.session_state['goal_amount']
+            key="goal_amount",         # starts from st.session_state['goal_amount']
         )
 
         goal_deadline = st.date_input(
             "Goal deadline",
-            key="goal_deadline",          # starts from st.session_state['goal_deadline']
+            key="goal_deadline",       # starts from st.session_state['goal_deadline']
         )
 
         st.caption("Use the Calculator first so this plan can use your real balance.")
