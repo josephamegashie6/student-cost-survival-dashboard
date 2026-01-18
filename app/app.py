@@ -123,74 +123,51 @@ def safe_read_csv(path: str):
 # SIDEBAR: NAV + SNAPSHOT + PAGE CONTROLS
 # ---------------------------------------
 with st.sidebar:
-    # Main nav
     st.markdown("### Student Cost Survival")
-    page = option_menu(
-        menu_title=None,
-        options=["Calculator", "City Compare", "My Plan", "Settings"],
-        icons=["calculator", "globe2", "wallet2", "gear"],
-        default_index=0,
+
+    page = st.radio(
+        "Navigate",
+        ["Calculator", "City Compare", "My Plan", "Settings"],
+        index=["Calculator", "City Compare", "My Plan", "Settings"].index(page),
+        label_visibility="collapsed",
     )
 
     st.markdown("---")
-
-    # 🔍 Global snapshot (from last calculation)
     st.markdown("#### My Snapshot")
-    status = st.session_state["status"]
-    balance = st.session_state["balance"]
-    city = st.session_state["context_city"]
-
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Status", status)
-    with col2:
-        st.metric("Balance / month", f"${balance:,.0f}")
-
-    st.caption(f"Based on last calculator run (city: {city})")
-
-    # Dynamic quick tips
-    if status == "Surplus":
-        st.success("Tip: Start building a buffer or short-term savings goal.")
-    elif status == "Break-even":
-        st.warning("Tip: Try to reduce one small category (food/misc) to build buffer.")
-    elif status == "Deficit":
-        st.error("Tip: Check rent + misc. Even $40 cut can flip you positive.")
-    else:
-        st.info("Run the Calculator to see your status.")
-
-    st.markdown("---")
+    st.write("Status:", st.session_state["status"])
+    st.write("Balance / month:", f"${st.session_state['balance']:.0f}")
+    st.caption(f"Based on last calculator run (city: {st.session_state['context_city']})")
 
     # 🔁 Page-specific sidebar controls
     if page == "City Compare":
         st.markdown("#### Compare settings")
 
-        st.session_state["compare_metric"] = st.selectbox(
+        # ✅ DO NOT assign to st.session_state here
+        compare_metric = st.selectbox(
             "Compare by",
             ["Balance", "Rent pressure", "Food cost", "Transport cost"],
-            key="compare_metric",
+            key="compare_metric",         # uses the default you set at the top
         )
 
-        st.session_state["month_preset"] = st.radio(
+        month_preset = st.radio(
             "Month range",
             ["All data", "Last 3 months", "Last 6 months"],
-            key="month_preset",
+            key="month_preset",           # uses the default you set at the top
         )
 
     elif page == "My Plan":
         st.markdown("#### Savings goal")
 
-        st.session_state["goal_amount"] = st.number_input(
+        goal_amount = st.number_input(
             "Goal amount ($)",
             min_value=0.0,
             step=50.0,
-            value=st.session_state["goal_amount"],
-            key="goal_amount",
+            key="goal_amount",            # starts from st.session_state['goal_amount']
         )
 
-        st.session_state["goal_deadline"] = st.date_input(
+        goal_deadline = st.date_input(
             "Goal deadline",
-            value=st.session_state["goal_deadline"],
-            key="goal_deadline",
+            key="goal_deadline",          # starts from st.session_state['goal_deadline']
         )
 
         st.caption("Use the Calculator first so this plan can use your real balance.")
