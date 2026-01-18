@@ -29,6 +29,15 @@ if "compare_metric" not in st.session_state:
 if "month_preset" not in st.session_state:
     st.session_state["month_preset"] = "All data"
 
+#financial health score
+if "health_score" not in st.session_state:
+    st.session_state["health_score"] = 0
+if "rent_ratio" not in st.session_state:
+    st.session_state["rent_ratio"] = None
+if "savings_rate" not in st.session_state:
+    st.session_state["savings_rate"] = None
+
+
 
 # =========================================================
 # 2) PAGE CONFIG (must be before most Streamlit calls)
@@ -118,10 +127,81 @@ def safe_read_csv(path: str):
     except Exception:
         return None
 
+# -----------------------------
+# Financial Health Score helpers
+# -----------------------------
 
-# ---------------------------------------
-# SIDEBAR: NAV + SNAPSHOT + PAGE CONTROLS
-# ---------------------------------------
+def clamp(n: float, low: float, high: float) -> float:
+    return max(low, min(high, n))
+
+
+def financial_health_score(
+    total_income: float,
+    total_expenses: float,
+    rent: float,
+    balance: float
+) -> tuple[int, dict]:
+
+    if total_income <= 0:
+        return 0, {
+            "balance_points": 0,
+            "rent_points": 0,
+            "savings_points": 0,
+            "buffer_points": 0,
+            "rent_ratio": None,
+            "savings_rate": None,
+            "buffer_months": 0,
+        }
+
+    rent_ratio = rent / total_income
+    savings_rate = balance / total_income
+
+    # 1) Balance (0 or 40)
+    balance_points = 40 if balance > 0 else 0
+
+    # 2) Rent health (0–25)
+    rent_points = 25 * (0.60 - rent_ratio) / (0.60 - 0.35)
+    rent_points = int(round(clamp(rent_points, 0, 25)))
+
+    # 3) Savings rate (0–20)
+    savings_points = 20 * (savings_rate / 0.10)
+    savings_points = int(round(clamp(savings_points, 0, 20)))
+
+    # 4) Buffer (0–15)
+    if total_expenses > 0:
+        buffer_months = balance / total_expenses
+    else:
+        buffer_months = 0
+
+    buffer_points = 15 * buffer_months
+    buffer_points = int(round(clamp(buffer_points, 0, 15)))
+
+    score = balance_points + rent_points + savings_points + buffer_points
+    score = int(clamp(score, 0, 100))
+
+    breakdown = {
+        "balance_points": balance_points,
+        "rent_points": rent_points,
+        "savings_points": savings_points,
+        "buffer_points": buffer_points,
+        "rent_ratio": rent_ratio,
+        "savings_rate": savings_rate,
+        "buffer_months": buffer_months,
+    }
+
+    return score, breakdown
+
+
+def score_label(score: int) -> str:
+    if score >= 80:
+        return "Excellent"
+    elif score >= 60:
+        return "Good"
+    elif score >= 40:
+        return "Risky"
+    return "Critical"
+
+
 # ------------------------------
 # SIDEBAR: NAV + SNAPSHOT + CONTROLS
 # ------------------------------
@@ -158,15 +238,32 @@ with st.sidebar:
         },
     )
 
-    # --------------- Snapshot ---------------
+    # ---------------- Snapshot ----------------
     st.markdown("---")
     st.markdown("#### My Snapshot")
 
     st.write("Status:", st.session_state["status"])
     st.write("Balance / month:", f"${st.session_state['balance']:.0f}")
     st.caption(
-        f"Based on last calculator run (city: {st.session_state['context_city']})"
+    f"Based on last calculator run (city: {st.session_state['context_city']})"
     )
+
+# Financial Health Score (safe)
+    health_score = st.session_state.get("health_score")
+
+    if health_score is not None:
+        st.write(
+        "Health score:",
+        health_score,
+        f"({score_label(health_score)})"
+        )
+        rr = st.session_state.get("rent_ratio")
+        sr = st.session_state.get("savings_rate")
+
+    if rr is not None and sr is not None:
+        st.caption(
+            f"Rent/Income: {rr*100:.1f}% • Savings rate: {sr*100:.1f}%"
+        )
 
     # 🔹 Dynamic tip based on status
     status = st.session_state["status"]
@@ -324,10 +421,19 @@ if page == "Calculator":
         total_expenses = rent + utilities + food + transport + phone_internet + misc_basic
         balance = total_income - total_expenses
         status = financial_status(balance)
+        health_score, score_breakdown = financial_health_score(
+            total_income=total_income,
+            total_expenses=total_expenses,
+            rent=rent,
+            balance=balance
+        )
+        st.session_state["health_score"] = health_score
+        st.session_state["rent_ratio"] = score_breakdown["rent_ratio"]
+        st.session_state["savings_rate"] = score_breakdown["savings_rate"]
+        st.session_state["buffer_months"] = score_breakdown["buffer_months"]
         st.session_state["status"] = status
         st.session_state["balance"] = float(balance)
         st.session_state["context_city"] = calc_city
-    
 
         # Results cards
         st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -352,6 +458,42 @@ if page == "Calculator":
             st.error("DEFICIT – You’ll likely need support or expense cuts.")
 
         st.markdown("</div>", unsafe_allow_html=True)
+
+# ----------------------------------------
+# Financial Health Score
+# ----------------------------------------
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.subheader("Financial Health Score")
+
+        score = st.session_state.get("health_score", 0)
+        rent_ratio = st.session_state.get("rent_ratio", 0)
+        savings_rate = st.session_state.get("savings_rate", 0)
+        buffer_months = st.session_state.get("buffer_months", 0)
+
+        # Progress bar (0–100)
+        score_int = int(round(score))
+        score_int = max(0, min(score_int, 100))
+        st.progress(score_int)
+
+        c1, c2, c3, c4 = st.columns(4)
+
+        c1.metric("Score", f"{int(score)}/100")
+        c2.metric("Rent / Income", f"{rent_ratio*100:.1f}%")
+        c3.metric("Savings rate", f"{savings_rate*100:.1f}%")
+        c4.metric("Buffer (months)", f"{buffer_months:.1f}")
+
+        # Interpretation
+    if score >= 75:
+        st.success("Excellent financial health. You are well-positioned.")
+    elif score >= 55:
+        st.info("Moderate health. Small improvements can strengthen your buffer.")
+    elif score >= 40:
+        st.warning("Fragile finances. Focus on reducing fixed costs or boosting income.")
+    else:
+        st.error("High financial stress. Immediate action recommended.")
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
 
         # Charts
         st.markdown("<div class='card'>", unsafe_allow_html=True)
