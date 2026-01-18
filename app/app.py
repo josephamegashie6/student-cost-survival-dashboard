@@ -511,7 +511,7 @@ if page == "Calculator":
         total_expenses = st.session_state.get("total_expenses")
 
         if total_income is None or total_expenses is None:
-        st.info("Run the Calculator first to see charts.")
+            st.info("Run the Calculator first to see charts.")
             st.stop()
 
         with ch1:
