@@ -122,38 +122,78 @@ def safe_read_csv(path: str):
 # ---------------------------------------
 # SIDEBAR: NAV + SNAPSHOT + PAGE CONTROLS
 # ---------------------------------------
+# ------------------------------
+# SIDEBAR: NAV + SNAPSHOT + CONTROLS
+# ------------------------------
 with st.sidebar:
+    # App title
     st.markdown("### Student Cost Survival")
 
-    page = st.radio(
-        "Navigate",
-        ["Calculator", "City Compare", "My Plan", "Settings"],
-        key="page",                    # streamlit remembers last selection
-        label_visibility="collapsed",
+    # 🔹 Navigation menu (pretty style, like your first screenshot)
+    page = option_menu(
+        menu_title=None,
+        options=["Calculator", "City Compare", "My Plan", "Settings"],
+        icons=["calculator", "globe2", "wallet2", "gear"],
+        default_index=0,
+        styles={
+            "container": {
+                "padding": "0.5rem 0.3rem",
+                "background-color": "#020617",
+            },
+            "icon": {
+                "color": "white",
+                "font-size": "1rem",
+            },
+            "nav-link": {
+                "font-size": "0.9rem",
+                "padding": "0.45rem 0.8rem",
+                "border-radius": "8px",
+                "color": "white",
+                "margin": "0.1rem 0",
+            },
+            "nav-link-selected": {
+                "background-color": "#f97316",
+                "color": "white",
+            },
+        },
     )
 
+    # --------------- Snapshot ---------------
     st.markdown("---")
     st.markdown("#### My Snapshot")
+
     st.write("Status:", st.session_state["status"])
     st.write("Balance / month:", f"${st.session_state['balance']:.0f}")
     st.caption(
         f"Based on last calculator run (city: {st.session_state['context_city']})"
     )
 
-    # 🔁 Page-specific sidebar controls
+    # 🔹 Dynamic tip based on status
+    status = st.session_state["status"]
+    if status == "Deficit":
+        st.info("Tip: Check rent + misc. Even $40 cut can flip you positive.")
+    elif status == "Break-even":
+        st.info("Tip: Try to build at least one month of buffer savings.")
+    elif status == "Surplus":
+        st.info("Tip: Consider saving or investing part of your surplus.")
+    else:
+        st.caption("Run the calculator to see a personalized snapshot.")
+
+    # --------------- Page-specific controls ---------------
     if page == "City Compare":
         st.markdown("#### Compare settings")
 
+        # ⚠️ Do not assign back to st.session_state manually.
         compare_metric = st.selectbox(
             "Compare by",
             ["Balance", "Rent pressure", "Food cost", "Transport cost"],
-            key="compare_metric",      # uses default from session_state
+            key="compare_metric",  # uses default from your session_state init
         )
 
         month_preset = st.radio(
             "Month range",
             ["All data", "Last 3 months", "Last 6 months"],
-            key="month_preset",
+            key="month_preset",  # uses default from your session_state init
         )
 
     elif page == "My Plan":
@@ -163,19 +203,25 @@ with st.sidebar:
             "Goal amount ($)",
             min_value=0.0,
             step=50.0,
-            key="goal_amount",         # starts from st.session_state['goal_amount']
+            key="goal_amount",  # prefilled from session_state['goal_amount']
         )
 
         goal_deadline = st.date_input(
             "Goal deadline",
-            key="goal_deadline",       # starts from st.session_state['goal_deadline']
+            key="goal_deadline",  # prefilled from session_state['goal_deadline']
         )
 
-        st.caption("Use the Calculator first so this plan can use your real balance.")
+        st.caption(
+            "Use the Calculator first so this plan can use your real monthly balance."
+        )
 
     elif page == "Settings":
         st.markdown("#### Preferences (future)")
-        st.info("Here you can later add currency, default weeks/month, wage presets, etc.")
+        st.info(
+            "Here you can later add currency options, default weeks/month, "
+            "wage presets, and theme settings."
+        )
+
 
 
 # =========================================================
