@@ -506,6 +506,13 @@ if page == "Calculator":
         st.subheader("Charts")
 
         ch1, ch2 = st.columns(2)
+        
+        total_income = st.session_state.get("total_income")
+        total_expenses = st.session_state.get("total_expenses")
+
+        if total_income is None or total_expenses is None:
+        st.info("Run the Calculator first to see charts.")
+            st.stop()
 
         with ch1:
             comparison_df = pd.DataFrame({
