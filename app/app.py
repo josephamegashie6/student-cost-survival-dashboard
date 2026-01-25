@@ -341,10 +341,6 @@ st.markdown(
 st.markdown("</div>", unsafe_allow_html=True)
 
 
-# =========================================================
-# 7) PAGE ROUTING (ONLY ONE if/elif chain!)
-# =========================================================
-
 # ---------------------------------------------------------
 # PAGE A: CALCULATOR
 # ---------------------------------------------------------
@@ -435,7 +431,7 @@ if page == "Calculator":
             rent=rent,
             balance=balance
         )
-        # ✅ Save for later use (sidebar + charts + other pages)
+        
         st.session_state["total_income"] = float(total_income)
         st.session_state["total_expenses"] = float(total_expenses)
         st.session_state["balance"] = float(balance)
@@ -545,6 +541,104 @@ if page == "Calculator":
             st.plotly_chart(fig2, use_container_width=True)
 
         st.markdown("</div>", unsafe_allow_html=True)
+
+    # -----------------------------
+    # Scenario Simulator
+    # -----------------------------
+    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
+    st.subheader("Scenario Simulator")
+    st.caption(
+        "Try quick what-ifs without changing the form above "
+        "(extra work hours, rent change, extra income)."
+    )
+
+    # Controls for the scenario
+    s1, s2, s3 = st.columns(3)
+
+    with s1:
+        extra_hours = st.slider(
+            "Extra work hours per week",
+            min_value=0.0,
+            max_value=10.0,
+            value=0.0,
+            step=1.0,
+            help="Simulate taking a few more hours at the same wage.",
+        )
+
+    with s2:
+        rent_change = st.slider(
+            "Rent change ($/month)",
+            min_value=-500.0,
+            max_value=500.0,
+            value=0.0,
+            step=25.0,
+            help="Negative = cheaper rent, positive = more expensive.",
+        )
+
+    with s3:
+        extra_income = st.slider(
+            "Extra monthly income ($)",
+            min_value=0.0,
+            max_value=1000.0,
+            value=0.0,
+            step=50.0,
+            help="Any extra monthly money (research job, scholarship, etc.).",
+        )
+
+    # ---- Recalculate scenario based on sliders ----
+
+    # Start from your existing weekly and monthly income
+    scenario_weekly_job_income = weekly_job_income + (wage * extra_hours)
+    scenario_monthly_job_income = scenario_weekly_job_income * weeks_per_month
+
+    # Adjust rent but never let it go below zero
+    scenario_rent = max(rent + rent_change, 0)
+
+    scenario_total_expenses = (
+        scenario_rent
+        + utilities
+        + food
+        + transport
+        + phone_internet
+        + misc_basic
+    )
+
+    scenario_total_income = scenario_monthly_job_income + stipend + extra_income
+    scenario_balance = scenario_total_income - scenario_total_expenses
+
+    delta_balance = scenario_balance - balance
+
+    # ---- Display scenario vs current ----
+    c1, c2, c3 = st.columns(3)
+
+    c1.metric(
+        "Scenario income / month",
+        money(scenario_total_income),
+        delta=money(scenario_total_income - total_income),
+    )
+    c2.metric(
+        "Scenario expenses / month",
+        money(scenario_total_expenses),
+        delta=money(scenario_total_expenses - total_expenses),
+    )
+    c3.metric(
+        "Scenario balance / month",
+        money(scenario_balance),
+        delta=money(delta_balance),
+    )
+
+    # Quick interpretation
+    if delta_balance > 0:
+        st.success("This scenario improves your monthly balance.")
+    elif delta_balance < 0:
+        st.warning("This scenario reduces your monthly balance.")
+    else:
+        st.info("This scenario keeps your balance the same.")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+
 
         # Download
         result_row = {
