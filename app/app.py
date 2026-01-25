@@ -38,7 +38,7 @@ if "savings_rate" not in st.session_state:
     st.session_state["savings_rate"] = None
 
 def score_label(score: float) -> str:
-"""Turn numeric score into a short label."""
+    """Turn numeric score into a short label."""
     if score >= 75:
         return "Strong"
     elif score >= 55:
