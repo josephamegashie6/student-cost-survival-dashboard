@@ -1016,7 +1016,7 @@ elif page == "My Plan":
         for name, val in expenses.items():
             val_f = float(val)
             share = pct(val_f, total_income)
-            rows.append({"Expense": name, "Amount": val_f, "ShareOfIncome": share})
+            rows.append({"Expense": name, "Amount": val_f, "Share Of Income": share})
 
         exp_df = pd.DataFrame(rows).sort_values("ShareOfIncome", ascending=False)
 
@@ -1030,9 +1030,9 @@ elif page == "My Plan":
         for _, r in top2.iterrows():
             cut_amount = 0.10 * float(r["Amount"])
             new_balance = monthly_balance + cut_amount
-            st.write(
-                f"- Cut ${cut_amount:,.0f} from {r['Expense']} (about 10%) "
-                f"and your monthly balance could move from {money(monthly_balance)} to {money(new_balance)}."
+            st.markdown(
+                f"- Cut **${cut_amount:,.0f}** from **{r['Expense']} (about 10%)** "
+                f"and your monthly balance could move from **{money(monthly_balance)}** to **{money(new_balance)}**)."
             )
 
     st.markdown("---")
