@@ -588,7 +588,14 @@ if page == "Calculator":
     # ---- Recalculate scenario based on sliders ----
 
     # Start from your existing weekly and monthly income
-        scenario_weekly_job_income = weekly_job_income + (wage * extra_hours)
+        base_weekly_job_income = st.session_state.get("weekly_job_income")
+
+    if base_weekly_job_income is None:
+        st.info("Run the Calculator first to enable scenario simulation.")
+        st.stop()
+
+        scenario_weekly_job_income = base_weekly_job_income + (wage * extra_hours)
+        
         scenario_monthly_job_income = scenario_weekly_job_income * weeks_per_month
 
     # Adjust rent but never let it go below zero
