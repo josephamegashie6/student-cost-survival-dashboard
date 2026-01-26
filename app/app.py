@@ -801,7 +801,7 @@ if page == "Calculator":
         else:
             st.caption("No saved scenarios yet.")
 
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
         # Download
         result_row = {
@@ -812,7 +812,7 @@ if page == "Calculator":
             "hours_sat": hours_sat,
             "hours_sun": hours_sun,
             "sunday_multiplier": sunday_multiplier,
-            "monthly_job_income_est": monthly_job_income_est,
+            "monthly_job_income_est": monthly_job_income,
             "stipend": stipend,
             "total_income": total_income,
             "total_expenses": total_expenses,
