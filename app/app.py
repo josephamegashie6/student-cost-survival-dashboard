@@ -656,29 +656,76 @@ if page == "Calculator":
         # Scenario Simulator + Save scenarios
         # -----------------------------
         st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-        st.subheader("Scenario Simulator")
-        st.caption("Try quick what-ifs without changing the form above (extra hours, rent change, extra income).")
+    st.subheader("Scenario Simulator")
+    st.caption(
+        "Try quick what-ifs without changing the form above "
+        "(extra work hours, rent change, extra income)."
+    )
 
-        s1, s2, s3 = st.columns(3)
-        with s1:
-            extra_hours = st.slider("Extra work hours per week", 0.0, 10.0, 0.0, 1.0)
-        with s2:
-            rent_change = st.slider("Rent change ($/month)", -500.0, 500.0, 0.0, 25.0)
-        with s3:
-            extra_income = st.slider("Extra monthly income ($)", 0.0, 1000.0, 0.0, 50.0)
+    # Controls for the scenario
+    s1, s2, s3 = st.columns(3)
+    with s1:
+        extra_hours = st.slider(
+            "Extra work hours per week",
+            min_value=0.0,
+            max_value=10.0,
+            value=0.0,
+            step=1.0,
+            help="Simulate taking a few more hours at the same wage.",
+        )
+    with s2:
+        rent_change = st.slider(
+            "Rent change ($/month)",
+            min_value=-500.0,
+            max_value=500.0,
+            value=0.0,
+            step=25.0,
+            help="Negative = cheaper rent, positive = more expensive.",
+        )
+    with s3:
+        extra_income = st.slider(
+            "Extra monthly income ($)",
+            min_value=0.0,
+            max_value=1000.0,
+            value=0.0,
+            step=50.0,
+            help="Any extra monthly money (research job, scholarship, etc.).",
+        )
 
-        base_weekly_job_income = st.session_state.get("weekly_job_income")
-        base_wage = st.session_state.get("wage")
-        base_weeks_per_month = st.session_state.get("weeks_per_month")
+    # Need a successful calculator run first
+    base_weekly_job_income = st.session_state.get("weekly_job_income")
+    base_wage = st.session_state.get("wage")
+    weeks_per_month = st.session_state.get("weeks_per_month")
+    stipend = st.session_state.get("stipend")
+    base_total_income = st.session_state.get("total_income")
+    base_total_expenses = st.session_state.get("total_expenses")
+    base_balance = st.session_state.get("balance")
 
-        if base_weekly_job_income is None or base_wage is None or base_weeks_per_month is None:
-            st.info("Run the Calculator first to enable scenario simulation.")
-            st.markdown("</div>", unsafe_allow_html=True)
-            st.stop()
+    rent = st.session_state.get("rent")
+    utilities = st.session_state.get("utilities")
+    food = st.session_state.get("food")
+    transport = st.session_state.get("transport")
+    phone_internet = st.session_state.get("phone_internet")
+    misc_basic = st.session_state.get("misc_basic")
 
+    # Smart empty state if user has never clicked Calculate
+    if (
+        base_weekly_job_income is None
+        or base_wage is None
+        or weeks_per_month is None
+        or base_total_income is None
+        or base_total_expenses is None
+        or base_balance is None
+        or rent is None
+    ):
+        st.info("Run the Calculator and click Calculate once to unlock the Scenario Simulator.")
+        st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        # Recalculate scenario based on sliders
         scenario_weekly_job_income = float(base_weekly_job_income) + (float(base_wage) * float(extra_hours))
-        scenario_monthly_job_income = scenario_weekly_job_income * float(base_weeks_per_month)
+        scenario_monthly_job_income = scenario_weekly_job_income * float(weeks_per_month)
 
+        # Adjust rent but never below zero
         scenario_rent = max(float(rent) + float(rent_change), 0.0)
 
         scenario_total_expenses = (
@@ -692,12 +739,26 @@ if page == "Calculator":
 
         scenario_total_income = float(scenario_monthly_job_income) + float(stipend) + float(extra_income)
         scenario_balance = scenario_total_income - scenario_total_expenses
-        delta_balance = scenario_balance - float(balance)
 
+        delta_balance = scenario_balance - float(base_balance)
+
+        # Display scenario vs current
         c1, c2, c3 = st.columns(3)
-        c1.metric("Scenario income / month", money(scenario_total_income), delta=money(scenario_total_income - float(total_income)))
-        c2.metric("Scenario expenses / month", money(scenario_total_expenses), delta=money(scenario_total_expenses - float(total_expenses)))
-        c3.metric("Scenario balance / month", money(scenario_balance), delta=money(delta_balance))
+        c1.metric(
+            "Scenario income / month",
+            money(scenario_total_income),
+            delta=money(scenario_total_income - float(base_total_income)),
+        )
+        c2.metric(
+            "Scenario expenses / month",
+            money(scenario_total_expenses),
+            delta=money(scenario_total_expenses - float(base_total_expenses)),
+        )
+        c3.metric(
+            "Scenario balance / month",
+            money(scenario_balance),
+            delta=money(delta_balance),
+        )
 
         if delta_balance > 0:
             st.success("This scenario improves your monthly balance.")
@@ -706,8 +767,7 @@ if page == "Calculator":
         else:
             st.info("This scenario keeps your balance the same.")
 
-        st.markdown("---")
-        st.markdown("#### Save this scenario (in memory)")
+        st.markdown("</div>", unsafe_allow_html=True)
 
         preset = st.selectbox("Scenario name", ["Current plan", "Optimized plan", "Worst case", "Custom"])
         custom_name = ""
