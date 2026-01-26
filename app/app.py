@@ -1,11 +1,4 @@
 # =========================================================
-# app.py  (copy and paste the whole file)
-# Fixes:
-# 1) NameError: monthly_job_income not defined  -> store monthly_job_income in session_state + guard download
-# 2) KeyError: 'ShareOfIncome'                 -> always build a DataFrame that includes ShareOfIncome
-# =========================================================
-
-# =========================================================
 # 1) IMPORTS (must be at the very top)
 # =========================================================
 import streamlit as st
