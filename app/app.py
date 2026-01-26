@@ -324,7 +324,7 @@ with st.sidebar:
     status_now = st.session_state["status"]
     st.write("")
     if status_now == "Deficit":
-        st.info("Tip: Check rent and misc. Even a small cut can flip you positive.")
+        st.info("Tip: Check rent and misc. Even a small  can flip you positive.")
     elif status_now == "Break-even":
         st.info("Tip: Try to build at least one month of buffer savings.")
     elif status_now == "Surplus":
@@ -541,7 +541,7 @@ if page == "Calculator":
         elif status == "Break-even":
             st.warning("BREAK-EVEN. You are surviving, but there is no buffer.")
         else:
-            st.error("DEFICIT. You will likely need support or expense cuts.")
+            st.error("DEFICIT. You will likely need support or expense s.")
         st.markdown("</div>", unsafe_allow_html=True)
 
         # Financial Health Score
@@ -1058,13 +1058,13 @@ elif page == "My Plan":
         )
     else:
         st.warning(
-            f"Short by about {money(abs(delta))} per week. Try cutting expenses or adding a few work hours."
+            f"Short by about {money(abs(delta))} per week. Try ting expenses or adding a few work hours."
         )
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Actionable cut suggestions (based on chosen calc)
+    # Actionable  suggestions (based on chosen calc)
     st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.markdown("#### Actionable cut suggestions (ranked)")
+    st.markdown("#### Actionable  suggestions (ranked)")
     st.write("")
 
     exp_all = {
@@ -1092,11 +1092,11 @@ elif page == "My Plan":
         for _, r in exp_rank.iterrows():
             cut_amount = 0.10 * float(r["Amount"])
             new_balance = monthly_balance + cut_amount
-            st.markdown(
-                f" - Cut  {money(cut_amount)}  from   {r['Expense']}  . "
-                f" This moves balance from   {money(monthly_balance)}   to   {money(new_balance)}  ."
-            )
-        st.write("")
+        st.markdown(
+            f"- Cut **{money(cut_amount)}** from **{r['Expense']}**.  "
+            f"This moves your monthly balance from **{money(monthly_balance)}** to **{money(new_balance)}**."
+        )
+    st.write("")
     st.markdown("</div>", unsafe_allow_html=True)
 
     # Small table of all saved calcs for quick view
