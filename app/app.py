@@ -1089,34 +1089,42 @@ elif page == "City Compare":
         st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.markdown("#### Expense mix (selected range)")
         st.write("")
+
         exp_mix = filt.groupby("city", as_index=False)[expense_columns].sum()
         donut_city = st.selectbox("Donut city", compare_cities, index=0)
         row = exp_mix[exp_mix["city"] == donut_city]
 
         if not row.empty:
             donut_df = pd.DataFrame(
-                {"Expense": expense_columns, "Amount": [float(row[col].iloc[0]) for col in expense_columns]}
+                {
+                    "Expense": expense_columns,
+                    "Amount": [float(row[col].iloc[0]) for col in expense_columns],
+                }
             )
             fig2 = px.pie(donut_df, names="Expense", values="Amount", hole=0.55)
-        fig2.update_layout(title=f"{donut_city}: total expenses by category")
-        st.plotly_chart(fig2, use_container_width=True)
-    else:
-        st.info("No expense data for donut chart.")
+            fig2.update_layout(title=f"{donut_city}: total expenses by category")
+            st.plotly_chart(fig2, use_container_width=True)
+        else:
+            st.info("No expense data for donut chart.")
+
         st.markdown("</div>", unsafe_allow_html=True)
 
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("#### Compare table")
-        st.write("")
-        show = summary.sort_values("avg_balance", ascending=False).copy()
-        show["Avg income"] = show["avg_income"].round(0)
-        show["Avg expenses"] = show["avg_expenses"].round(0)
-        show["Avg balance"] = show["avg_balance"].round(0)
-        show["Savings rate (%)"] = (show["savings_rate"] * 100).round(1)
-        show = show[
+    # Compare table card
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.markdown("#### Compare table")
+    st.write("")
+
+    show = summary.sort_values("avg_balance", ascending=False).copy()
+    show["Avg income"] = show["avg_income"].round(0)
+    show["Avg expenses"] = show["avg_expenses"].round(0)
+    show["Avg balance"] = show["avg_balance"].round(0)
+    show["Savings rate (%)"] = (show["savings_rate"] * 100).round(1)
+    show = show[
         ["city", "Avg income", "Avg expenses", "Avg balance", "months", "Savings rate (%)"]
-        ].rename(columns={"city": "City", "months": "Months"})
-        st.dataframe(show, use_container_width=True, hide_index=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+    ].rename(columns={"city": "City", "months": "Months"})
+
+    st.dataframe(show, use_container_width=True, hide_index=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 # =========================================================
