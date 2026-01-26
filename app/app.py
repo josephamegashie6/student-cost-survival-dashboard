@@ -83,9 +83,10 @@ def init_defaults():
         "debt_salary_to_debt_rate_1": 0.05,
         "debt_salary_to_debt_rate_2": 0.10,
         "debt_salary_to_debt_rate_3": 0.20,
-    }
-        # onboarding wizard
+         # onboarding wizard
         "onboarding_step": 1,
+    }
+       
 
     for k, v in defaults.items():
         if k not in st.session_state:
