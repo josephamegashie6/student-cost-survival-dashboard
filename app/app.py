@@ -20,7 +20,9 @@ def init_defaults():
         "status": "Unknown",
         "balance": 0.0,
         "context_city": "-",
-
+        "scenarios": [],
+        "active_scenario_id": None,
+        
         # goals and compare settings
         "goal_amount": 1000.0,
         "goal_deadline": date.today() + timedelta(days=90),
@@ -341,6 +343,9 @@ def payback_years(loan_amount: float, annual_rate: float, annual_payment: float)
     n = math.log(annual_payment / denom) / math.log(1 + r)
     return max(n, 0.0)
 
+def make_scenario_id() -> str:
+    """Simple id for saved scenarios."""
+    return "scn_" + datetime.now().strftime("%Y%m%d%H%M%S%f")
 
 # =========================================================
 # 6) SIDEBAR: NAV + SNAPSHOT + CONTROLS
@@ -351,8 +356,8 @@ with st.sidebar:
 
     page = option_menu(
         menu_title=None,
-        options=["Calculator", "City Compare", "My Plan", "Settings"],
-        icons=["calculator", "globe2", "wallet2", "gear"],
+        options=["Calculator", "Scenarios", "City Compare", "My Plan", "Settings"],
+        icons=["calculator", "calendar3", "globe2", "wallet2", "gear"],
         default_index=0,
         styles={
             "container": {"padding": "0.5rem 0.3rem", "background-color": "#020617"},
@@ -951,6 +956,106 @@ if page == "Calculator":
         )
         st.markdown("</div>", unsafe_allow_html=True)
 
+# =========================================================
+# PAGE A1: SCENARIOUS
+# =========================================================
+elif page == "Scenarios":
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("Scenario builder")
+    st.markdown(
+        "<div class='small-note'>Create named scenarios for different offers and model your financial journey "
+        "across pre-arrival, semesters, internships, and grace periods.</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    scenarios = st.session_state["scenarios"]
+
+    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
+    st.markdown("#### Create or select a scenario")
+    st.write("")
+
+    left, right = st.columns(2)
+
+    with left:
+        if scenarios:
+            labels = []
+            id_map = {}
+            for sc in scenarios:
+                label = f"{sc['name']} | {sc['city']}"
+                labels.append(label)
+                id_map[label] = sc["id"]
+
+            selected = st.selectbox("Existing scenarios", labels)
+            st.session_state["active_scenario_id"] = id_map[selected]
+        else:
+            st.info("No scenarios yet.")
+
+    with right:
+        with st.form("new_scenario"):
+            name = st.text_input("Scenario name", placeholder="WashU MSBA 2025")
+            city = st.text_input("City", placeholder="Saint Louis")
+            visa = st.text_input("Visa type", placeholder="F-1")
+            start = st.date_input("Program start")
+            end = st.date_input("Program end")
+            add = st.form_submit_button("Add scenario")
+
+        if add and name:
+            sc = {
+                "id": make_scenario_id(),
+                "name": name,
+                "city": city,
+                "visa": visa,
+                "program_start": str(start),
+                "program_end": str(end),
+                "phases": [],
+            }
+            st.session_state["scenarios"].append(sc)
+            st.session_state["active_scenario_id"] = sc["id"]
+            st.success("Scenario created.")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # Get active scenario
+    active = None
+    for sc in st.session_state["scenarios"]:
+        if sc["id"] == st.session_state["active_scenario_id"]:
+            active = sc
+            break
+
+    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
+    st.markdown("#### Add timeline phase")
+    st.write("")
+
+    if active is None:
+        st.info("Create or select a scenario first.")
+    else:
+        with st.form("add_phase"):
+            pname = st.text_input("Phase name", placeholder="Pre-arrival")
+            months = st.number_input("Months", 1, 36, 4)
+            income = st.number_input("Monthly income", 0.0, step=50.0)
+            expenses = st.number_input("Monthly expenses", 0.0, step=50.0)
+            oneoff = st.number_input("One-time costs", 0.0, step=50.0)
+            addp = st.form_submit_button("Add phase")
+
+        if addp and pname:
+            active["phases"].append(
+                {
+                    "name": pname,
+                    "months": months,
+                    "monthly_income": income,
+                    "monthly_expenses": expenses,
+                    "one_time_costs": oneoff,
+                }
+            )
+            st.success("Phase added.")
+
+        if active["phases"]:
+            df = pd.DataFrame(active["phases"])
+            st.dataframe(df, use_container_width=True, hide_index=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+    
 
 # =========================================================
 # PAGE B: CITY COMPARE
