@@ -1,5 +1,5 @@
 # =========================================================
-# app.py  (rewritten with saved calculations + My Plan link)
+# app.py  (enhanced: program details, risk zones, debt/payback, presets)
 # =========================================================
 
 # 1) IMPORTS
@@ -9,6 +9,7 @@ import pandas as pd
 import plotly.express as px
 from streamlit_option_menu import option_menu
 from datetime import date, timedelta, datetime
+import math
 
 
 # =========================================================
@@ -19,18 +20,24 @@ def init_defaults():
         "status": "Unknown",
         "balance": 0.0,
         "context_city": "-",
+
+        # goals and compare settings
         "goal_amount": 1000.0,
         "goal_deadline": date.today() + timedelta(days=90),
         "compare_metric": "Balance",
         "month_preset": "All data",
+
+        # health metrics
         "health_score": 0,
         "rent_ratio": None,
         "savings_rate": None,
         "buffer_months": 0.0,
+
+        # onboarding and flags
         "first_run": True,
         "calc_ready": False,
 
-        # history (for trends) and saved named calculations (for My Plan)
+        # history and saved scenarios
         "calc_history": [],
         "saved_calcs": [],
         "active_saved_calc_id": None,
@@ -53,6 +60,17 @@ def init_defaults():
 
         # My Plan extra
         "current_saved": 0.0,
+
+        # program and debt inputs (captured when saving calc)
+        "program_name": "",
+        "program_type": "Current offer",
+        "program_start": date.today(),
+        "program_end": date.today() + timedelta(days=365),
+        "tuition_total": 0.0,
+        "loan_amount": 0.0,
+        "loan_rate": 6.0,  # annual percent
+        "postgrad_savings_rate": 0.15,  # share of income used to repay debt
+        "expected_starting_salary": 60000.0,
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -135,6 +153,15 @@ hr.soft {
     border-top: 1px solid #1f2937;
     margin: 0.75rem 0;
 }
+.risk-badge {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+}
+.risk-good {background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.35);}
+.risk-warn {background: rgba(234,179,8,0.12); border: 1px solid rgba(234,179,8,0.35);}
+.risk-bad  {background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35);}
 </style>
 """,
     unsafe_allow_html=True,
@@ -150,6 +177,15 @@ CITY_MIN_WAGE = {
     "New York City": 16.00,
     "Los Angeles": 16.90,
 }
+
+# rough presets (you can tune these)
+CITY_EXPENSE_PRESETS = {
+    "Saint Louis": {"rent": 850, "utilities": 130, "food": 350, "transport": 90, "phone_internet": 60},
+    "Chicago": {"rent": 1300, "utilities": 160, "food": 420, "transport": 120, "phone_internet": 70},
+    "New York City": {"rent": 1700, "utilities": 180, "food": 500, "transport": 140, "phone_internet": 80},
+    "Los Angeles": {"rent": 1600, "utilities": 170, "food": 450, "transport": 130, "phone_internet": 70},
+}
+
 DEFAULT_CITY = "Saint Louis" if "Saint Louis" in CITY_MIN_WAGE else list(CITY_MIN_WAGE.keys())[0]
 
 
@@ -278,6 +314,34 @@ def make_saved_calc_id() -> str:
     return datetime.now().strftime("%Y%m%d%H%M%S%f")
 
 
+def risk_badge_html(label: str, level: str) -> str:
+    css = "risk-good"
+    if level == "warn":
+        css = "risk-warn"
+    elif level == "bad":
+        css = "risk-bad"
+    return f"<span class='risk-badge {css}'>{label}</span>"
+
+
+def payback_years(loan_amount: float, annual_rate: float, annual_payment: float) -> float:
+    """
+    Simple payback time using annuity formula.
+    If annual_payment is too small, return math.inf.
+    """
+    if loan_amount <= 0 or annual_payment <= 0:
+        return 0.0
+    r = annual_rate / 100.0
+    if r <= 0:
+        # no interest
+        return loan_amount / annual_payment
+    # n = ln(P / (P - r*L)) / ln(1 + r)
+    denom = annual_payment - r * loan_amount
+    if denom <= 0:
+        return math.inf
+    n = math.log(annual_payment / denom) / math.log(1 + r)
+    return max(n, 0.0)
+
+
 # =========================================================
 # 6) SIDEBAR: NAV + SNAPSHOT + CONTROLS
 # =========================================================
@@ -324,7 +388,7 @@ with st.sidebar:
     status_now = st.session_state["status"]
     st.write("")
     if status_now == "Deficit":
-        st.info("Tip: Check rent and misc. Even a small  can flip you positive.")
+        st.info("Tip: Check rent and misc. Even a small cut can flip you positive.")
     elif status_now == "Break-even":
         st.info("Tip: Try to build at least one month of buffer savings.")
     elif status_now == "Surplus":
@@ -364,14 +428,18 @@ st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.title("International Student Cost Survival Dashboard")
 st.markdown(
     "<div class='small-note'>Use the Calculator for personal numbers, City Compare for CSV insights, "
-    "and My Plan to turn one of your saved calculations into a goal plan.</div>",
+    "and My Plan to turn one of your saved calculations into a goal and debt plan.</div>",
     unsafe_allow_html=True,
 )
 st.markdown("</div>", unsafe_allow_html=True)
 
 # Guided first-time banner
 if st.session_state.get("first_run", True):
-    st.info("Step 1: Run Calculator. Step 2: Save a calculation. Step 3: Build a plan in My Plan.")
+    st.info(
+        "Step 1: In Calculator, fill your city, job and expenses. "
+        "Step 2: Add program details and save the scenario. "
+        "Step 3: Use My Plan to check goals and debt payback."
+    )
     st.session_state["first_run"] = False
 
 
@@ -382,8 +450,8 @@ if page == "Calculator":
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("Personal Calculator")
     st.markdown(
-        "<div class='small-note'>Fill the form and click Calculate. "
-        "We use city minimum wage to estimate job income.</div>",
+        "<div class='small-note'>Start with your study city and job hours. "
+        "Then add program details so you can save a full scenario.</div>",
         unsafe_allow_html=True,
     )
     st.markdown("</div>", unsafe_allow_html=True)
@@ -409,7 +477,6 @@ if page == "Calculator":
         st.markdown("### Work hours (weekly)")
         h1, h2, h3, h4 = st.columns(4)
         with h1:
-            # Using "-" instead of long dash here
             hours_mon_fri = st.number_input("Hours Mon-Fri (total)", min_value=0.0, value=20.0, step=1.0)
         with h2:
             hours_sat = st.number_input("Hours Saturday", min_value=0.0, value=0.0, step=1.0)
@@ -424,16 +491,60 @@ if page == "Calculator":
 
         st.write("")
         st.markdown("### Monthly expenses")
+
+        # preset button area
+        pcol, _ = st.columns([1.5, 1])
+        with pcol:
+            use_preset = st.checkbox("Use city presets for basic expenses")
+
         e1, e2, e3 = st.columns(3)
         with e1:
-            rent = st.number_input("Rent ($)", min_value=0.0, value=850.0, step=25.0)
-            utilities = st.number_input("Utilities ($)", min_value=0.0, value=120.0, step=10.0)
+            rent_default = CITY_EXPENSE_PRESETS.get(calc_city, {}).get("rent", 850) if use_preset else 850
+            utilities_default = CITY_EXPENSE_PRESETS.get(calc_city, {}).get("utilities", 120) if use_preset else 120
+            rent = st.number_input("Rent ($)", min_value=0.0, value=float(rent_default), step=25.0)
+            utilities = st.number_input("Utilities ($)", min_value=0.0, value=float(utilities_default), step=10.0)
         with e2:
-            food = st.number_input("Food ($)", min_value=0.0, value=350.0, step=10.0)
-            transport = st.number_input("Transport ($)", min_value=0.0, value=90.0, step=10.0)
+            food_default = CITY_EXPENSE_PRESETS.get(calc_city, {}).get("food", 350) if use_preset else 350
+            transport_default = CITY_EXPENSE_PRESETS.get(calc_city, {}).get("transport", 90) if use_preset else 90
+            food = st.number_input("Food ($)", min_value=0.0, value=float(food_default), step=10.0)
+            transport = st.number_input("Transport ($)", min_value=0.0, value=float(transport_default), step=10.0)
         with e3:
-            phone_internet = st.number_input("Phone/Internet ($)", min_value=0.0, value=60.0, step=10.0)
+            phone_default = CITY_EXPENSE_PRESETS.get(calc_city, {}).get("phone_internet", 60) if use_preset else 60
+            phone_internet = st.number_input("Phone/Internet ($)", min_value=0.0, value=float(phone_default), step=10.0)
             misc_basic = st.number_input("Misc basics ($)", min_value=0.0, value=130.0, step=10.0)
+
+        st.write("")
+        st.markdown("### Program details (for My Plan and debt view)")
+        d1, d2 = st.columns(2)
+        with d1:
+            program_name = st.text_input(
+                "Program name (for example: MS Business Analytics)",
+                value=st.session_state.get("program_name", ""),
+            )
+            program_type = st.selectbox(
+                "Scenario type",
+                ["Current offer", "Backup offer", "Dream option", "Current school"],
+                index=["Current offer", "Backup offer", "Dream option", "Current school"].index(
+                    st.session_state.get("program_type", "Current offer")
+                ),
+            )
+            program_start = st.date_input("Program start date", value=st.session_state.get("program_start", date.today()))
+        with d2:
+            program_end = st.date_input(
+                "Expected graduation date", value=st.session_state.get("program_end", date.today() + timedelta(days=365))
+            )
+            tuition_total = st.number_input(
+                "Total tuition and fees for full program ($)",
+                min_value=0.0,
+                value=float(st.session_state.get("tuition_total", 0.0)),
+                step=1000.0,
+            )
+            loan_amount = st.number_input(
+                "Planned total loan amount ($)",
+                min_value=0.0,
+                value=float(st.session_state.get("loan_amount", 0.0)),
+                step=1000.0,
+            )
 
         st.write("")
         submitted = st.form_submit_button("✅ Calculate")
@@ -441,8 +552,8 @@ if page == "Calculator":
     # Smart empty state
     if not submitted and not st.session_state.get("calc_ready", False):
         st.info(
-            "Fill the form above and click Calculate to see your budget, charts, scenario simulator, "
-            "and the save option for My Plan."
+            "Fill the form above and click Calculate to see your monthly budget, risk zones, "
+            "scenario simulator and save options for My Plan."
         )
     elif submitted:
         weekly_job_income = (wage * (hours_mon_fri + hours_sat)) + (wage * hours_sun * sunday_multiplier)
@@ -460,7 +571,7 @@ if page == "Calculator":
             balance=balance,
         )
 
-        # Persist for scenario + download + My Plan (fixes NameError issues)
+        # Persist for scenario + download + My Plan
         st.session_state["weekly_job_income"] = float(weekly_job_income)
         st.session_state["monthly_job_income"] = float(monthly_job_income)
         st.session_state["wage"] = float(wage)
@@ -484,6 +595,14 @@ if page == "Calculator":
         st.session_state["transport"] = float(transport)
         st.session_state["phone_internet"] = float(phone_internet)
         st.session_state["misc_basic"] = float(misc_basic)
+
+        # keep program and debt related values
+        st.session_state["program_name"] = program_name
+        st.session_state["program_type"] = program_type
+        st.session_state["program_start"] = program_start
+        st.session_state["program_end"] = program_end
+        st.session_state["tuition_total"] = float(tuition_total)
+        st.session_state["loan_amount"] = float(loan_amount)
 
         st.session_state["calc_ready"] = True
 
@@ -518,6 +637,13 @@ if page == "Calculator":
         phone_internet = float(st.session_state["phone_internet"])
         misc_basic = float(st.session_state["misc_basic"])
 
+        program_name = st.session_state.get("program_name", "")
+        program_type = st.session_state.get("program_type", "Current offer")
+        program_start = st.session_state.get("program_start", date.today())
+        program_end = st.session_state.get("program_end", date.today() + timedelta(days=365))
+        tuition_total = float(st.session_state.get("tuition_total", 0.0))
+        loan_amount = float(st.session_state.get("loan_amount", 0.0))
+
         # Results
         st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.subheader("Results")
@@ -541,12 +667,12 @@ if page == "Calculator":
         elif status == "Break-even":
             st.warning("BREAK-EVEN. You are surviving, but there is no buffer.")
         else:
-            st.error("DEFICIT. You will likely need support or expense s.")
+            st.error("DEFICIT. You will likely need support or expense cuts.")
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # Financial Health Score
+        # Financial Health Score + risk zones
         st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.subheader("Financial Health Score")
+        st.subheader("Financial Health and risk zones")
         st.write("")
 
         score = int(st.session_state.get("health_score", 0))
@@ -563,15 +689,41 @@ if page == "Calculator":
         c3.metric("Savings rate", f"{savings_rate*100:.1f}%")
         c4.metric("Buffer (months)", f"{buffer_months:.1f}")
 
+        # simple risk badges
         st.write("")
-        if score >= 75:
-            st.success("Excellent financial health. You are well-positioned.")
-        elif score >= 55:
-            st.info("Moderate health. Small improvements can strengthen your buffer.")
-        elif score >= 40:
-            st.warning("Fragile finances. Focus on reducing fixed costs or boosting income.")
+        rb1, rb2, rb3 = st.columns(3)
+
+        # rent risk
+        if rent_ratio <= 0.30:
+            rent_badge = risk_badge_html("Rent is light", "good")
+        elif rent_ratio <= 0.40:
+            rent_badge = risk_badge_html("Rent is heavy", "warn")
         else:
-            st.error("High financial stress. Immediate action recommended.")
+            rent_badge = risk_badge_html("Rent is very high", "bad")
+
+        # buffer risk
+        if buffer_months >= 2:
+            buf_badge = risk_badge_html("Buffer is ok", "good")
+        elif buffer_months >= 1:
+            buf_badge = risk_badge_html("Thin buffer", "warn")
+        else:
+            buf_badge = risk_badge_html("No buffer", "bad")
+
+        # savings risk
+        if savings_rate >= 0.10:
+            sav_badge = risk_badge_html("Strong savings", "good")
+        elif savings_rate >= 0.05:
+            sav_badge = risk_badge_html("Low savings", "warn")
+        else:
+            sav_badge = risk_badge_html("No savings", "bad")
+
+        with rb1:
+            st.markdown(f"Rent pressure: {rent_badge}", unsafe_allow_html=True)
+        with rb2:
+            st.markdown(f"Emergency cushion: {buf_badge}", unsafe_allow_html=True)
+        with rb3:
+            st.markdown(f"Savings habit: {sav_badge}", unsafe_allow_html=True)
+
         st.markdown("</div>", unsafe_allow_html=True)
 
         # Analytics: Expense pressure + trend + risk flags
@@ -580,12 +732,8 @@ if page == "Calculator":
         st.write("")
 
         # 2.1 Expense pressure indicators (ratios)
-        expense_dict = {
-            "Rent": rent,
-            "Food": food,
-            "Transport": transport,
-        }
-        exp_df = build_expense_pressure_df(total_income, expense_dict)  # fixes KeyError ShareOfIncome
+        expense_dict = {"Rent": rent, "Food": food, "Transport": transport}
+        exp_df = build_expense_pressure_df(total_income, expense_dict)
 
         st.markdown("#### Expense pressure indicators")
         st.write("")
@@ -618,12 +766,12 @@ if page == "Calculator":
         st.markdown("<hr class='soft'>", unsafe_allow_html=True)
 
         # 2.3 Risk flags
-        st.markdown("#### Risk flags")
+        st.markdown("#### Extra risk flags")
         st.write("")
         flags = []
 
         if total_income > 0 and (rent / total_income) > 0.40:
-            flags.append("Rent shock risk (rent is more than 40% of income).")
+            flags.append("Rent shock risk (rent is more than 40 percent of income).")
         if buffer_months <= 0:
             flags.append("Zero buffer risk (no savings cushion).")
         if balance < 0:
@@ -724,13 +872,13 @@ if page == "Calculator":
 
         # Save calculation for My Plan
         st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-        st.subheader("Save this calculation for My Plan")
-        st.caption("Give this calculation a name and save it so you can use it later in the My Plan tab.")
+        st.subheader("Save this scenario for My Plan")
+        st.caption("Give this scenario a name and save it so you can compare it later in the My Plan tab.")
         st.write("")
 
-        default_label = f"{calc_city} • {money(balance)}/month"
+        default_label = f"{program_name or calc_city} • {money(balance)}/month"
         label = st.text_input("Name for this calculation", value=default_label, key="save_calc_label")
-        save_clicked = st.button("💾 Save calculation")
+        save_clicked = st.button("💾 Save scenario")
 
         if save_clicked:
             calc_id = make_saved_calc_id()
@@ -739,6 +887,12 @@ if page == "Calculator":
                 "label": label,
                 "city": calc_city,
                 "run_date": str(date.today()),
+                "program_name": program_name,
+                "program_type": program_type,
+                "program_start": str(program_start),
+                "program_end": str(program_end),
+                "tuition_total": float(tuition_total),
+                "loan_amount": float(loan_amount),
                 "total_income": float(total_income),
                 "total_expenses": float(total_expenses),
                 "balance": float(balance),
@@ -753,10 +907,10 @@ if page == "Calculator":
             }
             st.session_state["saved_calcs"].append(saved_entry)
             st.session_state["active_saved_calc_id"] = calc_id
-            st.success("Calculation saved. You can use it in My Plan.")
+            st.success("Scenario saved. You can use it in My Plan.")
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # Download (safe, uses session_state values)
+        # Download
         st.markdown("<div class='section-card'>", unsafe_allow_html=True)
         st.subheader("Download")
         st.caption("Export your current calculation as a CSV file for your own records.")
@@ -764,14 +918,20 @@ if page == "Calculator":
 
         result_row = {
             "city": calc_city,
+            "program_name": program_name,
+            "program_type": program_type,
+            "program_start": str(program_start),
+            "program_end": str(program_end),
             "min_wage": wage,
             "weeks_per_month": float(st.session_state["weeks_per_month"]),
-            "monthly_job_income_est": float(st.session_state["monthly_job_income"]),  # NameError fix
+            "monthly_job_income_est": float(st.session_state["monthly_job_income"]),
             "stipend": float(st.session_state["stipend"]),
             "total_income": total_income,
             "total_expenses": total_expenses,
             "balance": balance,
             "status": status,
+            "tuition_total": tuition_total,
+            "loan_amount": loan_amount,
             "rent": rent,
             "utilities": utilities,
             "food": food,
@@ -854,7 +1014,6 @@ elif page == "City Compare":
         end_month = st.selectbox("End month", months_sorted, index=len(months_sorted) - 1)
 
     st.write("")
-    # Smart empty state
     if len(compare_cities) < 2:
         st.info("Select at least two cities to compare trends and expense mix.")
         st.stop()
@@ -939,11 +1098,11 @@ elif page == "City Compare":
                 {"Expense": expense_columns, "Amount": [float(row[col].iloc[0]) for col in expense_columns]}
             )
             fig2 = px.pie(donut_df, names="Expense", values="Amount", hole=0.55)
-            fig2.update_layout(title=f"{donut_city}: total expenses by category")
-            st.plotly_chart(fig2, use_container_width=True)
-        else:
-            st.info("No expense data for donut chart.")
-        st.markdown("</div>", unsafe_allow_html=True)
+        fig2.update_layout(title=f"{donut_city}: total expenses by category")
+        st.plotly_chart(fig2, use_container_width=True)
+    else:
+        st.info("No expense data for donut chart.")
+    st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.markdown("#### Compare table")
@@ -1058,13 +1217,13 @@ elif page == "My Plan":
         )
     else:
         st.warning(
-            f"Short by about {money(abs(delta))} per week. Try ting expenses or adding a few work hours."
+            f"Short by about {money(abs(delta))} per week. Try cutting expenses or adding a few work hours."
         )
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Actionable  suggestions (based on chosen calc)
+    # Actionable cut suggestions (based on chosen calc)
     st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.markdown("#### Actionable  suggestions (ranked)")
+    st.markdown("#### Actionable cut suggestions (ranked)")
     st.write("")
 
     exp_all = {
@@ -1092,22 +1251,22 @@ elif page == "My Plan":
         for _, r in exp_rank.iterrows():
             cut_amount = 0.10 * float(r["Amount"])
             new_balance = monthly_balance + cut_amount
-        st.markdown(
-            f"""
-            <li>
-                Cut <strong>{money(cut_amount)}</strong> from <strong>{r['Expense']}</strong>.
-                <br>
+            st.markdown(
+                f"""
+                <li>
+                    Cut <strong>{money(cut_amount)}</strong> from <strong>{r['Expense']}</strong>.
+                    <br>
                     <span style="opacity:0.8;">
-                    This moves your monthly balance from
-                    <strong>{money(monthly_balance)}</strong>
-                    to
-                    <strong>{money(new_balance)}</strong>.
-                </span>
-            </li>
-            """,
-        unsafe_allow_html=True,
-        )
-    st.write("")
+                        This moves your monthly balance from
+                        <strong>{money(monthly_balance)}</strong>
+                        to
+                        <strong>{money(new_balance)}</strong>.
+                    </span>
+                </li>
+                """,
+                unsafe_allow_html=True,
+            )
+        st.write("")
     st.markdown("</div>", unsafe_allow_html=True)
 
     # Small table of all saved calcs for quick view
