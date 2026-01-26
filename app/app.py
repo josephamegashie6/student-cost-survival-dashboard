@@ -26,6 +26,15 @@ def init_defaults():
         # goals and compare settings
         "goal_amount": 1000.0,
         "goal_deadline": date.today() + timedelta(days=90),
+        
+        # Debt / payback planning defaults
+        "tuition_total": 0.0,
+        "living_total": 0.0,
+        "scholarships_total": 0.0,
+        "loan_principal": 0.0,
+        "loan_interest_rate": 6.0,      # annual percent
+        "expected_starting_salary": 60000.0,  # annual
+        
         "compare_metric": "Balance",
         "month_preset": "All data",
 
@@ -317,12 +326,13 @@ def make_saved_calc_id() -> str:
 
 
 def risk_badge_html(label: str, level: str) -> str:
-    css = "risk-good"
-    if level == "warn":
-        css = "risk-warn"
-    elif level == "bad":
-        css = "risk-bad"
-    return f"<span class='risk-badge {css}'>{label}</span>"
+    css_map = {
+        "good": "pill pill-green",
+        "warn": "pill pill-yellow",
+        "bad": "pill pill-red",
+    }
+    css = css_map.get(level, "pill")
+    return f"<span class='{css}'>{label}</span>"
 
 
 def payback_years(loan_amount: float, annual_rate: float, annual_payment: float) -> float:
@@ -1332,6 +1342,128 @@ elif page == "My Plan":
         st.warning(
             f"Short by about {money(abs(delta))} per week. Try cutting expenses or adding a few work hours."
         )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    
+# -------------------------------------------------
+# Debt at graduation and payback time
+# -------------------------------------------------
+    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
+    st.markdown("#### Debt at graduation and payback time")
+    st.caption("Rough projection of how much debt you finish with and how long it can take to clear it.")
+
+    dcol1, dcol2, dcol3 = st.columns(3)
+    with dcol1:
+        st.number_input(
+            "Total tuition and fees for program ($)",
+            min_value=0.0,
+            step=1000.0,
+            key="tuition_total",
+        )
+        st.number_input(
+            "Total living costs during program ($)",
+            min_value=0.0,
+            step=1000.0,
+            key="living_total",
+        )
+    with dcol2:
+        st.number_input(
+            "Total scholarships or grants ($)",
+            min_value=0.0,
+            step=1000.0,
+            key="scholarships_total",
+        )
+        st.number_input(
+            "Loan principal at graduation ($)",
+            min_value=0.0,
+            step=1000.0,
+            key="loan_principal",
+        )
+    with dcol3:
+        st.number_input(
+            "Loan interest rate (annual, %)",
+            min_value=0.0,
+            max_value=20.0,
+            step=0.25,
+            key="loan_interest_rate",
+        )
+        st.number_input(
+            "Expected starting salary (annual, $)",
+            min_value=0.0,
+            step=5000.0,
+            key="expected_starting_salary",
+        )
+
+    # Pull values from state
+    tuition_total = float(st.session_state["tuition_total"])
+    living_total = float(st.session_state["living_total"])
+    scholarships_total = float(st.session_state["scholarships_total"])
+    loan_principal = float(st.session_state["loan_principal"])
+    loan_rate_annual = float(st.session_state["loan_interest_rate"])
+    salary_annual = float(st.session_state["expected_starting_salary"])
+
+    total_program_cost = tuition_total + living_total
+    net_cost_after_sch = max(total_program_cost - scholarships_total, 0.0)
+
+    # If user gave a loan principal, trust that; otherwise use net cost as a rough proxy
+    total_debt_at_grad = loan_principal if loan_principal > 0 else net_cost_after_sch
+
+    monthly_salary = salary_annual / 12.0 if salary_annual > 0 else 0.0
+    r = loan_rate_annual / 100.0 / 12.0 if loan_rate_annual > 0 else 0.0
+
+    def monthly_payment(principal: float, rate_monthly: float, years: float) -> float:
+        """Standard amortization payment."""
+        n = int(years * 12)
+        if principal <= 0 or n <= 0:
+            return 0.0
+        if rate_monthly <= 0:
+            return principal / n
+        return principal * rate_monthly / (1 - (1 + rate_monthly) ** (-n))
+
+    baseline_pmt = monthly_payment(total_debt_at_grad, r, 10)
+
+    import math
+
+    def years_to_pay(principal: float, rate_monthly: float, monthly_contrib: float) -> float:
+        """Years to clear debt if you pay a fixed amount each month."""
+        if principal <= 0 or monthly_contrib <= 0:
+            return 0.0
+        if rate_monthly <= 0:
+            # No interest case
+            return principal / (monthly_contrib * 12.0)
+        # If payment does not even cover interest, debt never clears
+        if monthly_contrib <= principal * rate_monthly:
+            return float("inf")
+        # n = -ln(1 - PV*r/pmt) / ln(1+r)
+        n_months = -math.log(1 - principal * rate_monthly / monthly_contrib) / math.log(1 + rate_monthly)
+        return n_months / 12.0
+
+    # Try three saving rates from salary
+    rates = [0.05, 0.10, 0.20]
+    payoff_rows = []
+    for sr in rates:
+        m_contrib = monthly_salary * sr
+        yrs = years_to_pay(total_debt_at_grad, r, m_contrib)
+        payoff_rows.append((sr, m_contrib, yrs))
+
+    d1, d2 = st.columns(2)
+    with d1:
+        st.metric("Total debt at graduation (approx.)", money(total_debt_at_grad))
+        st.metric("Standard 10 year payment", money(baseline_pmt))
+    with d2:
+        st.markdown("**If you put part of your salary into debt:**")
+        for sr, m_contrib, yrs in payoff_rows:
+            rate_label = int(sr * 100)
+            if yrs == float("inf"):
+                msg = "would never fully clear the debt (payment too low)."
+            elif yrs <= 0:
+                msg = "clears the debt immediately."
+            else:
+                msg = f"clears the debt in about {yrs:.1f} years."
+            st.markdown(
+                f"- Saving **{rate_label}%** (~{money(m_contrib)}/month) {msg}"
+            )
+
     st.markdown("</div>", unsafe_allow_html=True)
 
     # Actionable cut suggestions (based on chosen calc)
