@@ -1065,7 +1065,102 @@ elif page == "Scenarios":
             st.dataframe(df, use_container_width=True, hide_index=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
-    
+
+    # -------------------------------------------------
+    # Scenario balance timeline and insights
+    # -------------------------------------------------
+    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
+    st.markdown("#### Balance timeline")
+    st.write("")
+
+    if active is None or not active.get("phases"):
+        st.info("Add at least one phase above to see how your cash balance changes over time.")
+        st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        phases = active["phases"]
+
+        # Starting cash input
+        starting_cash = st.number_input(
+            "Starting cash before first phase ($)",
+            min_value=-50000.0,
+            max_value=500000.0,
+            value=0.0,
+            step=500.0,
+            help="Rough amount you will have saved before pre-arrival (family support, savings, etc).",
+            key=f"start_cash_{active['id']}",
+        )
+
+        # Build a timeline table: one row per phase
+        rows = []
+        current_balance = float(starting_cash)
+
+        for idx, ph in enumerate(phases, start=1):
+            name = ph["name"]
+            months = int(ph["months"])
+            mi = float(ph["monthly_income"])
+            me = float(ph["monthly_expenses"])
+            one_off = float(ph["one_time_costs"])
+
+            net_per_month = mi - me
+            recurring_impact = net_per_month * months
+            total_impact = recurring_impact - one_off  # one-off reduces balance
+            end_balance = current_balance + total_impact
+
+            rows.append(
+                {
+                    "Order": idx,
+                    "Phase": name,
+                    "Months": months,
+                    "Net per month": net_per_month,
+                    "Total impact": total_impact,
+                    "End balance": end_balance,
+                }
+            )
+
+            current_balance = end_balance
+
+        tl_df = pd.DataFrame(rows)
+
+        c1, c2 = st.columns([1.4, 1.2])
+
+        with c1:
+            st.markdown("**Phase summary**")
+            st.dataframe(tl_df, use_container_width=True, hide_index=True)
+
+        with c2:
+            st.markdown("**Balance over phases**")
+            fig = px.line(
+                tl_df,
+                x="Order",
+                y="End balance",
+                markers=True,
+                text="Phase",
+                title="Projected cash balance at the end of each phase",
+            )
+            fig.update_traces(textposition="top center")
+            fig.update_layout(
+                xaxis_title="Phase (in order)",
+                yaxis_title="Balance (USD)",
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+            min_bal = float(tl_df["End balance"].min())
+            max_bal = float(tl_df["End balance"].max())
+            st.caption(
+                f"Lowest balance across phases: {money(min_bal)} • "
+                f"Highest balance: {money(max_bal)}"
+            )
+
+            if min_bal < 0:
+                st.warning(
+                    "You dip below zero in at least one phase. "
+                    "You will need more savings, support, or higher income to avoid running out of cash."
+                )
+            else:
+                st.success("You never drop below zero in this scenario. Cash buffer looks feasible.")
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
 
 # =========================================================
 # PAGE B: CITY COMPARE
