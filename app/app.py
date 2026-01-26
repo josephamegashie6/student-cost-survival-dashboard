@@ -1102,21 +1102,21 @@ elif page == "City Compare":
         st.plotly_chart(fig2, use_container_width=True)
     else:
         st.info("No expense data for donut chart.")
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("#### Compare table")
-    st.write("")
-    show = summary.sort_values("avg_balance", ascending=False).copy()
-    show["Avg income"] = show["avg_income"].round(0)
-    show["Avg expenses"] = show["avg_expenses"].round(0)
-    show["Avg balance"] = show["avg_balance"].round(0)
-    show["Savings rate (%)"] = (show["savings_rate"] * 100).round(1)
-    show = show[
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.markdown("#### Compare table")
+        st.write("")
+        show = summary.sort_values("avg_balance", ascending=False).copy()
+        show["Avg income"] = show["avg_income"].round(0)
+        show["Avg expenses"] = show["avg_expenses"].round(0)
+        show["Avg balance"] = show["avg_balance"].round(0)
+        show["Savings rate (%)"] = (show["savings_rate"] * 100).round(1)
+        show = show[
         ["city", "Avg income", "Avg expenses", "Avg balance", "months", "Savings rate (%)"]
-    ].rename(columns={"city": "City", "months": "Months"})
-    st.dataframe(show, use_container_width=True, hide_index=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+        ].rename(columns={"city": "City", "months": "Months"})
+        st.dataframe(show, use_container_width=True, hide_index=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 # =========================================================
