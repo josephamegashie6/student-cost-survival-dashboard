@@ -1093,8 +1093,19 @@ elif page == "My Plan":
             cut_amount = 0.10 * float(r["Amount"])
             new_balance = monthly_balance + cut_amount
         st.markdown(
-            f"- Cut **{money(cut_amount)}** from **{r['Expense']}**.  "
-            f"This moves your monthly balance from **{money(monthly_balance)}** to **{money(new_balance)}**."
+            f"""
+            <li>
+                Cut <strong>{money(cut_amount)}</strong> from <strong>{r['Expense']}</strong>.
+                <br>
+                    <span style="opacity:0.8;">
+                    This moves your monthly balance from
+                    <strong>{money(monthly_balance)}</strong>
+                    to
+                    <strong>{money(new_balance)}</strong>.
+                </span>
+            </li>
+            """,
+        unsafe_allow_html=True,
         )
     st.write("")
     st.markdown("</div>", unsafe_allow_html=True)
