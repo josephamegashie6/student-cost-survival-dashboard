@@ -4,7 +4,7 @@ An interactive dashboard analyzing the monthly cost of living and financial surv
 ## Key Features
 - Monthly cost-of-living simulation for international students
 - Risk indicators (rent burden, savings rate, buffer months)
-- Scenario comparison across cities and income levels(still in developement)
+- Scenario comparison across cities and income levels (still in developement)
 - Mobile-friendly Streamlit interface
 
 ## 🌍 Live App
