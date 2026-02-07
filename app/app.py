@@ -1,15 +1,3 @@
-# =========================================================
-# app.py  (FULL FILE)
-# Enhanced:
-# - Saved calculations (multiple) and My Plan uses the selected saved calc
-# - Scenarios timeline (User -> Scenarios -> Phases) with real insights that persist
-# - Debt at graduation + payback that does NOT clear when switching pages (unique session keys)
-# - More spacing in UI (CSS + st.write("") usage)
-# =========================================================
-
-# =========================================================
-# 1) IMPORTS (must be at the very top)
-# =========================================================
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -18,9 +6,8 @@ from datetime import date, timedelta, datetime
 import math
 
 
-# =========================================================
-# 2) SESSION DEFAULTS
-# =========================================================
+
+#2) SESSION DEFAULTS
 def init_defaults():
     defaults = {
         # snapshot
@@ -82,18 +69,18 @@ def init_defaults():
         "savings_rate": None,
         "buffer_months": 0.0,
 
-        # debt planner inputs (UNIQUE KEYS so they do not collide)
+        # debt planner inputs 
         "debt_tuition_total": 0.0,
         "debt_living_total": 0.0,
         "debt_scholarships_total": 0.0,
         "debt_loan_principal": 0.0,
-        "debt_loan_interest_rate": 6.0,          # annual percent
-        "debt_expected_start_salary": 60000.0,   # annual
+        "debt_loan_interest_rate": 6.0,         
+        "debt_expected_start_salary": 60000.0, 
         "debt_salary_to_debt_rate_1": 0.05,
         "debt_salary_to_debt_rate_2": 0.10,
         "debt_salary_to_debt_rate_3": 0.20,
 
-         # onboarding wizard
+         # onboarding
         "onboarding_step": 1,
     }
     for k, v in defaults.items():
@@ -103,16 +90,10 @@ def init_defaults():
 
 init_defaults()
 
-
-# =========================================================
-# 3) PAGE CONFIG
-# =========================================================
+#3) PAGE CONFIG
 st.set_page_config(page_title="Student Cost Survival Dashboard", layout="wide")
 
-
-# =========================================================
-# 4) STYLING (CSS)
-# =========================================================
+#4) STYLING (CSS)
 st.markdown(
     """
 <style>
@@ -208,9 +189,7 @@ li { margin-bottom: 0.45rem; line-height: 1.45; }
 )
 
 
-# =========================================================
-# 5) CONSTANTS + HELPERS
-# =========================================================
+#5) CONSTANTS + HELPERS
 CITY_MIN_WAGE = {
     "Saint Louis": 12.30,
     "Chicago": 15.80,
@@ -226,8 +205,6 @@ CITY_EXPENSE_PRESETS = {
 }
 
 DEFAULT_CITY = "Saint Louis" if "Saint Louis" in CITY_MIN_WAGE else list(CITY_MIN_WAGE.keys())[0]
-
-
 def financial_status(balance: float) -> str:
     if balance > 0:
         return "Surplus"
@@ -235,13 +212,11 @@ def financial_status(balance: float) -> str:
         return "Break-even"
     return "Deficit"
 
-
 def money(x: float) -> str:
     try:
         return f"${float(x):,.0f}"
     except Exception:
         return "$0"
-
 
 def safe_read_csv(path: str):
     try:
@@ -249,10 +224,8 @@ def safe_read_csv(path: str):
     except Exception:
         return None
 
-
 def clamp(n: float, low: float, high: float) -> float:
     return max(low, min(high, n))
-
 
 def score_label(score: int) -> str:
     if score >= 80:
@@ -262,7 +235,6 @@ def score_label(score: int) -> str:
     if score >= 40:
         return "Risky"
     return "Critical"
-
 
 def financial_health_score(total_income: float, total_expenses: float, rent: float, balance: float) -> tuple[int, dict]:
     if total_income <= 0:
@@ -278,7 +250,7 @@ def financial_health_score(total_income: float, total_expenses: float, rent: flo
 
     rent_ratio = rent / total_income
     savings_rate = balance / total_income
-
+    
     balance_points = 40 if balance > 0 else 0
 
     rent_points = 25 * (0.60 - rent_ratio) / (0.60 - 0.35)
@@ -303,15 +275,13 @@ def financial_health_score(total_income: float, total_expenses: float, rent: flo
         "buffer_months": buffer_months,
     }
     return score, breakdown
-
-
+    
 def pressure_flag(share: float) -> tuple[str, str]:
     if share <= 0.25:
         return "Healthy", "pill-green"
     if share <= 0.35:
         return "Risky", "pill-yellow"
     return "Danger", "pill-red"
-
 
 def build_expense_pressure_df(total_income: float, expense_dict: dict) -> pd.DataFrame:
     rows = []
@@ -330,20 +300,16 @@ def build_expense_pressure_df(total_income: float, expense_dict: dict) -> pd.Dat
         return pd.DataFrame(columns=["Expense", "Amount", "ShareOfIncome", "FlagLabel", "FlagCss"])
     return df.sort_values("ShareOfIncome", ascending=False, ignore_index=True)
 
-
 def make_saved_calc_id() -> str:
     return "calc_" + datetime.now().strftime("%Y%m%d%H%M%S%f")
 
-
 def make_scenario_id() -> str:
     return "scn_" + datetime.now().strftime("%Y%m%d%H%M%S%f")
-
 
 def risk_badge_html(label: str, level: str) -> str:
     css_map = {"good": "pill pill-green", "warn": "pill pill-yellow", "bad": "pill pill-red"}
     css = css_map.get(level, "pill")
     return f"<span class='{css}'>{label}</span>"
-
 
 def get_active_scenario_index():
     active_id = st.session_state.get("active_scenario_id")
@@ -353,7 +319,6 @@ def get_active_scenario_index():
             return i
     return None
 
-
 def monthly_payment(principal: float, rate_monthly: float, years: float) -> float:
     n = int(years * 12)
     if principal <= 0 or n <= 0:
@@ -361,7 +326,6 @@ def monthly_payment(principal: float, rate_monthly: float, years: float) -> floa
     if rate_monthly <= 0:
         return principal / n
     return principal * rate_monthly / (1 - (1 + rate_monthly) ** (-n))
-
 
 def years_to_pay(principal: float, rate_monthly: float, monthly_contrib: float) -> float:
     if principal <= 0 or monthly_contrib <= 0:
@@ -374,9 +338,7 @@ def years_to_pay(principal: float, rate_monthly: float, monthly_contrib: float) 
     return n_months / 12.0
 
 
-# =========================================================
-# 6) SIDEBAR: NAV + SNAPSHOT + CONTROLS
-# =========================================================
+#6) SIDEBAR: NAV + SNAPSHOT + CONTROLS
 with st.sidebar:
     st.markdown("### Student Cost Survival")
     st.write("")
@@ -444,9 +406,7 @@ with st.sidebar:
         st.number_input("Already saved toward goal ($)", min_value=0.0, step=50.0, key="current_saved")
         st.caption("Use Calculator and Save at least one calculation.")
 
-# =========================================================
 # 7) TOP TITLE
-# =========================================================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.title("International Student Cost Survival Dashboard")
 st.markdown(
@@ -459,9 +419,8 @@ if st.session_state.get("first_run", True):
     st.info("Step 1: Run Calculator. Step 2: Save a calculation. Step 3: Use My Plan. Step 4: Use Scenarios to model phases.")
     st.session_state["first_run"] = False
 
-# =========================================================
+
 # PAGE 0: ONBOARDING WIZARD
-# =========================================================
 if page == "Onboarding":
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("Quick onboarding")
@@ -718,9 +677,7 @@ if page == "Onboarding":
             st.session_state["onboarding_step"] = 1
             st.success("Values sent. Open the Calculator page to see and refine them.")
 
-# =========================================================
-# PAGE A: CALCULATOR
-# =========================================================
+#PAGE A: CALCULATOR
 if page == "Calculator":
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("Personal Calculator")
@@ -876,7 +833,7 @@ if page == "Calculator":
         st.session_state["phone_internet"] = float(phone_internet)
         st.session_state["misc_basic"] = float(misc_basic)
 
-        # program details persisted
+        # program details 
         st.session_state["program_name"] = program_name
         st.session_state["program_type"] = program_type
         st.session_state["program_start"] = program_start
@@ -1240,9 +1197,7 @@ if page == "Calculator":
         st.markdown("</div>", unsafe_allow_html=True)
 
 
-# =========================================================
-# PAGE B: SCENARIOS
-# =========================================================
+#PAGE B: SCENARIOS
 elif page == "Scenarios":
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("Scenario builder")
@@ -1435,9 +1390,7 @@ elif page == "Scenarios":
         st.markdown("</div>", unsafe_allow_html=True)
 
 
-# =========================================================
 # PAGE C: CITY COMPARE
-# =========================================================
 elif page == "City Compare":
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("City comparison (CSV)")
@@ -1560,10 +1513,7 @@ elif page == "City Compare":
     st.dataframe(show, use_container_width=True, hide_index=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-
-# =========================================================
 # PAGE D: MY PLAN
-# =========================================================
 elif page == "My Plan":
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("My plan")
@@ -1801,10 +1751,7 @@ elif page == "My Plan":
         st.caption("No saved calculations to display.")
     st.markdown("</div>", unsafe_allow_html=True)
 
-
-# =========================================================
 # PAGE E: SETTINGS
-# =========================================================
 elif page == "Settings":
     st.subheader("Settings")
     st.write("")
