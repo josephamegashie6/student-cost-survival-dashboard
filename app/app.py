@@ -92,6 +92,9 @@ def init_defaults():
         "debt_salary_to_debt_rate_1": 0.05,
         "debt_salary_to_debt_rate_2": 0.10,
         "debt_salary_to_debt_rate_3": 0.20,
+
+         # onboarding wizard
+        "onboarding_step": 1,
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -178,9 +181,27 @@ hr.soft {
     margin: 0.90rem 0;
 }
 
-/* better spacing for lists and text */
 ul { margin-top: 0.25rem; margin-bottom: 0.45rem; }
 li { margin-bottom: 0.45rem; line-height: 1.45; }
+
+/* Mobile-first tweaks */
+@media (max-width: 768px) {
+    .block-container {
+        padding-top: 1.5rem;
+        padding-left: 0.7rem;
+        padding-right: 0.7rem;
+    }
+    .card, .section-card {
+        padding: 0.9rem 0.9rem;
+        margin-bottom: 0.8rem;
+    }
+    .kpi-value {
+        font-size: 1.3rem;
+    }
+    .kpi-sub, .small-note {
+        font-size: 0.85rem;
+    }
+}
 </style>
 """,
     unsafe_allow_html=True,
@@ -362,8 +383,8 @@ with st.sidebar:
 
     page = option_menu(
         menu_title=None,
-        options=["Calculator", "Scenarios", "City Compare", "My Plan", "Settings"],
-        icons=["calculator", "calendar3", "globe2", "wallet2", "gear"],
+        options=["Onboarding", "Calculator", "Scenarios", "City Compare", "My Plan", "Settings"],
+        icons=["play-circle", "calculator", "calendar3", "globe2", "wallet2", "gear"],
         default_index=0,
         styles={
             "container": {"padding": "0.5rem 0.3rem", "background-color": "#020617"},
@@ -423,7 +444,6 @@ with st.sidebar:
         st.number_input("Already saved toward goal ($)", min_value=0.0, step=50.0, key="current_saved")
         st.caption("Use Calculator and Save at least one calculation.")
 
-
 # =========================================================
 # 7) TOP TITLE
 # =========================================================
@@ -439,6 +459,264 @@ if st.session_state.get("first_run", True):
     st.info("Step 1: Run Calculator. Step 2: Save a calculation. Step 3: Use My Plan. Step 4: Use Scenarios to model phases.")
     st.session_state["first_run"] = False
 
+# =========================================================
+# PAGE 0: ONBOARDING WIZARD
+# =========================================================
+if page == "Onboarding":
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("Quick onboarding")
+    st.markdown(
+        "<div class='small-note'>Four short steps: school and timing, income, housing and bills, then a simple result + risks. You can always fine-tune later in Calculator.</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    step = st.session_state.get("onboarding_step", 1)
+    step = int(step)
+
+    # progress / step header
+    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
+    st.markdown(f"**Step {step} of 4**")
+    st.write("")
+
+    # STEP 1
+    if step == 1:
+        st.markdown("### Step 1: Where will you study and when do you arrive?")
+        st.write("")
+        col1, col2 = st.columns(2)
+        with col1:
+            city = st.selectbox(
+                "Study city",
+                list(CITY_MIN_WAGE.keys()),
+                index=list(CITY_MIN_WAGE.keys()).index(DEFAULT_CITY),
+                key="ob_city",
+            )
+        with col2:
+            arrival = st.date_input("Approx arrival date", key="ob_arrival_date")
+
+        st.caption("This helps set your city presets and gives you a rough timeline.")
+
+    # STEP 2
+    if step == 2:
+        st.markdown("### Step 2: Income sources")
+        st.write("")
+        c1, c2 = st.columns(2)
+        with c1:
+            wage = st.number_input(
+                "Campus / hourly wage ($/hour)",
+                min_value=0.0,
+                value=st.session_state.get("wage", CITY_MIN_WAGE.get(st.session_state.get('ob_city', DEFAULT_CITY), 15.0)),
+                step=0.25,
+                key="ob_wage",
+            )
+            weekly_hours = st.number_input(
+                "Total weekly work hours",
+                min_value=0.0,
+                value=20.0,
+                step=1.0,
+                key="ob_weekly_hours",
+            )
+        with c2:
+            weeks_per_month = st.number_input(
+                "Weeks per month",
+                min_value=3.0,
+                max_value=5.0,
+                value=4.33,
+                step=0.01,
+                key="ob_weeks_per_month",
+            )
+            stipend = st.number_input(
+                "Monthly stipend / family support ($)",
+                min_value=0.0,
+                value=0.0,
+                step=50.0,
+                key="ob_stipend",
+            )
+
+        st.caption("This will estimate your monthly income automatically in the background.")
+
+    # STEP 3
+    if step == 3:
+        st.markdown("### Step 3: Housing and bills")
+        st.write("")
+
+        city_for_preset = st.session_state.get("ob_city", DEFAULT_CITY)
+        preset = CITY_EXPENSE_PRESETS.get(city_for_preset, CITY_EXPENSE_PRESETS.get(DEFAULT_CITY, {}))
+
+        use_preset = st.checkbox(
+            f"Use typical {city_for_preset} presets as a starting point",
+            key="ob_use_preset",
+        )
+
+        def preset_or(name, fallback):
+            if use_preset:
+                return float(preset.get(name, fallback))
+            return float(fallback)
+
+        e1, e2, e3 = st.columns(3)
+        with e1:
+            st.number_input(
+                "Rent ($)",
+                min_value=0.0,
+                value=preset_or("rent", 900.0),
+                step=25.0,
+                key="ob_rent",
+            )
+            st.number_input(
+                "Utilities ($)",
+                min_value=0.0,
+                value=preset_or("utilities", 130.0),
+                step=10.0,
+                key="ob_utilities",
+            )
+        with e2:
+            st.number_input(
+                "Food ($)",
+                min_value=0.0,
+                value=preset_or("food", 350.0),
+                step=10.0,
+                key="ob_food",
+            )
+            st.number_input(
+                "Transport ($)",
+                min_value=0.0,
+                value=preset_or("transport", 90.0),
+                step=10.0,
+                key="ob_transport",
+            )
+        with e3:
+            st.number_input(
+                "Phone/Internet ($)",
+                min_value=0.0,
+                value=preset_or("phone_internet", 60.0),
+                step=10.0,
+                key="ob_phone_internet",
+            )
+            st.number_input(
+                "Misc basics ($)",
+                min_value=0.0,
+                value=preset_or("misc_basic", 130.0),
+                step=10.0,
+                key="ob_misc_basic",
+            )
+
+        st.caption("These are benchmarks for an off-campus student. Change them to match your actual numbers.")
+
+    # STEP 4
+    if step == 4:
+        st.markdown("### Step 4: Result + risks")
+        st.write("")
+
+        # pull onboarding values
+        city = st.session_state.get("ob_city", DEFAULT_CITY)
+        wage = float(st.session_state.get("ob_wage", CITY_MIN_WAGE.get(city, 15.0)))
+        weekly_hours = float(st.session_state.get("ob_weekly_hours", 20.0))
+        weeks_per_month = float(st.session_state.get("ob_weeks_per_month", 4.33))
+        stipend = float(st.session_state.get("ob_stipend", 0.0))
+
+        rent = float(st.session_state.get("ob_rent", 900.0))
+        utilities = float(st.session_state.get("ob_utilities", 130.0))
+        food = float(st.session_state.get("ob_food", 350.0))
+        transport = float(st.session_state.get("ob_transport", 90.0))
+        phone_internet = float(st.session_state.get("ob_phone_internet", 60.0))
+        misc_basic = float(st.session_state.get("ob_misc_basic", 130.0))
+
+        monthly_job_income = wage * weekly_hours * weeks_per_month
+        total_income = monthly_job_income + stipend
+        total_expenses = rent + utilities + food + transport + phone_internet + misc_basic
+        balance = total_income - total_expenses
+        status = financial_status(balance)
+
+        score, breakdown = financial_health_score(
+            total_income=total_income,
+            total_expenses=total_expenses,
+            rent=rent,
+            balance=balance,
+        )
+
+        rent_ratio = breakdown["rent_ratio"] or 0.0
+        savings_rate = breakdown["savings_rate"] or 0.0
+        buffer_months = float(breakdown.get("buffer_months", 0.0))
+
+        # quick summary
+        r1, r2, r3 = st.columns(3)
+        r1.metric("Income / month", money(total_income))
+        r2.metric("Expenses / month", money(total_expenses))
+        r3.metric("Balance / month", money(balance))
+
+        st.write("")
+        if status == "Surplus":
+            st.success("You are in surplus. You have some buffer after essentials.")
+        elif status == "Break-even":
+            st.warning("You are at break-even. You survive, but you have no buffer.")
+        else:
+            st.error("You are in deficit. You will need support, higher income, or lower expenses.")
+
+        st.write("")
+        st.markdown("##### Quick risk zones")
+
+        c1, c2, c3 = st.columns(3)
+        c1.metric(
+            "Rent / income",
+            f"{rent_ratio*100:.1f}%",
+            help="How much of your income goes to rent. Above 40% is usually a red zone."
+        )
+        c2.metric(
+            "Savings rate",
+            f"{savings_rate*100:.1f}%",
+            help="What's left after core expenses. Below ~5% is fragile."
+        )
+        c3.metric(
+            "Buffer months",
+            f"{buffer_months:.1f}",
+            help="How long you can keep going if your income stops and you keep spending the same."
+        )
+
+        st.write("")
+        flags = []
+        if total_income > 0 and rent_ratio > 0.40:
+            flags.append("Rent is above 40 percent of income (red zone).")
+        if buffer_months <= 0:
+            flags.append("Zero buffer (you have no savings cushion).")
+        if savings_rate < 0.05:
+            flags.append("Savings rate is under 5 percent (yellow zone).")
+
+        if flags:
+            for f in flags:
+                st.warning(f)
+        else:
+            st.success("No major risk flags based on these numbers.")
+
+        st.write("")
+        st.caption("You can now open the Calculator page to fine-tune details and save this setup as a scenario.")
+
+    # navigation buttons
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    nav_col1, nav_col2, nav_col3 = st.columns([1, 1, 2])
+    with nav_col1:
+        if step > 1 and st.button("⬅️ Back"):
+            st.session_state["onboarding_step"] = max(1, step - 1)
+    with nav_col2:
+        if step < 4 and st.button("Next ➡️"):
+            st.session_state["onboarding_step"] = min(4, step + 1)
+    with nav_col3:
+        if step == 4 and st.button("Send to Calculator"):
+            # push onboarding values into main calculator defaults
+            st.session_state["context_city"] = st.session_state.get("ob_city", DEFAULT_CITY)
+            st.session_state["wage"] = float(st.session_state.get("ob_wage", CITY_MIN_WAGE.get(st.session_state["context_city"], 15.0)))
+            st.session_state["weeks_per_month"] = float(st.session_state.get("ob_weeks_per_month", 4.33))
+            st.session_state["stipend"] = float(st.session_state.get("ob_stipend", 0.0))
+
+            st.session_state["rent"] = float(st.session_state.get("ob_rent", 900.0))
+            st.session_state["utilities"] = float(st.session_state.get("ob_utilities", 130.0))
+            st.session_state["food"] = float(st.session_state.get("ob_food", 350.0))
+            st.session_state["transport"] = float(st.session_state.get("ob_transport", 90.0))
+            st.session_state["phone_internet"] = float(st.session_state.get("ob_phone_internet", 60.0))
+            st.session_state["misc_basic"] = float(st.session_state.get("ob_misc_basic", 130.0))
+
+            st.session_state["onboarding_step"] = 1
+            st.success("Values sent. Open the Calculator page to see and refine them.")
 
 # =========================================================
 # PAGE A: CALCULATOR
@@ -679,11 +957,26 @@ if page == "Calculator":
         st.progress(int(clamp(score, 0, 100)))
 
         c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Score", f"{score}/100")
-        c2.metric("Rent / income", f"{rent_ratio*100:.1f}%")
-        c3.metric("Savings rate", f"{savings_rate*100:.1f}%")
-        c4.metric("Buffer (months)", f"{buffer_months:.1f}")
-
+        c1.metric(
+            "Score",
+            f"{score}/100",
+            help="Quick 0–100 view of how your month looks (income, expenses, savings, buffer)."
+        )
+        c2.metric(
+            "Rent / income",
+            f"{rent_ratio*100:.1f}%",
+            help="How much of your monthly income goes to rent."
+        )
+        c3.metric(
+            "Savings rate",
+            f"{savings_rate*100:.1f}%",
+            help="Part of your income left after core expenses. Think of it as your savings muscle."
+        )
+        c4.metric(
+            "Buffer (months)",
+            f"{buffer_months:.1f}",
+            help="Buffer months is how long you can survive if income stops and you keep spending the same."
+        )
         st.write("")
         rb1, rb2, rb3 = st.columns(3)
 
