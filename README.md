@@ -114,13 +114,5 @@ Suitable for roles in **financial analysis**, **business analytics**, **fintech*
 
 ---
 
-## Running Locally
-
-```bash
-pip install -r requirements.txt
-streamlit run app/app.py
-```
-
----
-
-*Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.*
+*App is Live Here*
+https://international-student-cost-dashboard.streamlit.app/
