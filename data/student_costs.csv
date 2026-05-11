@@ -1,6 +1,55 @@
-city,month,campus_job_income,stipend_income,rent,utilities,food,transport,phone_internet,misc_basic
-Saint Louis,2026-01,1200,1500,850,120,350,90,110,80
-Saint Louis,2026-02,1200,1500,875,125,360,90,110,85
-Saint Louis,2026-03,1200,1500,900,130,370,95,110,90
-Saint Louis,2026-04,1200,1500,925,135,380,95,110,95
-
+city,month,campus_job_income,stipend_income,tuition_monthly,rent,utilities,food,transport,phone_internet,misc_basic,discretionary,emergency_expense,category,semester_phase,inflation_index
+Saint Louis,2024-08,980,1500,0,875,145,310,85,65,120,210,0,Pre-Arrival,Pre-Arrival,1.00
+Saint Louis,2024-09,1040,1500,1250,875,138,340,90,65,130,185,0,Semester 1,Fall Semester,1.00
+Saint Louis,2024-10,1120,1500,0,875,142,355,88,65,125,220,0,Semester 1,Fall Semester,1.01
+Saint Louis,2024-11,1080,1500,0,875,165,370,92,65,140,195,320,Semester 1,Fall Semester,1.01
+Saint Louis,2024-12,760,1500,0,875,172,395,78,65,180,310,0,Winter Break,Winter Break,1.01
+Saint Louis,2025-01,1100,1500,1250,900,148,345,90,65,128,175,0,Semester 2,Spring Semester,1.02
+Saint Louis,2025-02,1150,1500,0,900,135,360,95,65,122,200,0,Semester 2,Spring Semester,1.02
+Saint Louis,2025-03,1200,1500,0,900,130,375,90,65,118,215,0,Semester 2,Spring Semester,1.02
+Saint Louis,2025-04,1180,1500,0,900,128,380,88,65,125,230,480,Semester 2,Spring Semester,1.03
+Saint Louis,2025-05,1050,1500,1250,900,140,365,85,65,130,260,0,Finals,Spring Semester,1.03
+Saint Louis,2025-06,1320,500,0,900,132,340,80,65,110,190,0,Summer,Summer,1.03
+Saint Louis,2025-07,1380,500,0,900,155,330,82,65,105,175,0,Summer,Summer,1.04
+Saint Louis,2025-08,1290,500,0,925,160,345,85,65,115,200,0,Summer,Summer,1.04
+Saint Louis,2025-09,1100,1500,1350,925,148,360,92,65,132,185,0,Semester 3,Fall Semester,1.04
+Saint Louis,2025-10,1140,1500,0,925,145,375,90,65,128,210,0,Semester 3,Fall Semester,1.05
+Saint Louis,2025-11,1080,1500,0,925,170,390,95,65,145,195,550,Semester 3,Fall Semester,1.05
+Saint Louis,2025-12,720,1500,0,925,178,410,80,65,190,340,0,Winter Break,Winter Break,1.05
+Saint Louis,2026-01,1120,1500,1350,950,152,355,92,65,130,180,0,Semester 4,Spring Semester,1.06
+Chicago,2024-08,1050,1800,0,1320,175,420,115,75,155,240,0,Pre-Arrival,Pre-Arrival,1.00
+Chicago,2024-09,1120,1800,1500,1320,168,445,120,75,165,210,0,Semester 1,Fall Semester,1.00
+Chicago,2024-10,1200,1800,0,1320,172,460,118,75,158,245,0,Semester 1,Fall Semester,1.01
+Chicago,2024-11,1160,1800,0,1320,198,480,122,75,175,220,380,Semester 1,Fall Semester,1.01
+Chicago,2024-12,820,1800,0,1320,205,510,105,75,215,360,0,Winter Break,Winter Break,1.01
+Chicago,2025-01,1180,1800,1500,1350,178,450,122,75,162,200,0,Semester 2,Spring Semester,1.02
+Chicago,2025-02,1240,1800,0,1350,165,465,128,75,155,225,0,Semester 2,Spring Semester,1.02
+Chicago,2025-03,1290,1800,0,1350,160,478,122,75,148,240,0,Semester 2,Spring Semester,1.02
+Chicago,2025-04,1260,1800,0,1350,158,485,120,75,158,260,520,Semester 2,Spring Semester,1.03
+Chicago,2025-05,1130,1800,1500,1350,170,470,118,75,165,290,0,Finals,Spring Semester,1.03
+Chicago,2025-06,1420,600,0,1350,162,445,112,75,140,215,0,Summer,Summer,1.03
+Chicago,2025-07,1480,600,0,1350,188,435,115,75,135,200,0,Summer,Summer,1.04
+Chicago,2025-08,1390,600,0,1380,192,450,118,75,148,225,0,Summer,Summer,1.04
+Chicago,2025-09,1180,1800,1650,1380,178,468,125,75,168,210,0,Semester 3,Fall Semester,1.04
+Chicago,2025-10,1220,1800,0,1380,175,482,122,75,162,235,0,Semester 3,Fall Semester,1.05
+Chicago,2025-11,1160,1800,0,1380,202,498,128,75,180,220,620,Semester 3,Fall Semester,1.05
+Chicago,2025-12,780,1800,0,1380,210,525,112,75,228,380,0,Winter Break,Winter Break,1.05
+Chicago,2026-01,1200,1800,1650,1410,182,472,125,75,165,205,0,Semester 4,Spring Semester,1.06
+New York City,2024-08,1100,2000,0,1720,195,510,138,85,185,280,0,Pre-Arrival,Pre-Arrival,1.00
+New York City,2024-09,1180,2000,1800,1720,188,535,145,85,195,250,0,Semester 1,Fall Semester,1.00
+New York City,2024-10,1260,2000,0,1720,192,552,142,85,188,285,0,Semester 1,Fall Semester,1.01
+New York City,2024-11,1220,2000,0,1720,218,572,148,85,205,260,450,Semester 1,Fall Semester,1.01
+New York City,2024-12,870,2000,0,1720,225,598,128,85,248,420,0,Winter Break,Winter Break,1.01
+New York City,2025-01,1240,2000,1800,1750,208,545,148,85,192,235,0,Semester 2,Spring Semester,1.02
+New York City,2025-02,1300,2000,0,1750,185,562,155,85,185,265,0,Semester 2,Spring Semester,1.02
+New York City,2025-03,1360,2000,0,1750,180,578,148,85,178,280,0,Semester 2,Spring Semester,1.02
+New York City,2025-04,1320,2000,0,1750,178,585,145,85,188,305,610,Semester 2,Spring Semester,1.03
+New York City,2025-05,1190,2000,1800,1750,190,568,142,85,195,340,0,Finals,Spring Semester,1.03
+New York City,2025-06,1480,700,0,1750,182,542,135,85,168,252,0,Summer,Summer,1.03
+New York City,2025-07,1540,700,0,1750,208,530,138,85,162,238,0,Summer,Summer,1.04
+New York City,2025-08,1450,700,0,1780,212,548,142,85,178,265,0,Summer,Summer,1.04
+New York City,2025-09,1240,2000,1980,1780,198,565,150,85,198,248,0,Semester 3,Fall Semester,1.04
+New York City,2025-10,1280,2000,0,1780,195,582,148,85,192,275,0,Semester 3,Fall Semester,1.05
+New York City,2025-11,1220,2000,0,1780,222,598,155,85,212,260,720,Semester 3,Fall Semester,1.05
+New York City,2025-12,830,2000,0,1780,230,622,135,85,265,445,0,Winter Break,Winter Break,1.05
+New York City,2026-01,1260,2000,1980,1810,202,572,150,85,195,242,0,Semester 4,Spring Semester,1.06

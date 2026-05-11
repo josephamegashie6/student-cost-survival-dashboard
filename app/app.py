@@ -1,1758 +1,1083 @@
+"""
+Student Financial Intelligence Dashboard
+=========================================
+A financial analytics platform designed to help students monitor spending behaviour,
+forecast living costs, evaluate affordability pressure, and make data-driven financial decisions.
+
+Author : Joseph Amegashie
+Version: 2.0 — Financial Intelligence Edition
+"""
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from streamlit_option_menu import option_menu
 from datetime import date, timedelta, datetime
 import math
+import numpy as np
 
-
-
-#2) SESSION DEFAULTS
-def init_defaults():
-    defaults = {
-        # snapshot
-        "status": "Unknown",
-        "balance": 0.0,
-        "context_city": "-",
-
-        # nav settings
-        "compare_metric": "Balance",
-        "month_preset": "All data",
-
-        # onboarding
-        "first_run": True,
-        "calc_ready": False,
-
-        # calculator history
-        "calc_history": [],
-
-        # saved calculations (for My Plan)
-        "saved_calcs": [],
-        "active_saved_calc_id": None,
-
-        # scenario model (timeline)
-        "scenarios": [],
-        "active_scenario_id": None,
-
-        # calculator persisted values
-        "weekly_job_income": None,
-        "monthly_job_income": None,
-        "wage": None,
-        "weeks_per_month": None,
-        "stipend": None,
-        "total_income": None,
-        "total_expenses": None,
-
-        "rent": None,
-        "utilities": None,
-        "food": None,
-        "transport": None,
-        "phone_internet": None,
-        "misc_basic": None,
-
-        # My Plan goal
-        "goal_amount": 1000.0,
-        "goal_deadline": date.today() + timedelta(days=90),
-        "current_saved": 0.0,
-
-        # program details stored from Calculator (for saving calc)
-        "program_name": "",
-        "program_type": "Current offer",
-        "program_start": date.today(),
-        "program_end": date.today() + timedelta(days=365),
-        "program_tuition_total": 0.0,
-        "program_loan_amount": 0.0,
-
-        # health metrics stored from Calculator
-        "health_score": 0,
-        "rent_ratio": None,
-        "savings_rate": None,
-        "buffer_months": 0.0,
-
-        # debt planner inputs 
-        "debt_tuition_total": 0.0,
-        "debt_living_total": 0.0,
-        "debt_scholarships_total": 0.0,
-        "debt_loan_principal": 0.0,
-        "debt_loan_interest_rate": 6.0,         
-        "debt_expected_start_salary": 60000.0, 
-        "debt_salary_to_debt_rate_1": 0.05,
-        "debt_salary_to_debt_rate_2": 0.10,
-        "debt_salary_to_debt_rate_3": 0.20,
-
-         # onboarding
-        "onboarding_step": 1,
-    }
-    for k, v in defaults.items():
-        if k not in st.session_state:
-            st.session_state[k] = v
-
-
-init_defaults()
-
-#3) PAGE CONFIG
-st.set_page_config(page_title="Student Cost Survival Dashboard", layout="wide")
-
-#4) STYLING (CSS)
-st.markdown(
-    """
-<style>
-.block-container {
-    padding-top: 3.5rem;
-    max-width: 1300px;
-}
-.card {
-    padding: 1.0rem 1.1rem;
-    border-radius: 14px;
-    background: #020617;
-    border: 1px solid #1f2937;
-    margin-bottom: 0.9rem;
-}
-.section-card {
-    padding: 1.0rem 1.1rem;
-    border-radius: 14px;
-    background: #020617;
-    border: 1px solid #1f2937;
-    margin-bottom: 1.0rem;
-}
-.small-note {
-    opacity: 0.78;
-    font-size: 0.92rem;
-    margin-top: 0.35rem;
-    line-height: 1.55;
-}
-.kpi-card {
-    padding: 0.8rem 0.9rem;
-    border-radius: 12px;
-    background: #020617;
-    border: 1px solid #1f2937;
-    margin-bottom: 0.8rem;
-}
-.kpi-label {
-    font-size: 0.85rem;
-    opacity: 0.8;
-}
-.kpi-value {
-    font-size: 1.6rem;
-    font-weight: 600;
-    margin-top: 0.2rem;
-}
-.kpi-sub {
-    font-size: 0.82rem;
-    opacity: 0.7;
-    margin-top: 0.25rem;
-    line-height: 1.35;
-}
-.pill {
-    display: inline-block;
-    padding: 0.18rem 0.60rem;
-    border-radius: 999px;
-    border: 1px solid #334155;
-    font-size: 0.80rem;
-    opacity: 0.95;
-    margin-left: 0.40rem;
-}
-.pill-green {background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.35);}
-.pill-yellow {background: rgba(234,179,8,0.12); border-color: rgba(234,179,8,0.35);}
-.pill-red {background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35);}
-
-hr.soft {
-    border: none;
-    border-top: 1px solid #1f2937;
-    margin: 0.90rem 0;
-}
-
-ul { margin-top: 0.25rem; margin-bottom: 0.45rem; }
-li { margin-bottom: 0.45rem; line-height: 1.45; }
-
-/* Mobile-first tweaks */
-@media (max-width: 768px) {
-    .block-container {
-        padding-top: 1.5rem;
-        padding-left: 0.7rem;
-        padding-right: 0.7rem;
-    }
-    .card, .section-card {
-        padding: 0.9rem 0.9rem;
-        margin-bottom: 0.8rem;
-    }
-    .kpi-value {
-        font-size: 1.3rem;
-    }
-    .kpi-sub, .small-note {
-        font-size: 0.85rem;
-    }
-}
-</style>
-""",
-    unsafe_allow_html=True,
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE CONFIG
+# ─────────────────────────────────────────────────────────────────────────────
+st.set_page_config(
+    page_title="Student Financial Intelligence Dashboard",
+    page_icon="📊",
+    layout="wide",
+    initial_sidebar_state="expanded",
 )
 
+# ─────────────────────────────────────────────────────────────────────────────
+# GLOBAL CSS — Bloomberg-inspired dark finance aesthetic
+# ─────────────────────────────────────────────────────────────────────────────
+st.markdown("""
+<style>
+/* ── Base ── */
+.block-container { padding-top: 2.5rem; max-width: 1400px; }
+body, .stApp { background: #050a14; color: #e2e8f0; }
 
-#5) CONSTANTS + HELPERS
+/* ── Glass cards ── */
+.glass-card {
+    background: rgba(10, 20, 40, 0.85);
+    border: 1px solid rgba(20, 184, 166, 0.18);
+    border-radius: 14px;
+    padding: 1.4rem 1.6rem;
+    margin-bottom: 1.2rem;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+.section-header {
+    background: linear-gradient(90deg, rgba(20,184,166,0.12) 0%, rgba(5,10,20,0) 100%);
+    border-left: 3px solid #14b8a6;
+    padding: 0.5rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #e2e8f0;
+}
+.page-title {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #f8fafc;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.25rem;
+}
+.page-subtitle {
+    font-size: 0.88rem;
+    color: #94a3b8;
+    margin-bottom: 1.2rem;
+    letter-spacing: 0.02em;
+}
+
+/* ── KPI tiles ── */
+.kpi-tile {
+    background: rgba(10, 20, 40, 0.9);
+    border: 1px solid rgba(20,184,166,0.22);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.8rem;
+    position: relative;
+    overflow: hidden;
+}
+.kpi-tile::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #14b8a6, #f59e0b);
+}
+.kpi-label { font-size: 0.78rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; }
+.kpi-value { font-size: 1.65rem; font-weight: 700; color: #f8fafc; margin: 0.2rem 0; }
+.kpi-delta { font-size: 0.82rem; color: #94a3b8; }
+.kpi-green { color: #10b981; }
+.kpi-red   { color: #ef4444; }
+.kpi-gold  { color: #f59e0b; }
+.kpi-teal  { color: #14b8a6; }
+
+/* ── Status pills ── */
+.pill {
+    display: inline-block;
+    padding: 0.15rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+.pill-green  { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+.pill-yellow { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+.pill-red    { background: rgba(239,68,68,0.12);  color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+.pill-teal   { background: rgba(20,184,166,0.12); color: #14b8a6; border: 1px solid rgba(20,184,166,0.3); }
+
+/* ── Alert boxes ── */
+.alert-warn {
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    margin: 0.5rem 0;
+    color: #fbbf24;
+    font-size: 0.88rem;
+}
+.alert-danger {
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    margin: 0.5rem 0;
+    color: #f87171;
+    font-size: 0.88rem;
+}
+.alert-ok {
+    background: rgba(16,185,129,0.08);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    margin: 0.5rem 0;
+    color: #34d399;
+    font-size: 0.88rem;
+}
+
+/* ── Workflow diagram ── */
+.workflow-step {
+    background: rgba(20,184,166,0.07);
+    border: 1px solid rgba(20,184,166,0.2);
+    border-radius: 10px;
+    padding: 0.65rem 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #14b8a6;
+    margin: 0.2rem 0;
+}
+.workflow-arrow { text-align: center; color: #334155; font-size: 1.1rem; margin: 0.1rem 0; }
+
+/* ── Dividers ── */
+hr.soft { border: none; border-top: 1px solid rgba(20,184,166,0.12); margin: 1rem 0; }
+
+/* ── Disclaimer ── */
+.disclaimer {
+    font-size: 0.78rem;
+    color: #475569;
+    border-top: 1px solid rgba(20,184,166,0.1);
+    padding-top: 0.8rem;
+    margin-top: 1.5rem;
+    font-style: italic;
+}
+
+/* ── Sidebar ── */
+section[data-testid="stSidebar"] { background: #070d1a; border-right: 1px solid rgba(20,184,166,0.12); }
+
+/* ── Metric overrides ── */
+[data-testid="stMetricValue"] { color: #f8fafc !important; font-size: 1.4rem !important; }
+[data-testid="stMetricLabel"] { color: #64748b !important; font-size: 0.78rem !important; text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* ── Tables ── */
+.stDataFrame { border: 1px solid rgba(20,184,166,0.15) !important; border-radius: 10px; }
+
+@media (max-width: 768px) {
+    .block-container { padding-top: 1.2rem; padding-left: 0.6rem; padding-right: 0.6rem; }
+    .kpi-value { font-size: 1.3rem; }
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PLOTLY DARK THEME
+# ─────────────────────────────────────────────────────────────────────────────
+PLOT_LAYOUT = dict(
+    paper_bgcolor="rgba(5,10,20,0)",
+    plot_bgcolor="rgba(5,10,20,0)",
+    font=dict(color="#94a3b8", size=11),
+    xaxis=dict(gridcolor="rgba(20,184,166,0.08)", linecolor="rgba(20,184,166,0.15)"),
+    yaxis=dict(gridcolor="rgba(20,184,166,0.08)", linecolor="rgba(20,184,166,0.15)"),
+    margin=dict(l=10, r=10, t=40, b=10),
+    legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(color="#94a3b8")),
+)
+COLORS = {
+    "teal":   "#14b8a6",
+    "gold":   "#f59e0b",
+    "green":  "#10b981",
+    "red":    "#ef4444",
+    "blue":   "#3b82f6",
+    "purple": "#8b5cf6",
+    "slate":  "#64748b",
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CONSTANTS
+# ─────────────────────────────────────────────────────────────────────────────
 CITY_MIN_WAGE = {
     "Saint Louis": 12.30,
-    "Chicago": 15.80,
+    "Chicago":     15.80,
     "New York City": 16.00,
-    "Los Angeles": 16.90,
 }
-
 CITY_EXPENSE_PRESETS = {
-    "Saint Louis": {"rent": 850, "utilities": 130, "food": 350, "transport": 90, "phone_internet": 60, "misc_basic": 130},
-    "Chicago": {"rent": 1300, "utilities": 160, "food": 420, "transport": 120, "phone_internet": 70, "misc_basic": 150},
-    "New York City": {"rent": 1700, "utilities": 180, "food": 500, "transport": 140, "phone_internet": 80, "misc_basic": 170},
-    "Los Angeles": {"rent": 1600, "utilities": 170, "food": 450, "transport": 130, "phone_internet": 70, "misc_basic": 160},
+    "Saint Louis":   {"rent": 900,  "utilities": 140, "food": 360, "transport": 90,  "phone_internet": 65, "misc_basic": 130, "discretionary": 200},
+    "Chicago":       {"rent": 1350, "utilities": 170, "food": 460, "transport": 125, "phone_internet": 75, "misc_basic": 160, "discretionary": 250},
+    "New York City": {"rent": 1750, "utilities": 195, "food": 550, "transport": 148, "phone_internet": 85, "misc_basic": 195, "discretionary": 300},
 }
+EXPENSE_COLS = ["rent", "utilities", "food", "transport", "phone_internet", "misc_basic"]
+INFLATION_RATE = 0.035  # 3.5% annual
 
-DEFAULT_CITY = "Saint Louis" if "Saint Louis" in CITY_MIN_WAGE else list(CITY_MIN_WAGE.keys())[0]
-def financial_status(balance: float) -> str:
-    if balance > 0:
-        return "Surplus"
-    if balance == 0:
-        return "Break-even"
-    return "Deficit"
+# ─────────────────────────────────────────────────────────────────────────────
+# HELPERS
+# ─────────────────────────────────────────────────────────────────────────────
+def usd(x):
+    try: return f"${float(x):,.0f}"
+    except: return "$0"
 
-def money(x: float) -> str:
-    try:
-        return f"${float(x):,.0f}"
-    except Exception:
-        return "$0"
+def pct(x, decimals=1):
+    try: return f"{float(x)*100:.{decimals}f}%"
+    except: return "0.0%"
 
-def safe_read_csv(path: str):
-    try:
-        return pd.read_csv(path)
-    except Exception:
-        return None
+def clamp(n, lo, hi): return max(lo, min(hi, n))
 
-def clamp(n: float, low: float, high: float) -> float:
-    return max(low, min(high, n))
+def safe_csv(path):
+    try: return pd.read_csv(path)
+    except: return None
 
-def score_label(score: int) -> str:
-    if score >= 80:
-        return "Excellent"
-    if score >= 60:
-        return "Good"
-    if score >= 40:
-        return "Risky"
-    return "Critical"
+def pill(label, level):
+    css = {"green": "pill-green", "yellow": "pill-yellow", "red": "pill-red", "teal": "pill-teal"}.get(level, "pill-teal")
+    return f"<span class='pill {css}'>{label}</span>"
 
-def financial_health_score(total_income: float, total_expenses: float, rent: float, balance: float) -> tuple[int, dict]:
-    if total_income <= 0:
-        return 0, {
-            "balance_points": 0,
-            "rent_points": 0,
-            "savings_points": 0,
-            "buffer_points": 0,
-            "rent_ratio": None,
-            "savings_rate": None,
-            "buffer_months": 0.0,
-        }
+def kpi_tile(label, value, delta=None, color="kpi-teal"):
+    delta_html = f"<div class='kpi-delta'>{delta}</div>" if delta else ""
+    return f"""
+    <div class='kpi-tile'>
+        <div class='kpi-label'>{label}</div>
+        <div class='kpi-value {color}'>{value}</div>
+        {delta_html}
+    </div>"""
 
-    rent_ratio = rent / total_income
-    savings_rate = balance / total_income
-    
-    balance_points = 40 if balance > 0 else 0
+def alert_html(msg, level="warn"):
+    css = {"warn": "alert-warn", "danger": "alert-danger", "ok": "alert-ok"}.get(level, "alert-warn")
+    icon = {"warn": "⚠", "danger": "🔴", "ok": "✓"}.get(level, "⚠")
+    return f"<div class='{css}'>{icon} {msg}</div>"
 
-    rent_points = 25 * (0.60 - rent_ratio) / (0.60 - 0.35)
-    rent_points = int(round(clamp(rent_points, 0, 25)))
+def financial_health_score(income, expenses, rent, balance):
+    if income <= 0:
+        return 0, {}
+    rent_ratio   = rent / income
+    savings_rate = balance / income
+    buffer_months = (balance / expenses) if expenses > 0 else 0.0
 
-    savings_points = 20 * (savings_rate / 0.10)
-    savings_points = int(round(clamp(savings_points, 0, 20)))
+    bal_pts  = 40 if balance > 0 else 0
+    rent_pts = int(round(clamp(25 * (0.60 - rent_ratio) / 0.25, 0, 25)))
+    sav_pts  = int(round(clamp(20 * (savings_rate / 0.10), 0, 20)))
+    buf_pts  = int(round(clamp(15 * buffer_months, 0, 15)))
+    score    = int(clamp(bal_pts + rent_pts + sav_pts + buf_pts, 0, 100))
 
-    buffer_months = (balance / total_expenses) if total_expenses > 0 else 0.0
-    buffer_points = 15 * buffer_months
-    buffer_points = int(round(clamp(buffer_points, 0, 15)))
-
-    score = int(clamp(balance_points + rent_points + savings_points + buffer_points, 0, 100))
-
-    breakdown = {
-        "balance_points": balance_points,
-        "rent_points": rent_points,
-        "savings_points": savings_points,
-        "buffer_points": buffer_points,
-        "rent_ratio": rent_ratio,
-        "savings_rate": savings_rate,
+    return score, {
+        "rent_ratio": rent_ratio, "savings_rate": savings_rate,
         "buffer_months": buffer_months,
+        "bal_pts": bal_pts, "rent_pts": rent_pts, "sav_pts": sav_pts, "buf_pts": buf_pts,
     }
-    return score, breakdown
-    
-def pressure_flag(share: float) -> tuple[str, str]:
-    if share <= 0.25:
-        return "Healthy", "pill-green"
-    if share <= 0.35:
-        return "Risky", "pill-yellow"
-    return "Danger", "pill-red"
 
-def build_expense_pressure_df(total_income: float, expense_dict: dict) -> pd.DataFrame:
+def affordability_score(income, rent, tuition_monthly=0):
+    if income <= 0: return 0
+    housing_burden = rent / income
+    total_burden   = (rent + tuition_monthly) / income
+    score = 100 - int(clamp(housing_burden * 120 + total_burden * 40, 0, 100))
+    return max(0, score)
+
+def stress_level(score):
+    if score >= 75: return "Low",    "green"
+    if score >= 50: return "Moderate","yellow"
+    if score >= 30: return "High",   "yellow"
+    return "Critical", "red"
+
+def forecast_balance(current_balance, monthly_net, months, inflation_rate=0.035):
     rows = []
-    income = float(total_income) if total_income else 0.0
+    bal = current_balance
+    for m in range(1, months + 1):
+        inflation_adj = (1 + inflation_rate / 12) ** m
+        adj_net = monthly_net / inflation_adj
+        bal += adj_net
+        rows.append({"Month": m, "Projected Balance": round(bal, 2), "Monthly Net (Inflation-Adj)": round(adj_net, 2)})
+    return pd.DataFrame(rows)
 
-    for name, amt in expense_dict.items():
-        amt_f = float(amt)
-        share = (amt_f / income) if income > 0 else 0.0
-        label, css = pressure_flag(share)
-        rows.append(
-            {"Expense": name, "Amount": amt_f, "ShareOfIncome": share, "FlagLabel": label, "FlagCss": css}
-        )
+# ─────────────────────────────────────────────────────────────────────────────
+# SESSION STATE
+# ─────────────────────────────────────────────────────────────────────────────
+_defaults = {
+    "calc_ready": False, "calc_history": [],
+    "income": 0.0, "expenses": 0.0, "balance": 0.0,
+    "rent": 900.0, "utilities": 140.0, "food": 360.0,
+    "transport": 90.0, "phone_internet": 65.0, "misc_basic": 130.0,
+    "discretionary": 200.0, "tuition_monthly": 0.0,
+    "wage": 12.30, "weekly_hours": 20.0, "weeks_per_month": 4.33,
+    "stipend": 0.0, "city": "Saint Louis",
+    "health_score": 0, "rent_ratio": 0.0, "savings_rate": 0.0, "buffer_months": 0.0,
+    "scenarios": [], "active_scenario_id": None,
+}
+for k, v in _defaults.items():
+    if k not in st.session_state:
+        st.session_state[k] = v
 
-    df = pd.DataFrame(rows)
-    if df.empty:
-        return pd.DataFrame(columns=["Expense", "Amount", "ShareOfIncome", "FlagLabel", "FlagCss"])
-    return df.sort_values("ShareOfIncome", ascending=False, ignore_index=True)
-
-def make_saved_calc_id() -> str:
-    return "calc_" + datetime.now().strftime("%Y%m%d%H%M%S%f")
-
-def make_scenario_id() -> str:
-    return "scn_" + datetime.now().strftime("%Y%m%d%H%M%S%f")
-
-def risk_badge_html(label: str, level: str) -> str:
-    css_map = {"good": "pill pill-green", "warn": "pill pill-yellow", "bad": "pill pill-red"}
-    css = css_map.get(level, "pill")
-    return f"<span class='{css}'>{label}</span>"
-
-def get_active_scenario_index():
-    active_id = st.session_state.get("active_scenario_id")
-    scenarios = st.session_state.get("scenarios", [])
-    for i, sc in enumerate(scenarios):
-        if sc.get("id") == active_id:
-            return i
-    return None
-
-def monthly_payment(principal: float, rate_monthly: float, years: float) -> float:
-    n = int(years * 12)
-    if principal <= 0 or n <= 0:
-        return 0.0
-    if rate_monthly <= 0:
-        return principal / n
-    return principal * rate_monthly / (1 - (1 + rate_monthly) ** (-n))
-
-def years_to_pay(principal: float, rate_monthly: float, monthly_contrib: float) -> float:
-    if principal <= 0 or monthly_contrib <= 0:
-        return 0.0
-    if rate_monthly <= 0:
-        return principal / (monthly_contrib * 12.0)
-    if monthly_contrib <= principal * rate_monthly:
-        return float("inf")
-    n_months = -math.log(1 - principal * rate_monthly / monthly_contrib) / math.log(1 + rate_monthly)
-    return n_months / 12.0
-
-
-#6) SIDEBAR: NAV + SNAPSHOT + CONTROLS
+# ─────────────────────────────────────────────────────────────────────────────
+# SIDEBAR
+# ─────────────────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### Student Cost Survival")
-    st.write("")
+    st.markdown("""
+    <div style='padding: 0.8rem 0 1rem 0;'>
+        <div style='font-size:1.05rem; font-weight:700; color:#14b8a6; letter-spacing:0.04em;'>
+            📊 SFID
+        </div>
+        <div style='font-size:0.72rem; color:#475569; margin-top:0.2rem; letter-spacing:0.06em;'>
+            STUDENT FINANCIAL INTELLIGENCE DASHBOARD
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     page = option_menu(
         menu_title=None,
-        options=["Onboarding", "Calculator", "Scenarios", "City Compare", "My Plan", "Settings"],
-        icons=["play-circle", "calculator", "calendar3", "globe2", "wallet2", "gear"],
+        options=["Overview", "Cash Flow Analysis", "Cost Intelligence", "Forecasting", "Scenario Analysis", "City Analytics", "Case Study"],
+        icons=["speedometer2", "bar-chart-line", "pie-chart", "graph-up-arrow", "sliders", "building", "journal-text"],
+        menu_icon="cast",
         default_index=0,
         styles={
-            "container": {"padding": "0.5rem 0.3rem", "background-color": "#020617"},
-            "icon": {"color": "white", "font-size": "1rem"},
-            "nav-link": {
-                "font-size": "0.9rem",
-                "padding": "0.45rem 0.8rem",
-                "border-radius": "8px",
-                "color": "white",
-                "margin": "0.1rem 0",
-            },
-            "nav-link-selected": {"background-color": "#f97316", "color": "white"},
+            "container":      {"background-color": "transparent", "padding": "0"},
+            "icon":           {"color": "#14b8a6", "font-size": "0.85rem"},
+            "nav-link":       {"font-size": "0.82rem", "color": "#94a3b8", "padding": "0.45rem 0.8rem", "border-radius": "6px"},
+            "nav-link-selected": {"background-color": "rgba(20,184,166,0.12)", "color": "#14b8a6", "font-weight": "600"},
         },
     )
 
-    st.markdown("---")
-    st.markdown("#### My Snapshot")
-    st.write("")
+    st.markdown("<hr class='soft'>", unsafe_allow_html=True)
 
-    st.write("Status:", st.session_state["status"])
-    st.write("Balance / month:", f"${st.session_state['balance']:.0f}")
-    st.caption(f"Based on last calculator run (city: {st.session_state['context_city']})")
-
-    hs = st.session_state.get("health_score")
-    if hs is not None:
-        st.write("Health score:", int(hs), f"({score_label(int(hs))})")
-
-    rr = st.session_state.get("rent_ratio")
-    sr = st.session_state.get("savings_rate")
-    if rr is not None and sr is not None:
-        st.caption(f"Rent/Income: {rr*100:.1f}%  •  Savings rate: {sr*100:.1f}%")
-
-    st.write("")
-    status_now = st.session_state["status"]
-    if status_now == "Deficit":
-        st.info("Tip: rent and misc are the fastest levers to adjust.")
-    elif status_now == "Break-even":
-        st.info("Tip: aim for a small buffer, even one month helps.")
-    elif status_now == "Surplus":
-        st.info("Good spot. protect your buffer and grow savings.")
+    # Quick snapshot
+    if st.session_state["calc_ready"]:
+        bal = st.session_state["balance"]
+        inc = st.session_state["income"]
+        exp = st.session_state["expenses"]
+        score = st.session_state["health_score"]
+        status_label = "SURPLUS" if bal > 0 else ("BREAK-EVEN" if bal == 0 else "DEFICIT")
+        status_color = "#10b981" if bal > 0 else ("#f59e0b" if bal == 0 else "#ef4444")
+        st.markdown(f"""
+        <div style='font-size:0.72rem; color:#475569; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem;'>Live Position</div>
+        <div style='font-size:1.3rem; font-weight:700; color:{status_color};'>{usd(bal)}<span style='font-size:0.75rem; margin-left:0.4rem;'>/mo net</span></div>
+        <div style='font-size:0.78rem; color:{status_color}; margin-bottom:0.6rem;'>{status_label}</div>
+        <div style='font-size:0.75rem; color:#64748b;'>Inflows: {usd(inc)} &nbsp;|&nbsp; Outflows: {usd(exp)}</div>
+        <div style='font-size:0.75rem; color:#64748b; margin-top:0.2rem;'>Financial Health: {score}/100</div>
+        """, unsafe_allow_html=True)
     else:
-        st.caption("Run Calculator to see a personalized snapshot.")
-
-    if page == "City Compare":
-        st.markdown("---")
-        st.markdown("#### Compare settings")
-        st.write("")
-        st.selectbox("Compare by", ["Balance", "Rent pressure", "Food cost", "Transport cost"], key="compare_metric")
-        st.radio("Month range", ["All data", "Last 3 months", "Last 6 months"], key="month_preset")
-
-    if page == "My Plan":
-        st.markdown("---")
-        st.markdown("#### Savings goal")
-        st.write("")
-        st.number_input("Goal amount ($)", min_value=0.0, step=50.0, key="goal_amount")
-        st.date_input("Goal deadline", key="goal_deadline")
-        st.number_input("Already saved toward goal ($)", min_value=0.0, step=50.0, key="current_saved")
-        st.caption("Use Calculator and Save at least one calculation.")
-
-# 7) TOP TITLE
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.title("International Student Cost Survival Dashboard")
-st.markdown(
-    "<div class='small-note'>Calculator for personal numbers. Scenarios for your timeline. City Compare for CSV insights. My Plan uses a saved calculation.</div>",
-    unsafe_allow_html=True,
-)
-st.markdown("</div>", unsafe_allow_html=True)
-
-if st.session_state.get("first_run", True):
-    st.info("Step 1: Run Calculator. Step 2: Save a calculation. Step 3: Use My Plan. Step 4: Use Scenarios to model phases.")
-    st.session_state["first_run"] = False
-
-
-# PAGE 0: ONBOARDING WIZARD
-if page == "Onboarding":
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("Quick onboarding")
-    st.markdown(
-        "<div class='small-note'>Four short steps: school and timing, income, housing and bills, then a simple result + risks. You can always fine-tune later in Calculator.</div>",
-        unsafe_allow_html=True,
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    step = st.session_state.get("onboarding_step", 1)
-    step = int(step)
-
-    # progress / step header
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.markdown(f"**Step {step} of 4**")
-    st.write("")
-
-    # STEP 1
-    if step == 1:
-        st.markdown("### Step 1: Where will you study and when do you arrive?")
-        st.write("")
-        col1, col2 = st.columns(2)
-        with col1:
-            city = st.selectbox(
-                "Study city",
-                list(CITY_MIN_WAGE.keys()),
-                index=list(CITY_MIN_WAGE.keys()).index(DEFAULT_CITY),
-                key="ob_city",
-            )
-        with col2:
-            arrival = st.date_input("Approx arrival date", key="ob_arrival_date")
-
-        st.caption("This helps set your city presets and gives you a rough timeline.")
-
-    # STEP 2
-    if step == 2:
-        st.markdown("### Step 2: Income sources")
-        st.write("")
-        c1, c2 = st.columns(2)
-        with c1:
-            wage = st.number_input(
-                "Campus / hourly wage ($/hour)",
-                min_value=0.0,
-                value=st.session_state.get("wage", CITY_MIN_WAGE.get(st.session_state.get('ob_city', DEFAULT_CITY), 15.0)),
-                step=0.25,
-                key="ob_wage",
-            )
-            weekly_hours = st.number_input(
-                "Total weekly work hours",
-                min_value=0.0,
-                value=20.0,
-                step=1.0,
-                key="ob_weekly_hours",
-            )
-        with c2:
-            weeks_per_month = st.number_input(
-                "Weeks per month",
-                min_value=3.0,
-                max_value=5.0,
-                value=4.33,
-                step=0.01,
-                key="ob_weeks_per_month",
-            )
-            stipend = st.number_input(
-                "Monthly stipend / family support ($)",
-                min_value=0.0,
-                value=0.0,
-                step=50.0,
-                key="ob_stipend",
-            )
-
-        st.caption("This will estimate your monthly income automatically in the background.")
-
-    # STEP 3
-    if step == 3:
-        st.markdown("### Step 3: Housing and bills")
-        st.write("")
-
-        city_for_preset = st.session_state.get("ob_city", DEFAULT_CITY)
-        preset = CITY_EXPENSE_PRESETS.get(city_for_preset, CITY_EXPENSE_PRESETS.get(DEFAULT_CITY, {}))
-
-        use_preset = st.checkbox(
-            f"Use typical {city_for_preset} presets as a starting point",
-            key="ob_use_preset",
-        )
-
-        def preset_or(name, fallback):
-            if use_preset:
-                return float(preset.get(name, fallback))
-            return float(fallback)
-
-        e1, e2, e3 = st.columns(3)
-        with e1:
-            st.number_input(
-                "Rent ($)",
-                min_value=0.0,
-                value=preset_or("rent", 900.0),
-                step=25.0,
-                key="ob_rent",
-            )
-            st.number_input(
-                "Utilities ($)",
-                min_value=0.0,
-                value=preset_or("utilities", 130.0),
-                step=10.0,
-                key="ob_utilities",
-            )
-        with e2:
-            st.number_input(
-                "Food ($)",
-                min_value=0.0,
-                value=preset_or("food", 350.0),
-                step=10.0,
-                key="ob_food",
-            )
-            st.number_input(
-                "Transport ($)",
-                min_value=0.0,
-                value=preset_or("transport", 90.0),
-                step=10.0,
-                key="ob_transport",
-            )
-        with e3:
-            st.number_input(
-                "Phone/Internet ($)",
-                min_value=0.0,
-                value=preset_or("phone_internet", 60.0),
-                step=10.0,
-                key="ob_phone_internet",
-            )
-            st.number_input(
-                "Misc basics ($)",
-                min_value=0.0,
-                value=preset_or("misc_basic", 130.0),
-                step=10.0,
-                key="ob_misc_basic",
-            )
-
-        st.caption("These are benchmarks for an off-campus student. Change them to match your actual numbers.")
-
-    # STEP 4
-    if step == 4:
-        st.markdown("### Step 4: Result + risks")
-        st.write("")
-
-        # pull onboarding values
-        city = st.session_state.get("ob_city", DEFAULT_CITY)
-        wage = float(st.session_state.get("ob_wage", CITY_MIN_WAGE.get(city, 15.0)))
-        weekly_hours = float(st.session_state.get("ob_weekly_hours", 20.0))
-        weeks_per_month = float(st.session_state.get("ob_weeks_per_month", 4.33))
-        stipend = float(st.session_state.get("ob_stipend", 0.0))
-
-        rent = float(st.session_state.get("ob_rent", 900.0))
-        utilities = float(st.session_state.get("ob_utilities", 130.0))
-        food = float(st.session_state.get("ob_food", 350.0))
-        transport = float(st.session_state.get("ob_transport", 90.0))
-        phone_internet = float(st.session_state.get("ob_phone_internet", 60.0))
-        misc_basic = float(st.session_state.get("ob_misc_basic", 130.0))
-
-        monthly_job_income = wage * weekly_hours * weeks_per_month
-        total_income = monthly_job_income + stipend
-        total_expenses = rent + utilities + food + transport + phone_internet + misc_basic
-        balance = total_income - total_expenses
-        status = financial_status(balance)
-
-        score, breakdown = financial_health_score(
-            total_income=total_income,
-            total_expenses=total_expenses,
-            rent=rent,
-            balance=balance,
-        )
-
-        rent_ratio = breakdown["rent_ratio"] or 0.0
-        savings_rate = breakdown["savings_rate"] or 0.0
-        buffer_months = float(breakdown.get("buffer_months", 0.0))
-
-        # quick summary
-        r1, r2, r3 = st.columns(3)
-        r1.metric("Income / month", money(total_income))
-        r2.metric("Expenses / month", money(total_expenses))
-        r3.metric("Balance / month", money(balance))
-
-        st.write("")
-        if status == "Surplus":
-            st.success("You are in surplus. You have some buffer after essentials.")
-        elif status == "Break-even":
-            st.warning("You are at break-even. You survive, but you have no buffer.")
-        else:
-            st.error("You are in deficit. You will need support, higher income, or lower expenses.")
-
-        st.write("")
-        st.markdown("##### Quick risk zones")
-
-        c1, c2, c3 = st.columns(3)
-        c1.metric(
-            "Rent / income",
-            f"{rent_ratio*100:.1f}%",
-            help="How much of your income goes to rent. Above 40% is usually a red zone."
-        )
-        c2.metric(
-            "Savings rate",
-            f"{savings_rate*100:.1f}%",
-            help="What's left after core expenses. Below ~5% is fragile."
-        )
-        c3.metric(
-            "Buffer months",
-            f"{buffer_months:.1f}",
-            help="How long you can keep going if your income stops and you keep spending the same."
-        )
-
-        st.write("")
-        flags = []
-        if total_income > 0 and rent_ratio > 0.40:
-            flags.append("Rent is above 40 percent of income (red zone).")
-        if buffer_months <= 0:
-            flags.append("Zero buffer (you have no savings cushion).")
-        if savings_rate < 0.05:
-            flags.append("Savings rate is under 5 percent (yellow zone).")
-
-        if flags:
-            for f in flags:
-                st.warning(f)
-        else:
-            st.success("No major risk flags based on these numbers.")
-
-        st.write("")
-        st.caption("You can now open the Calculator page to fine-tune details and save this setup as a scenario.")
-
-    # navigation buttons
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    nav_col1, nav_col2, nav_col3 = st.columns([1, 1, 2])
-    with nav_col1:
-        if step > 1 and st.button("⬅️ Back"):
-            st.session_state["onboarding_step"] = max(1, step - 1)
-    with nav_col2:
-        if step < 4 and st.button("Next ➡️"):
-            st.session_state["onboarding_step"] = min(4, step + 1)
-    with nav_col3:
-        if step == 4 and st.button("Send to Calculator"):
-            # push onboarding values into main calculator defaults
-            st.session_state["context_city"] = st.session_state.get("ob_city", DEFAULT_CITY)
-            st.session_state["wage"] = float(st.session_state.get("ob_wage", CITY_MIN_WAGE.get(st.session_state["context_city"], 15.0)))
-            st.session_state["weeks_per_month"] = float(st.session_state.get("ob_weeks_per_month", 4.33))
-            st.session_state["stipend"] = float(st.session_state.get("ob_stipend", 0.0))
-
-            st.session_state["rent"] = float(st.session_state.get("ob_rent", 900.0))
-            st.session_state["utilities"] = float(st.session_state.get("ob_utilities", 130.0))
-            st.session_state["food"] = float(st.session_state.get("ob_food", 350.0))
-            st.session_state["transport"] = float(st.session_state.get("ob_transport", 90.0))
-            st.session_state["phone_internet"] = float(st.session_state.get("ob_phone_internet", 60.0))
-            st.session_state["misc_basic"] = float(st.session_state.get("ob_misc_basic", 130.0))
-
-            st.session_state["onboarding_step"] = 1
-            st.success("Values sent. Open the Calculator page to see and refine them.")
-
-#PAGE A: CALCULATOR
-if page == "Calculator":
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("Personal Calculator")
-    st.markdown(
-        "<div class='small-note'>Fill the form and click Calculate. You can also save the result for My Plan.</div>",
-        unsafe_allow_html=True,
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    with st.form("calculator_form"):
-        top1, top2, top3 = st.columns([1.2, 1, 1])
-
-        with top1:
-            calc_city = st.selectbox("City", list(CITY_MIN_WAGE.keys()), index=list(CITY_MIN_WAGE.keys()).index(DEFAULT_CITY))
-
-        with top2:
-            min_wage = CITY_MIN_WAGE.get(calc_city, 15.0)
-            wage = st.number_input("Minimum wage ($/hour)", min_value=0.0, value=float(min_wage), step=0.25)
-
-        with top3:
-            weeks_per_month = st.number_input("Weeks per month", min_value=3.0, max_value=5.0, value=4.33, step=0.01)
-
-        st.write("")
-        st.markdown("### Work hours (weekly)")
-        h1, h2, h3, h4 = st.columns(4)
-        with h1:
-            hours_mon_fri = st.number_input("Hours Mon-Fri (total)", min_value=0.0, value=20.0, step=1.0)
-        with h2:
-            hours_sat = st.number_input("Hours Saturday", min_value=0.0, value=0.0, step=1.0)
-        with h3:
-            hours_sun = st.number_input("Hours Sunday", min_value=0.0, value=0.0, step=1.0)
-        with h4:
-            sunday_multiplier = st.number_input("Sunday pay multiplier", min_value=1.0, value=1.0, step=0.25)
-
-        st.write("")
-        st.markdown("### Other monthly income")
-        stipend = st.number_input("Monthly stipend / support ($)", min_value=0.0, value=0.0, step=50.0)
-
-        st.write("")
-        st.markdown("### Monthly expenses")
-
-        pcol, _ = st.columns([1.5, 1])
-        with pcol:
-            use_preset = st.checkbox("Use city presets for basic expenses", value=False)
-
-        preset = CITY_EXPENSE_PRESETS.get(calc_city, CITY_EXPENSE_PRESETS.get(DEFAULT_CITY, {}))
-
-        e1, e2, e3 = st.columns(3)
-        with e1:
-            rent = st.number_input(
-                "Rent ($)",
-                min_value=0.0,
-                value=float(preset.get("rent", 850)) if use_preset else 850.0,
-                step=25.0,
-            )
-            utilities = st.number_input(
-                "Utilities ($)",
-                min_value=0.0,
-                value=float(preset.get("utilities", 120)) if use_preset else 120.0,
-                step=10.0,
-            )
-        with e2:
-            food = st.number_input(
-                "Food ($)",
-                min_value=0.0,
-                value=float(preset.get("food", 350)) if use_preset else 350.0,
-                step=10.0,
-            )
-            transport = st.number_input(
-                "Transport ($)",
-                min_value=0.0,
-                value=float(preset.get("transport", 90)) if use_preset else 90.0,
-                step=10.0,
-            )
-        with e3:
-            phone_internet = st.number_input(
-                "Phone/Internet ($)",
-                min_value=0.0,
-                value=float(preset.get("phone_internet", 60)) if use_preset else 60.0,
-                step=10.0,
-            )
-            misc_basic = st.number_input(
-                "Misc basics ($)",
-                min_value=0.0,
-                value=float(preset.get("misc_basic", 130)) if use_preset else 130.0,
-                step=10.0,
-            )
-
-        st.write("")
-        st.markdown("### Program details (optional, helps naming and saving)")
-        d1, d2 = st.columns(2)
-        with d1:
-            program_name = st.text_input("Program name", value=st.session_state.get("program_name", ""))
-            program_type = st.selectbox(
-                "Scenario type",
-                ["Current offer", "Backup offer", "Dream option", "Current school"],
-                index=["Current offer", "Backup offer", "Dream option", "Current school"].index(st.session_state.get("program_type", "Current offer")),
-            )
-            program_start = st.date_input("Program start date", value=st.session_state.get("program_start", date.today()))
-        with d2:
-            program_end = st.date_input("Expected graduation date", value=st.session_state.get("program_end", date.today() + timedelta(days=365)))
-            program_tuition_total = st.number_input(
-                "Total tuition and fees for full program ($)",
-                min_value=0.0,
-                value=float(st.session_state.get("program_tuition_total", 0.0)),
-                step=1000.0,
-            )
-            program_loan_amount = st.number_input(
-                "Planned total loan amount ($)",
-                min_value=0.0,
-                value=float(st.session_state.get("program_loan_amount", 0.0)),
-                step=1000.0,
-            )
-
-        st.write("")
-        submitted = st.form_submit_button("✅ Calculate")
-
-    if not submitted and not st.session_state.get("calc_ready", False):
-        st.info("Fill the form and click Calculate. Your results stay available across pages after the first run.")
-    elif submitted:
-        weekly_job_income = (wage * (hours_mon_fri + hours_sat)) + (wage * hours_sun * sunday_multiplier)
-        monthly_job_income = weekly_job_income * weeks_per_month
-
-        total_income = monthly_job_income + stipend
-        total_expenses = rent + utilities + food + transport + phone_internet + misc_basic
-        balance = total_income - total_expenses
-        status = financial_status(balance)
-
-        health_score, score_breakdown = financial_health_score(total_income=total_income, total_expenses=total_expenses, rent=rent, balance=balance)
-
-        # persist core
-        st.session_state["weekly_job_income"] = float(weekly_job_income)
-        st.session_state["monthly_job_income"] = float(monthly_job_income)
-        st.session_state["wage"] = float(wage)
-        st.session_state["weeks_per_month"] = float(weeks_per_month)
-        st.session_state["stipend"] = float(stipend)
-
-        st.session_state["total_income"] = float(total_income)
-        st.session_state["total_expenses"] = float(total_expenses)
-        st.session_state["balance"] = float(balance)
-        st.session_state["status"] = status
-        st.session_state["context_city"] = calc_city
-
-        st.session_state["health_score"] = int(health_score)
-        st.session_state["rent_ratio"] = float(score_breakdown["rent_ratio"]) if score_breakdown["rent_ratio"] is not None else None
-        st.session_state["savings_rate"] = float(score_breakdown["savings_rate"]) if score_breakdown["savings_rate"] is not None else None
-        st.session_state["buffer_months"] = float(score_breakdown.get("buffer_months", 0.0))
-
-        st.session_state["rent"] = float(rent)
-        st.session_state["utilities"] = float(utilities)
-        st.session_state["food"] = float(food)
-        st.session_state["transport"] = float(transport)
-        st.session_state["phone_internet"] = float(phone_internet)
-        st.session_state["misc_basic"] = float(misc_basic)
-
-        # program details 
-        st.session_state["program_name"] = program_name
-        st.session_state["program_type"] = program_type
-        st.session_state["program_start"] = program_start
-        st.session_state["program_end"] = program_end
-        st.session_state["program_tuition_total"] = float(program_tuition_total)
-        st.session_state["program_loan_amount"] = float(program_loan_amount)
-
-        st.session_state["calc_ready"] = True
-
-        # history
-        st.session_state["calc_history"].append(
-            {"run_date": str(date.today()), "city": calc_city, "total_income": float(total_income), "total_expenses": float(total_expenses), "balance": float(balance)}
-        )
-        st.session_state["calc_history"] = st.session_state["calc_history"][-12:]
-
-    # show results if ready
-    if st.session_state.get("calc_ready", False):
-        total_income = float(st.session_state["total_income"])
-        total_expenses = float(st.session_state["total_expenses"])
-        balance = float(st.session_state["balance"])
-        status = st.session_state["status"]
-        calc_city = st.session_state["context_city"]
-
-        wage = float(st.session_state["wage"])
-        monthly_job_income = float(st.session_state["monthly_job_income"])
-        stipend = float(st.session_state["stipend"])
-
-        rent = float(st.session_state["rent"])
-        utilities = float(st.session_state["utilities"])
-        food = float(st.session_state["food"])
-        transport = float(st.session_state["transport"])
-        phone_internet = float(st.session_state["phone_internet"])
-        misc_basic = float(st.session_state["misc_basic"])
-
-        program_name = st.session_state.get("program_name", "")
-        program_type = st.session_state.get("program_type", "Current offer")
-        program_start = st.session_state.get("program_start", date.today())
-        program_end = st.session_state.get("program_end", date.today() + timedelta(days=365))
-        program_tuition_total = float(st.session_state.get("program_tuition_total", 0.0))
-        program_loan_amount = float(st.session_state.get("program_loan_amount", 0.0))
-
-        # Results card
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.subheader("Results")
-        st.write("")
-
-        r1, r2, r3, r4 = st.columns(4)
-        r1.metric("City", calc_city)
-        r2.metric("Min wage", f"${wage:.2f}/hr")
-        r3.metric("Monthly job income (est.)", money(monthly_job_income))
-        r4.metric("Monthly stipend", money(stipend))
-
-        st.write("")
-        k1, k2, k3 = st.columns(3)
-        k1.metric("Total income", money(total_income))
-        k2.metric("Total expenses", money(total_expenses))
-        k3.metric("Balance", money(balance))
-
-        st.write("")
-        if status == "Surplus":
-            st.success("SURPLUS. You have buffer after essentials.")
-        elif status == "Break-even":
-            st.warning("BREAK-EVEN. You are surviving, but there is no buffer.")
-        else:
-            st.error("DEFICIT. You will likely need support or expense cuts.")
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        # Financial health and risk zones
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.subheader("Financial Health and risk zones")
-        st.write("")
-
-        score = int(st.session_state.get("health_score", 0))
-        rent_ratio = float(st.session_state.get("rent_ratio") or 0.0)
-        savings_rate = float(st.session_state.get("savings_rate") or 0.0)
-        buffer_months = float(st.session_state.get("buffer_months", 0.0))
-
-        st.progress(int(clamp(score, 0, 100)))
+        st.markdown("<div style='font-size:0.78rem; color:#475569;'>Run the Cash Flow Analysis to populate live metrics.</div>", unsafe_allow_html=True)
+
+    st.markdown("<hr class='soft'>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:0.70rem; color:#334155; text-align:center;'>v2.0 · Financial Intelligence Edition</div>", unsafe_allow_html=True)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 1: OVERVIEW / EXECUTIVE SUMMARY
+# ─────────────────────────────────────────────────────────────────────────────
+if page == "Overview":
+    st.markdown("<div class='page-title'>Student Financial Intelligence Dashboard</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Financial Decision-Support System · Cost Intelligence Analytics · Forecasting & Planning Platform</div>", unsafe_allow_html=True)
+
+    # KPI row
+    if st.session_state["calc_ready"]:
+        inc  = st.session_state["income"]
+        exp  = st.session_state["expenses"]
+        bal  = st.session_state["balance"]
+        rent = st.session_state["rent"]
+        score = st.session_state["health_score"]
+        rr   = st.session_state["rent_ratio"]
+        sr   = st.session_state["savings_rate"]
+        bm   = st.session_state["buffer_months"]
+        aff  = affordability_score(inc, rent, st.session_state["tuition_monthly"])
+        sl, sl_color = stress_level(aff)
 
         c1, c2, c3, c4 = st.columns(4)
-        c1.metric(
-            "Score",
-            f"{score}/100",
-            help="Quick 0–100 view of how your month looks (income, expenses, savings, buffer)."
-        )
-        c2.metric(
-            "Rent / income",
-            f"{rent_ratio*100:.1f}%",
-            help="How much of your monthly income goes to rent."
-        )
-        c3.metric(
-            "Savings rate",
-            f"{savings_rate*100:.1f}%",
-            help="Part of your income left after core expenses. Think of it as your savings muscle."
-        )
-        c4.metric(
-            "Buffer (months)",
-            f"{buffer_months:.1f}",
-            help="Buffer months is how long you can survive if income stops and you keep spending the same."
-        )
-        st.write("")
-        rb1, rb2, rb3 = st.columns(3)
+        with c1:
+            color = "kpi-green" if bal > 0 else "kpi-red"
+            st.markdown(kpi_tile("Projected Net Liquidity", usd(bal), f"{'Surplus' if bal>0 else 'Deficit'} position", color), unsafe_allow_html=True)
+        with c2:
+            st.markdown(kpi_tile("Total Monthly Inflows", usd(inc), "Wage + stipend", "kpi-teal"), unsafe_allow_html=True)
+        with c3:
+            st.markdown(kpi_tile("Total Monthly Outflows", usd(exp), "All expense categories", "kpi-gold"), unsafe_allow_html=True)
+        with c4:
+            color = "kpi-green" if score >= 60 else ("kpi-gold" if score >= 40 else "kpi-red")
+            st.markdown(kpi_tile("Financial Stability Indicator", f"{score}/100", f"Health score · {score_label(score)}", color), unsafe_allow_html=True)
 
-        # rent badge
-        if rent_ratio <= 0.30:
-            rent_badge = risk_badge_html("Rent is light", "good")
-        elif rent_ratio <= 0.40:
-            rent_badge = risk_badge_html("Rent is heavy", "warn")
-        else:
-            rent_badge = risk_badge_html("Rent is very high", "bad")
+        c5, c6, c7, c8 = st.columns(4)
+        with c5:
+            color = "kpi-green" if rr <= 0.30 else ("kpi-gold" if rr <= 0.40 else "kpi-red")
+            st.markdown(kpi_tile("Rent Burden Ratio", pct(rr), "Housing cost pressure", color), unsafe_allow_html=True)
+        with c6:
+            color = "kpi-green" if sr >= 0.10 else ("kpi-gold" if sr >= 0.05 else "kpi-red")
+            st.markdown(kpi_tile("Cash Reserve Position", pct(sr), "Savings rate vs income", color), unsafe_allow_html=True)
+        with c7:
+            color = "kpi-green" if bm >= 2 else ("kpi-gold" if bm >= 1 else "kpi-red")
+            st.markdown(kpi_tile("Emergency Fund Coverage", f"{bm:.1f} mo", "Runway if income stops", color), unsafe_allow_html=True)
+        with c8:
+            color = "kpi-green" if sl == "Low" else ("kpi-gold" if sl in ("Moderate","High") else "kpi-red")
+            st.markdown(kpi_tile("Affordability Score", f"{aff}/100", f"Financial stress: {sl}", color), unsafe_allow_html=True)
 
-        # buffer badge
-        if buffer_months >= 2:
-            buf_badge = risk_badge_html("Buffer is ok", "good")
-        elif buffer_months >= 1:
-            buf_badge = risk_badge_html("Thin buffer", "warn")
-        else:
-            buf_badge = risk_badge_html("No buffer", "bad")
-
-        # savings badge
-        if savings_rate >= 0.10:
-            sav_badge = risk_badge_html("Strong savings", "good")
-        elif savings_rate >= 0.05:
-            sav_badge = risk_badge_html("Low savings", "warn")
-        else:
-            sav_badge = risk_badge_html("No savings", "bad")
-
-        with rb1:
-            st.markdown(f"Rent pressure: {rent_badge}", unsafe_allow_html=True)
-        with rb2:
-            st.markdown(f"Emergency cushion: {buf_badge}", unsafe_allow_html=True)
-        with rb3:
-            st.markdown(f"Savings habit: {sav_badge}", unsafe_allow_html=True)
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        # Analytics insights
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.subheader("Analytics insights")
-        st.write("")
-
-        expense_dict = {"Rent": rent, "Food": food, "Transport": transport}
-        exp_df = build_expense_pressure_df(total_income, expense_dict)
-
-        st.markdown("#### Expense pressure indicators")
-        st.write("")
-        for _, row in exp_df.iterrows():
-            share_pct = float(row["ShareOfIncome"]) * 100
-            st.markdown(
-                f"- **{row['Expense']}**: {money(row['Amount'])} "
-                f"({share_pct:.1f}% of income) "
-                f"<span class='pill {row['FlagCss']}'>{row['FlagLabel']}</span>",
-                unsafe_allow_html=True,
-            )
-
-        st.write("")
+        # Behavioral alerts
         st.markdown("<hr class='soft'>", unsafe_allow_html=True)
-
-        st.markdown("#### Trend insights")
-        st.write("")
-        hist = pd.DataFrame(st.session_state.get("calc_history", []))
-        if not hist.empty:
-            hist["balance"] = pd.to_numeric(hist["balance"], errors="coerce")
-            last3 = hist["balance"].tail(3)
-            rolling3 = float(last3.mean()) if len(last3) > 0 else float(balance)
-            st.caption(f"3-run rolling average balance: {money(rolling3)}")
-
-        projected_6m = float(balance) * 6
-        st.caption(f"Simple projection: at this rate, in 6 months your net change is about {money(projected_6m)}")
-
-        st.write("")
-        st.markdown("<hr class='soft'>", unsafe_allow_html=True)
-
-        st.markdown("#### Extra risk flags")
-        st.write("")
-        flags = []
-        if total_income > 0 and (rent / total_income) > 0.40:
-            flags.append("Rent shock risk (rent is above 40 percent of income).")
-        if buffer_months <= 0:
-            flags.append("Zero buffer risk (no savings cushion).")
-        if balance < 0:
-            flags.append("Cashflow deficit risk (spending more than income).")
-
-        if hist.shape[0] >= 4:
-            vol = float(hist["balance"].tail(6).std() or 0.0)
-            if vol > 200:
-                flags.append("Income or expense volatility across recent runs.")
-
-        if flags:
-            for f in flags:
-                st.warning(f)
+        st.markdown("<div class='section-header'>Behavioral Finance Alerts</div>", unsafe_allow_html=True)
+        alerts = []
+        if rr > 0.40: alerts.append(("Rent Shock Risk: Housing cost exceeds 40% of monthly inflows — critical affordability threshold breached.", "danger"))
+        if bal < 0:   alerts.append(("Cashflow Deficit: Monthly outflows exceed inflows — negative net liquidity position.", "danger"))
+        if sr < 0.05: alerts.append(("Savings Erosion: Cash reserve position below 5% — insufficient buffer accumulation.", "warn"))
+        if bm < 1:    alerts.append(("Liquidity Risk: Emergency fund coverage below 1 month — high financial vulnerability.", "warn"))
+        disc = st.session_state.get("discretionary", 0)
+        if inc > 0 and disc / inc > 0.15: alerts.append(("Discretionary Spending Alert: Discretionary outflows exceed 15% of inflows — review non-essential expenditure.", "warn"))
+        if not alerts:
+            st.markdown(alert_html("No critical alerts. Financial position within acceptable parameters.", "ok"), unsafe_allow_html=True)
         else:
-            st.success("No major risk flags triggered from current inputs.")
+            for msg, lvl in alerts:
+                st.markdown(alert_html(msg, lvl), unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <div class='glass-card'>
+            <div class='section-header'>Platform Overview</div>
+            <p style='color:#94a3b8; font-size:0.9rem; line-height:1.7;'>
+            This financial intelligence platform combines <strong style='color:#14b8a6;'>spending analytics</strong>,
+            <strong style='color:#f59e0b;'>affordability monitoring</strong>, and
+            <strong style='color:#10b981;'>forecasting models</strong> to support data-driven financial planning decisions.
+            Navigate to <strong>Cash Flow Analysis</strong> to input your financial parameters and activate all dashboard modules.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
-        st.markdown("</div>", unsafe_allow_html=True)
+    # Workflow diagram
+    st.markdown("<div class='section-header'>Analytical Workflow</div>", unsafe_allow_html=True)
+    wf_cols = st.columns([1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1])
+    steps = ["Income Inputs", "Expense Categorisation", "Cash Flow Analysis", "Forecast Modelling", "Risk & Affordability Analysis", "Financial Planning Insights"]
+    for i, step in enumerate(steps):
+        with wf_cols[i * 2]:
+            st.markdown(f"<div class='workflow-step'>{step}</div>", unsafe_allow_html=True)
+        if i < len(steps) - 1:
+            with wf_cols[i * 2 + 1]:
+                st.markdown("<div class='workflow-arrow'>→</div>", unsafe_allow_html=True)
 
-        # Charts
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.subheader("Charts")
-        st.write("")
+    st.markdown("<div class='disclaimer'>Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.</div>", unsafe_allow_html=True)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 2: CASH FLOW ANALYSIS
+# ─────────────────────────────────────────────────────────────────────────────
+elif page == "Cash Flow Analysis":
+    st.markdown("<div class='page-title'>Cash Flow Analysis</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Monthly inflows vs outflows · Fixed vs variable expense decomposition · Net liquidity position</div>", unsafe_allow_html=True)
+
+    with st.form("cashflow_form"):
+        st.markdown("<div class='section-header'>Income Parameters</div>", unsafe_allow_html=True)
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            city = st.selectbox("City / Market", list(CITY_MIN_WAGE.keys()))
+            wage = st.number_input("Hourly wage ($/hr)", min_value=0.0, value=float(CITY_MIN_WAGE.get(city, 12.30)), step=0.25)
+        with c2:
+            weekly_hours = st.number_input("Weekly work hours", min_value=0.0, max_value=40.0, value=20.0, step=1.0)
+            weeks_per_month = st.number_input("Weeks per month", min_value=3.0, max_value=5.0, value=4.33, step=0.01)
+        with c3:
+            stipend = st.number_input("Monthly stipend / support ($)", min_value=0.0, value=1500.0, step=50.0)
+            tuition_monthly = st.number_input("Monthly tuition allocation ($)", min_value=0.0, value=0.0, step=50.0, help="Tuition amortised monthly for affordability analysis")
+
+        st.markdown("<div class='section-header' style='margin-top:1rem;'>Expense Parameters</div>", unsafe_allow_html=True)
+        preset = CITY_EXPENSE_PRESETS.get(city, CITY_EXPENSE_PRESETS["Saint Louis"])
+        use_preset = st.checkbox("Populate with city benchmark values")
+
+        e1, e2, e3, e4 = st.columns(4)
+        def pv(k, fb): return float(preset.get(k, fb)) if use_preset else float(fb)
+        with e1:
+            rent       = st.number_input("Rent ($)",           min_value=0.0, value=pv("rent",900),        step=25.0)
+            utilities  = st.number_input("Utilities ($)",      min_value=0.0, value=pv("utilities",140),   step=10.0)
+        with e2:
+            food       = st.number_input("Food & Groceries ($)",min_value=0.0, value=pv("food",360),       step=10.0)
+            transport  = st.number_input("Transportation ($)", min_value=0.0, value=pv("transport",90),    step=10.0)
+        with e3:
+            phone_internet = st.number_input("Phone / Internet ($)", min_value=0.0, value=pv("phone_internet",65), step=5.0)
+            misc_basic     = st.number_input("Essential Misc ($)",    min_value=0.0, value=pv("misc_basic",130),   step=10.0)
+        with e4:
+            discretionary = st.number_input("Discretionary Spending ($)", min_value=0.0, value=pv("discretionary",200), step=25.0, help="Non-essential: entertainment, dining out, subscriptions")
+            emergency_reserve = st.number_input("Emergency Reserve Target ($)", min_value=0.0, value=500.0, step=50.0)
+
+        submitted = st.form_submit_button("Run Cash Flow Analysis", use_container_width=True)
+
+    if submitted:
+        monthly_wage = wage * weekly_hours * weeks_per_month
+        total_income = monthly_wage + stipend
+        fixed_expenses = rent + utilities + phone_internet
+        variable_expenses = food + transport + misc_basic + discretionary
+        total_expenses = fixed_expenses + variable_expenses + tuition_monthly
+        balance = total_income - total_expenses
+        score, breakdown = financial_health_score(total_income, total_expenses, rent, balance)
+
+        # Persist to session
+        st.session_state.update({
+            "calc_ready": True, "city": city,
+            "income": total_income, "expenses": total_expenses, "balance": balance,
+            "rent": rent, "utilities": utilities, "food": food,
+            "transport": transport, "phone_internet": phone_internet,
+            "misc_basic": misc_basic, "discretionary": discretionary,
+            "tuition_monthly": tuition_monthly,
+            "wage": wage, "weekly_hours": weekly_hours, "weeks_per_month": weeks_per_month,
+            "stipend": stipend,
+            "health_score": score,
+            "rent_ratio": breakdown.get("rent_ratio", 0),
+            "savings_rate": breakdown.get("savings_rate", 0),
+            "buffer_months": breakdown.get("buffer_months", 0),
+        })
+        hist = st.session_state["calc_history"]
+        hist.append({"ts": str(datetime.now()), "income": total_income, "expenses": total_expenses, "balance": balance, "score": score})
+        st.session_state["calc_history"] = hist[-12:]
+
+    if st.session_state["calc_ready"]:
+        total_income  = st.session_state["income"]
+        total_expenses = st.session_state["expenses"]
+        balance       = st.session_state["balance"]
+        rent          = st.session_state["rent"]
+        utilities     = st.session_state["utilities"]
+        food          = st.session_state["food"]
+        transport     = st.session_state["transport"]
+        phone_internet = st.session_state["phone_internet"]
+        misc_basic    = st.session_state["misc_basic"]
+        discretionary = st.session_state["discretionary"]
+        tuition_monthly = st.session_state["tuition_monthly"]
+        score         = st.session_state["health_score"]
+
+        fixed_expenses    = rent + utilities + phone_internet
+        variable_expenses = food + transport + misc_basic + discretionary
+
+        st.markdown("<hr class='soft'>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header'>Monthly Cash Flow Summary</div>", unsafe_allow_html=True)
+
+        k1, k2, k3, k4 = st.columns(4)
+        with k1: st.metric("Total Monthly Inflows",  usd(total_income))
+        with k2: st.metric("Total Monthly Outflows", usd(total_expenses))
+        with k3:
+            delta_color = "normal" if balance >= 0 else "inverse"
+            st.metric("Projected Net Liquidity", usd(balance), delta=f"{'Surplus' if balance >= 0 else 'Deficit'}")
+        with k4: st.metric("Financial Stability Indicator", f"{score}/100")
+
+        st.markdown("<div class='section-header' style='margin-top:1rem;'>Fixed vs Variable Expense Decomposition</div>", unsafe_allow_html=True)
 
         ch1, ch2 = st.columns(2)
         with ch1:
-            comparison_df = pd.DataFrame({"Category": ["Total income", "Total expenses"], "Amount": [total_income, total_expenses]})
-            fig = px.bar(comparison_df, x="Category", y="Amount", text="Amount", title="Income vs essential expenses")
-            fig.update_traces(texttemplate="$%{text:,.0f}", textposition="outside", cliponaxis=False)
-            fig.update_yaxes(range=[0, max(total_income, total_expenses) * 1.25])
-            fig.update_layout(yaxis_title="USD", xaxis_title="")
+            fig = go.Figure()
+            fig.add_trace(go.Bar(name="Total Inflows",  x=["Monthly Position"], y=[total_income],  marker_color=COLORS["teal"],  text=[usd(total_income)],  textposition="outside"))
+            fig.add_trace(go.Bar(name="Fixed Outflows", x=["Monthly Position"], y=[fixed_expenses], marker_color=COLORS["gold"],  text=[usd(fixed_expenses)], textposition="outside"))
+            fig.add_trace(go.Bar(name="Variable Outflows", x=["Monthly Position"], y=[variable_expenses], marker_color=COLORS["red"], text=[usd(variable_expenses)], textposition="outside"))
+            fig.update_layout(title="Inflows vs Fixed vs Variable Outflows", barmode="group", **PLOT_LAYOUT)
             st.plotly_chart(fig, use_container_width=True)
 
         with ch2:
-            exp_all_df = pd.DataFrame(
-                {"Expense": ["Rent", "Utilities", "Food", "Transport", "Phone/Internet", "Misc basics"],
-                 "Amount": [rent, utilities, food, transport, phone_internet, misc_basic]}
-            )
-            fig2 = px.bar(exp_all_df, x="Expense", y="Amount", text="Amount", title="Expense breakdown")
-            fig2.update_traces(texttemplate="$%{text:,.0f}", textposition="outside", cliponaxis=False)
-            fig2.update_yaxes(range=[0, max(exp_all_df["Amount"]) * 1.25])
-            fig2.update_layout(yaxis_title="USD", xaxis_title="")
+            labels = ["Rent", "Utilities", "Phone/Internet", "Food", "Transport", "Essential Misc", "Discretionary"]
+            if tuition_monthly > 0: labels.append("Tuition")
+            values = [rent, utilities, phone_internet, food, transport, misc_basic, discretionary]
+            if tuition_monthly > 0: values.append(tuition_monthly)
+            colors_pie = [COLORS["red"], COLORS["gold"], COLORS["purple"], COLORS["teal"], COLORS["blue"], COLORS["green"], COLORS["slate"]]
+            if tuition_monthly > 0: colors_pie.append("#f97316")
+            fig2 = go.Figure(go.Pie(
+                labels=labels, values=values,
+                hole=0.52,
+                marker=dict(colors=colors_pie, line=dict(color="#050a14", width=2)),
+                textinfo="label+percent", textfont=dict(size=10),
+            ))
+            fig2.update_layout(title="Expense Allocation by Category", **PLOT_LAYOUT)
             st.plotly_chart(fig2, use_container_width=True)
 
-        st.markdown("</div>", unsafe_allow_html=True)
+        # Savings trajectory
+        st.markdown("<div class='section-header'>Savings Trajectory (12-Month Projection)</div>", unsafe_allow_html=True)
+        months_proj = list(range(1, 13))
+        cumulative_savings = [max(0, balance) * m for m in months_proj]
+        fig3 = go.Figure()
+        fig3.add_trace(go.Scatter(x=months_proj, y=cumulative_savings, mode="lines+markers",
+                                  line=dict(color=COLORS["teal"], width=2.5),
+                                  marker=dict(size=6, color=COLORS["teal"]),
+                                  fill="tozeroy", fillcolor="rgba(20,184,166,0.08)",
+                                  name="Cumulative Cash Reserve"))
+        fig3.update_layout(title="Projected Cash Reserve Accumulation (12 Months, No Inflation Adjustment)",
+                           xaxis_title="Month", yaxis_title="Cumulative Balance (USD)", **PLOT_LAYOUT)
+        st.plotly_chart(fig3, use_container_width=True)
 
-        # Scenario simulator (quick what-ifs)
-        st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-        st.subheader("Scenario simulator")
-        st.caption("Try quick what-ifs without changing the form above.")
-        st.write("")
-
-        s1, s2, s3 = st.columns(3)
-        with s1:
-            extra_hours = st.slider("Extra work hours per week", 0.0, 10.0, 0.0, 1.0)
-        with s2:
-            rent_change = st.slider("Rent change ($/month)", -500.0, 500.0, 0.0, 25.0)
-        with s3:
-            extra_income = st.slider("Extra monthly income ($)", 0.0, 1000.0, 0.0, 50.0)
-
-        base_weekly_job_income = float(st.session_state["weekly_job_income"])
-        base_wage = float(st.session_state["wage"])
-        base_weeks_per_month = float(st.session_state["weeks_per_month"])
-        base_stipend = float(st.session_state["stipend"])
-
-        scenario_weekly_job_income = base_weekly_job_income + (base_wage * extra_hours)
-        scenario_monthly_job_income = scenario_weekly_job_income * base_weeks_per_month
-
-        scenario_rent = max(rent + rent_change, 0.0)
-        scenario_total_expenses = scenario_rent + utilities + food + transport + phone_internet + misc_basic
-        scenario_total_income = scenario_monthly_job_income + base_stipend + extra_income
-        scenario_balance = scenario_total_income - scenario_total_expenses
-        delta_balance = scenario_balance - balance
-
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Scenario income / month", money(scenario_total_income), delta=money(scenario_total_income - total_income))
-        c2.metric("Scenario expenses / month", money(scenario_total_expenses), delta=money(scenario_total_expenses - total_expenses))
-        c3.metric("Scenario balance / month", money(scenario_balance), delta=money(delta_balance))
-
-        st.write("")
-        if delta_balance > 0:
-            st.success("This scenario improves your monthly balance.")
-        elif delta_balance < 0:
-            st.warning("This scenario reduces your monthly balance.")
-        else:
-            st.info("This scenario keeps your balance the same.")
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        # Save calculation for My Plan
-        st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-        st.subheader("Save this calculation for My Plan")
-        st.caption("Save multiple options like WashU 2025, UT Dallas backup, etc.")
-        st.write("")
-
-        default_label = f"{program_name or calc_city}  •  {money(balance)}/month"
-        label = st.text_input("Name for this saved calculation", value=default_label, key="save_calc_label")
-
-        col_save, col_clear = st.columns([1, 1.2])
-        with col_save:
-            save_clicked = st.button("💾 Save calculation")
-        with col_clear:
-            st.caption("Tip: after saving, go to My Plan to compare, plan, and run debt payback.")
-
-        if save_clicked:
-            calc_id = make_saved_calc_id()
-            saved_entry = {
-                "id": calc_id,
-                "label": label,
-                "run_date": str(date.today()),
-                "city": calc_city,
-
-                "program_name": program_name,
-                "program_type": program_type,
-                "program_start": str(program_start),
-                "program_end": str(program_end),
-                "program_tuition_total": float(program_tuition_total),
-                "program_loan_amount": float(program_loan_amount),
-
-                "total_income": float(total_income),
-                "total_expenses": float(total_expenses),
-                "balance": float(balance),
-
-                "monthly_job_income": float(monthly_job_income),
-                "stipend": float(stipend),
-
-                "rent": float(rent),
-                "utilities": float(utilities),
-                "food": float(food),
-                "transport": float(transport),
-                "phone_internet": float(phone_internet),
-                "misc_basic": float(misc_basic),
-
-                "health_score": int(score),
-                "rent_ratio": float(rent_ratio),
-                "savings_rate": float(savings_rate),
-                "buffer_months": float(buffer_months),
-            }
-            st.session_state["saved_calcs"].append(saved_entry)
-            st.session_state["active_saved_calc_id"] = calc_id
-            st.success("Saved. Open My Plan to use this calculation.")
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        # Download current calc
-        st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-        st.subheader("Download")
-        st.caption("Export your current calculation as CSV.")
-        st.write("")
-
-        result_row = {
-            "city": calc_city,
-            "program_name": program_name,
-            "program_type": program_type,
-            "program_start": str(program_start),
-            "program_end": str(program_end),
-            "program_tuition_total": program_tuition_total,
-            "program_loan_amount": program_loan_amount,
-            "min_wage": wage,
-            "weeks_per_month": float(st.session_state["weeks_per_month"]),
-            "monthly_job_income_est": float(st.session_state["monthly_job_income"]),
-            "stipend": float(st.session_state["stipend"]),
-            "total_income": total_income,
-            "total_expenses": total_expenses,
-            "balance": balance,
-            "status": status,
-            "rent": rent,
-            "utilities": utilities,
-            "food": food,
-            "transport": transport,
-            "phone_internet": phone_internet,
-            "misc_basic": misc_basic,
-        }
-        out_df = pd.DataFrame([result_row])
-        csv_bytes = out_df.to_csv(index=False).encode("utf-8")
-
-        st.download_button(
-            label="⬇️ Download your calculation as CSV",
-            data=csv_bytes,
-            file_name=f"{calc_city}_calculator_result.csv",
-            mime="text/csv",
-            key="calc_download_csv",
-        )
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("<div class='disclaimer'>Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.</div>", unsafe_allow_html=True)
 
 
-#PAGE B: SCENARIOS
-elif page == "Scenarios":
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("Scenario builder")
-    st.markdown(
-        "<div class='small-note'>Store scenarios per user: User → Scenarios → Phases. Build a timeline for pre-arrival, semesters, internships, and grace period.</div>",
-        unsafe_allow_html=True,
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 3: COST INTELLIGENCE
+# ─────────────────────────────────────────────────────────────────────────────
+elif page == "Cost Intelligence":
+    st.markdown("<div class='page-title'>Cost Intelligence Analytics</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Cost burden analysis · Affordability pressure indicators · Spending pattern anomalies</div>", unsafe_allow_html=True)
 
-    # Create or select scenario
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.markdown("#### Create or select a scenario")
-    st.write("")
-
-    scenarios = st.session_state.get("scenarios", [])
-    left, right = st.columns(2)
-
-    with left:
-        if scenarios:
-            labels = []
-            label_to_id = {}
-            for sc in scenarios:
-                label = f"{sc.get('name','Unnamed')}  |  {sc.get('city','-')}  |  {sc.get('visa','-')}"
-                labels.append(label)
-                label_to_id[label] = sc["id"]
-            chosen_label = st.selectbox("Existing scenarios", labels)
-            st.session_state["active_scenario_id"] = label_to_id[chosen_label]
-        else:
-            st.info("No scenarios yet. Add your first one on the right.")
-
-    with right:
-        with st.form("new_scenario_form"):
-            name = st.text_input("Scenario name", placeholder="WashU 2025")
-            city = st.text_input("City", placeholder="Saint Louis")
-            visa = st.text_input("Visa type", placeholder="F-1")
-            start = st.date_input("Program start", value=date.today())
-            end = st.date_input("Program end", value=date.today() + timedelta(days=365))
-            add = st.form_submit_button("Add scenario")
-
-        if add and name.strip():
-            new_sc = {
-                "id": make_scenario_id(),
-                "name": name.strip(),
-                "city": city.strip() if city else "-",
-                "visa": visa.strip() if visa else "-",
-                "program_start": str(start),
-                "program_end": str(end),
-                "phases": [],
-            }
-            st.session_state["scenarios"].append(new_sc)
-            st.session_state["active_scenario_id"] = new_sc["id"]
-            st.success("Scenario created.")
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # Active scenario (always from session list)
-    idx = get_active_scenario_index()
-    active = st.session_state["scenarios"][idx] if idx is not None else None
-
-    # Add phase
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.markdown("#### Add timeline phase")
-    st.write("")
-
-    if active is None:
-        st.info("Select or create a scenario above, then add phases.")
-        st.markdown("</div>", unsafe_allow_html=True)
-    else:
-        with st.form("add_phase_form"):
-            pname = st.text_input("Phase name", placeholder="Pre-arrival")
-            months = st.number_input("Months in this phase", min_value=1, max_value=48, value=4)
-            income = st.number_input("Average monthly income ($)", min_value=0.0, step=50.0)
-            expenses = st.number_input("Average monthly expenses ($)", min_value=0.0, step=50.0)
-            oneoff = st.number_input("One-time costs in this phase ($)", min_value=0.0, step=50.0)
-            addp = st.form_submit_button("Add phase")
-
-        if addp and pname.strip():
-            active["phases"].append(
-                {
-                    "name": pname.strip(),
-                    "months": int(months),
-                    "monthly_income": float(income),
-                    "monthly_expenses": float(expenses),
-                    "one_time_costs": float(oneoff),
-                }
-            )
-            # write back
-            st.session_state["scenarios"][idx] = active
-            st.success(f"Phase '{pname.strip()}' added.")
-
-        st.write("")
-        if active.get("phases"):
-            st.markdown("**Current phases**")
-            df_ph = pd.DataFrame(active["phases"])
-            st.dataframe(df_ph, use_container_width=True, hide_index=True)
-        else:
-            st.caption("No phases yet. Add pre-arrival first, then semesters, internship months, and grace period.")
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # Timeline insights
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.markdown("#### Balance timeline and insights")
-    st.write("")
-
-    if active is None or not active.get("phases"):
-        st.info("Add at least one phase to see projected cash balance and warnings.")
-        st.markdown("</div>", unsafe_allow_html=True)
-    else:
-        starting_cash_key = f"scenario_start_cash__{active['id']}"
-        if starting_cash_key not in st.session_state:
-            st.session_state[starting_cash_key] = 0.0
-
-        starting_cash = st.number_input(
-            "Starting cash before first phase ($)",
-            min_value=-50000.0,
-            max_value=500000.0,
-            value=float(st.session_state[starting_cash_key]),
-            step=500.0,
-            key=starting_cash_key,
-        )
-
-        rows = []
-        current_balance = float(starting_cash)
-
-        for order, ph in enumerate(active["phases"], start=1):
-            months = int(ph.get("months", 0))
-            mi = float(ph.get("monthly_income", 0.0))
-            me = float(ph.get("monthly_expenses", 0.0))
-            oneoff = float(ph.get("one_time_costs", 0.0))
-
-            net_per_month = mi - me
-            recurring_impact = net_per_month * months
-            total_impact = recurring_impact - oneoff
-            end_balance = current_balance + total_impact
-
-            rows.append(
-                {
-                    "Order": order,
-                    "Phase": ph.get("name", f"Phase {order}"),
-                    "Months": months,
-                    "Monthly net": net_per_month,
-                    "One-time costs": oneoff,
-                    "Phase impact": total_impact,
-                    "End balance": end_balance,
-                }
-            )
-            current_balance = end_balance
-
-        tl_df = pd.DataFrame(rows)
-
-        c1, c2 = st.columns([1.15, 1.85])
-        with c1:
-            st.markdown("**Phase summary**")
-            st.dataframe(tl_df, use_container_width=True, hide_index=True)
-
-        with c2:
-            st.markdown("**Cash balance over phases**")
-            fig = px.line(tl_df, x="Order", y="End balance", markers=True, title="Projected cash balance by phase end")
-            fig.update_layout(xaxis_title="Phase order", yaxis_title="Balance (USD)")
-            st.plotly_chart(fig, use_container_width=True)
-
-        st.write("")
-        min_bal = float(tl_df["End balance"].min())
-        max_bal = float(tl_df["End balance"].max())
-        final_bal = float(tl_df["End balance"].iloc[-1])
-        worst_row = tl_df.loc[tl_df["End balance"].idxmin()]
-
-        st.markdown("**Key insights**")
-        st.write(f"- Lowest balance: **{money(min_bal)}** (worst phase: **{worst_row['Phase']}**) ")
-        st.write(f"- Highest balance: **{money(max_bal)}** ")
-        st.write(f"- Final balance after last phase: **{money(final_bal)}** ")
-
-        if min_bal < 0:
-            extra_needed = abs(min_bal)
-            st.warning(f"You go below zero at some point. To never go negative, you need about **{money(extra_needed)}** more starting cash or funding.")
-        else:
-            st.success("You never go below zero in this scenario. Cash buffer looks feasible.")
-
-        # Practical recommendation: where to fix first
-        st.write("")
-        st.markdown("**What to change first**")
-        if float(worst_row["Monthly net"]) < 0:
-            st.write("- Your worst phase has negative monthly net. First fix is to increase income or reduce expenses during that phase.")
-        if float(worst_row["One-time costs"]) > 0:
-            st.write("- Your worst phase includes one-time costs. Consider spreading those costs earlier, saving for them, or reducing them.")
-        if min_bal < 0 and final_bal > 0:
-            st.write("- You recover later. So the gap is a timing problem. Plan a buffer before the dip phase.")
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-
-# PAGE C: CITY COMPARE
-elif page == "City Compare":
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("City comparison (CSV)")
-    st.markdown("<div class='small-note'>Compare cities using data/student_costs.csv (month must be YYYY-MM).</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    data = safe_read_csv("data/student_costs.csv")
-    if data is None:
-        st.error("Could not read data/student_costs.csv. Make sure the file exists.")
+    if not st.session_state["calc_ready"]:
+        st.info("Run Cash Flow Analysis first to activate cost intelligence modules.")
         st.stop()
 
-    required_cols = {
-        "city", "month", "campus_job_income", "stipend_income",
-        "rent", "utilities", "food", "transport", "phone_internet", "misc_basic"
-    }
-    missing = required_cols - set(data.columns)
-    if missing:
-        st.error(f"Your CSV is missing these columns: {sorted(list(missing))}")
-        st.stop()
+    inc  = st.session_state["income"]
+    rent = st.session_state["rent"]
+    food = st.session_state["food"]
+    transport = st.session_state["transport"]
+    utilities = st.session_state["utilities"]
+    phone_internet = st.session_state["phone_internet"]
+    misc_basic = st.session_state["misc_basic"]
+    discretionary = st.session_state["discretionary"]
+    tuition_monthly = st.session_state["tuition_monthly"]
+    exp  = st.session_state["expenses"]
+    bal  = st.session_state["balance"]
 
-    expense_columns = ["rent", "utilities", "food", "transport", "phone_internet", "misc_basic"]
-
-    data["month_dt"] = pd.to_datetime(data["month"], format="%Y-%m", errors="coerce")
-    if data["month_dt"].isna().all():
-        st.error("Month parsing failed. Ensure month column is YYYY-MM (example: 2026-01).")
-        st.stop()
-
-    data["total_income"] = data["campus_job_income"] + data["stipend_income"]
-    data["total_expenses"] = data[expense_columns].sum(axis=1)
-    data["balance"] = data["total_income"] - data["total_expenses"]
-    data["status"] = data["balance"].apply(financial_status)
-
-    cities = sorted(data["city"].dropna().unique().tolist())
-    months_sorted = sorted(data["month"].dropna().unique().tolist())
-
-    f1, f2, f3 = st.columns([1.4, 1.3, 1.3])
-    with f1:
-        compare_cities = st.multiselect("Cities to compare", cities, default=cities[:2] if len(cities) >= 2 else cities)
-    with f2:
-        start_month = st.selectbox("Start month", months_sorted, index=0)
-    with f3:
-        end_month = st.selectbox("End month", months_sorted, index=len(months_sorted) - 1)
-
-    st.write("")
-    if len(compare_cities) < 2:
-        st.info("Select at least two cities to compare trends and expense mix.")
-        st.stop()
-
-    start_dt = pd.to_datetime(start_month, format="%Y-%m", errors="coerce")
-    end_dt = pd.to_datetime(end_month, format="%Y-%m", errors="coerce")
-    if pd.isna(start_dt) or pd.isna(end_dt) or start_dt > end_dt:
-        st.error("Invalid month range. Check Start and End month.")
-        st.stop()
-
-    filt = data[(data["city"].isin(compare_cities)) & (data["month_dt"] >= start_dt) & (data["month_dt"] <= end_dt)].copy()
-    if filt.empty:
-        st.warning("No rows found for the selected cities and month range.")
-        st.stop()
-
-    summary = (
-        filt.groupby("city", as_index=False)
-        .agg(avg_income=("total_income", "mean"), avg_expenses=("total_expenses", "mean"), avg_balance=("balance", "mean"), months=("month", "nunique"))
-    )
-    summary["savings_rate"] = summary.apply(lambda r: (r["avg_balance"] / r["avg_income"]) if r["avg_income"] else 0.0, axis=1)
-
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("#### KPI tiles (average per month)")
-    st.write("")
-
-    cols = st.columns(min(4, len(summary)))
-    for i, row in summary.iterrows():
-        col = cols[i % len(cols)]
-        with col:
-            st.markdown("<div class='kpi-card'>", unsafe_allow_html=True)
-            st.markdown(f"<div class='kpi-label'>{row['city']}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='kpi-value'>{money(row['avg_balance'])}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='kpi-sub'>Avg income {money(row['avg_income'])} • Avg expenses {money(row['avg_expenses'])}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='kpi-sub'>Months: {int(row['months'])} • Savings rate: {row['savings_rate']*100:.1f}%</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    c1, c2 = st.columns([1.6, 1.0])
-    with c1:
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("#### Balance trend (by city)")
-        st.write("")
-        trend = filt.groupby(["month_dt", "city"], as_index=False).agg(balance=("balance", "mean")).sort_values(["month_dt", "city"])
-        fig = px.line(trend, x="month_dt", y="balance", color="city", markers=True)
-        fig.update_layout(xaxis_title="Month", yaxis_title="Balance (USD)")
-        st.plotly_chart(fig, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    with c2:
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("#### Expense mix (selected range)")
-        st.write("")
-        exp_mix = filt.groupby("city", as_index=False)[expense_columns].sum()
-        donut_city = st.selectbox("Donut city", compare_cities, index=0)
-        row = exp_mix[exp_mix["city"] == donut_city]
-
-        if not row.empty:
-            donut_df = pd.DataFrame({"Expense": expense_columns, "Amount": [float(row[col].iloc[0]) for col in expense_columns]})
-            fig2 = px.pie(donut_df, names="Expense", values="Amount", hole=0.55)
-            fig2.update_layout(title=f"{donut_city}: total expenses by category")
-            st.plotly_chart(fig2, use_container_width=True)
-        else:
-            st.info("No expense data for donut chart.")
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("#### Compare table")
-    st.write("")
-    show = summary.sort_values("avg_balance", ascending=False).copy()
-    show["Avg income"] = show["avg_income"].round(0)
-    show["Avg expenses"] = show["avg_expenses"].round(0)
-    show["Avg balance"] = show["avg_balance"].round(0)
-    show["Savings rate (%)"] = (show["savings_rate"] * 100).round(1)
-    show = show[["city", "Avg income", "Avg expenses", "Avg balance", "months", "Savings rate (%)"]].rename(columns={"city": "City", "months": "Months"})
-    st.dataframe(show, use_container_width=True, hide_index=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# PAGE D: MY PLAN
-elif page == "My Plan":
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("My plan")
-    st.markdown("<div class='small-note'>Pick one saved calculation and turn it into a goal plan plus a debt payback view.</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    saved = st.session_state.get("saved_calcs", [])
-    if not saved:
-        st.info("No saved calculations yet. Go to Calculator and click Save calculation.")
-        st.stop()
-
-    # choose saved calc
-    options = []
-    display_to_entry = {}
-    for entry in saved:
-        label = entry.get("label", "Unnamed")
-        city = entry.get("city", "-")
-        bal = float(entry.get("balance", 0.0))
-        run_date = entry.get("run_date", "")
-        display = f"{label}  |  {city}  |  {money(bal)}/month  |  {run_date}"
-        options.append(display)
-        display_to_entry[display] = entry
-
-    # default selection
-    default_index = 0
-    active_id = st.session_state.get("active_saved_calc_id")
-    if active_id:
-        for i, entry in enumerate(saved):
-            if entry.get("id") == active_id:
-                default_index = i
-                break
-
-    selection = st.selectbox("Saved calculation", options, index=default_index)
-    chosen = display_to_entry[selection]
-    st.session_state["active_saved_calc_id"] = chosen.get("id")
-
-    st.write("")
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.markdown("#### Selected calculation snapshot")
-    st.write("")
-    s1, s2, s3, s4 = st.columns(4)
-    s1.metric("City", chosen.get("city", "-"))
-    s2.metric("Income / month", money(float(chosen.get("total_income", 0.0))))
-    s3.metric("Expenses / month", money(float(chosen.get("total_expenses", 0.0))))
-    s4.metric("Balance / month", money(float(chosen.get("balance", 0.0))))
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # Goal plan
-    goal_amount = float(st.session_state["goal_amount"])
-    deadline = st.session_state["goal_deadline"]
-    current_saved = float(st.session_state.get("current_saved", 0.0))
-    monthly_balance = float(chosen.get("balance", 0.0))
-
-    today = date.today()
-    days_left = max((deadline - today).days, 1)
-    weeks_left = days_left / 7.0
-    weekly_target = (goal_amount - current_saved) / weeks_left if weeks_left > 0 else goal_amount
-
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.markdown("#### Goal summary")
-    st.write("")
-    g1, g2, g3, g4 = st.columns(4)
-    g1.metric("Goal", money(goal_amount))
-    g2.metric("Saved so far", money(current_saved))
-    g3.metric("Weeks left", f"{weeks_left:.1f}")
-    g4.metric("Target per week", money(weekly_target))
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.markdown("#### Progress tracking")
-    st.write("")
-    remaining = max(goal_amount - current_saved, 0.0)
-    pct = 0.0 if goal_amount <= 0 else clamp(current_saved / goal_amount, 0, 1)
-    st.progress(int(pct * 100))
-    p1, p2, p3 = st.columns(3)
-    p1.metric("Progress", f"{pct*100:.1f}%")
-    p2.metric("Remaining", money(remaining))
-    p3.metric("Time left (days)", f"{days_left}")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.markdown("#### Am I on track?")
-    st.write("")
-    weekly_from_balance = monthly_balance / 4.33 if monthly_balance else 0.0
-    delta = weekly_from_balance - weekly_target
-
-    if monthly_balance <= 0:
-        st.error("This saved calculation is not saving anything. Improve the Calculator result or save a better scenario.")
-    elif delta >= 0:
-        st.success(f"On track. Estimated weekly saving is {money(weekly_from_balance)} and your target is {money(weekly_target)}.")
-    else:
-        st.warning(f"Short by about {money(abs(delta))} per week. Reduce expenses or increase income.")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # Debt at graduation and payback (PERSISTENT inputs)
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.markdown("#### Debt at graduation and payback time")
-    st.caption("These inputs stay saved even when you switch pages.")
-    st.write("")
-
-    dcol1, dcol2, dcol3 = st.columns(3)
-    with dcol1:
-        st.number_input("Total tuition and fees for program ($)", min_value=0.0, step=1000.0, key="debt_tuition_total")
-        st.number_input("Total living costs during program ($)", min_value=0.0, step=1000.0, key="debt_living_total")
-    with dcol2:
-        st.number_input("Total scholarships or grants ($)", min_value=0.0, step=1000.0, key="debt_scholarships_total")
-        st.number_input("Loan principal at graduation ($)", min_value=0.0, step=1000.0, key="debt_loan_principal")
-    with dcol3:
-        st.number_input("Loan interest rate (annual, %)", min_value=0.0, max_value=25.0, step=0.25, key="debt_loan_interest_rate")
-        st.number_input("Expected starting salary (annual, $)", min_value=0.0, step=5000.0, key="debt_expected_start_salary")
-
-    st.write("")
-    rcol1, rcol2, rcol3 = st.columns(3)
-    with rcol1:
-        st.number_input("Payoff scenario 1: salary share (%)", min_value=0.0, max_value=60.0, step=1.0, key="debt_salary_to_debt_rate_1")
-    with rcol2:
-        st.number_input("Payoff scenario 2: salary share (%)", min_value=0.0, max_value=60.0, step=1.0, key="debt_salary_to_debt_rate_2")
-    with rcol3:
-        st.number_input("Payoff scenario 3: salary share (%)", min_value=0.0, max_value=60.0, step=1.0, key="debt_salary_to_debt_rate_3")
-
-    tuition_total = float(st.session_state["debt_tuition_total"])
-    living_total = float(st.session_state["debt_living_total"])
-    scholarships_total = float(st.session_state["debt_scholarships_total"])
-    loan_principal = float(st.session_state["debt_loan_principal"])
-    loan_rate_annual = float(st.session_state["debt_loan_interest_rate"])
-    salary_annual = float(st.session_state["debt_expected_start_salary"])
-
-    total_program_cost = tuition_total + living_total
-    net_cost_after_sch = max(total_program_cost - scholarships_total, 0.0)
-    total_debt_at_grad = loan_principal if loan_principal > 0 else net_cost_after_sch
-
-    monthly_salary = salary_annual / 12.0 if salary_annual > 0 else 0.0
-    r = loan_rate_annual / 100.0 / 12.0 if loan_rate_annual > 0 else 0.0
-
-    baseline_pmt = monthly_payment(total_debt_at_grad, r, 10)
-
-    st.write("")
-    m1, m2, m3 = st.columns(3)
-    m1.metric("Total debt at graduation (approx.)", money(total_debt_at_grad))
-    m2.metric("Standard 10-year payment", money(baseline_pmt))
-    m3.metric("Monthly salary (est.)", money(monthly_salary))
-
-    st.write("")
-    st.markdown("**Payback outcomes**")
-    rates_pct = [
-        float(st.session_state["debt_salary_to_debt_rate_1"]),
-        float(st.session_state["debt_salary_to_debt_rate_2"]),
-        float(st.session_state["debt_salary_to_debt_rate_3"]),
+    # Cost burden ratios
+    st.markdown("<div class='section-header'>Cost Burden Analysis</div>", unsafe_allow_html=True)
+    burden_data = [
+        ("Rent Burden Ratio",          rent / inc if inc > 0 else 0,       0.30, 0.40, "Housing cost as % of inflows"),
+        ("Tuition Pressure Indicator", tuition_monthly / inc if inc > 0 else 0, 0.20, 0.35, "Tuition allocation as % of inflows"),
+        ("Transportation Expense Ratio", transport / inc if inc > 0 else 0, 0.08, 0.15, "Transport cost as % of inflows"),
+        ("Food Cost Ratio",            food / inc if inc > 0 else 0,        0.15, 0.25, "Food spend as % of inflows"),
+        ("Discretionary Spending Ratio", discretionary / inc if inc > 0 else 0, 0.10, 0.18, "Non-essential spend as % of inflows"),
     ]
 
-    for rp in rates_pct:
-        sr = max(rp, 0.0) / 100.0
-        m_contrib = monthly_salary * sr
-        yrs = years_to_pay(total_debt_at_grad, r, m_contrib)
+    b1, b2 = st.columns(2)
+    for i, (label, ratio, warn_thresh, danger_thresh, desc) in enumerate(burden_data):
+        col = b1 if i % 2 == 0 else b2
+        with col:
+            if ratio <= warn_thresh:   status, color = "Healthy",  "green"
+            elif ratio <= danger_thresh: status, color = "Elevated", "yellow"
+            else:                       status, color = "Critical", "red"
+            st.markdown(f"""
+            <div class='glass-card' style='padding:0.9rem 1.1rem; margin-bottom:0.7rem;'>
+                <div style='display:flex; justify-content:space-between; align-items:center;'>
+                    <div>
+                        <div style='font-size:0.78rem; color:#64748b; text-transform:uppercase; letter-spacing:0.06em;'>{label}</div>
+                        <div style='font-size:1.4rem; font-weight:700; color:#f8fafc; margin:0.15rem 0;'>{pct(ratio)}</div>
+                        <div style='font-size:0.78rem; color:#64748b;'>{desc}</div>
+                    </div>
+                    {pill(status, color)}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
-        if total_debt_at_grad <= 0:
-            st.write("- No debt estimated at graduation based on your inputs.")
-            break
+    # Financial health indicators
+    st.markdown("<div class='section-header'>Financial Health Indicators</div>", unsafe_allow_html=True)
+    score = st.session_state["health_score"]
+    rr    = st.session_state["rent_ratio"]
+    sr    = st.session_state["savings_rate"]
+    bm    = st.session_state["buffer_months"]
+    aff   = affordability_score(inc, rent, tuition_monthly)
+    sl, sl_color = stress_level(aff)
 
-        if yrs == float("inf"):
-            st.warning(f"- If you pay **{rp:.0f}%** of salary (~{money(m_contrib)}/month), it will not clear (payment too low to cover interest).")
+    h1, h2, h3, h4 = st.columns(4)
+    with h1: st.metric("Emergency Fund Coverage", f"{bm:.1f} mo", help="Months of expenses covered by current net balance")
+    with h2: st.metric("Affordability Score",     f"{aff}/100",  help="Composite affordability index (higher = more affordable)")
+    with h3: st.metric("Financial Stress Level",  sl,            help="Derived from rent burden + tuition pressure")
+    with h4: st.metric("Discretionary Ratio",     pct(discretionary / inc if inc > 0 else 0), help="Non-essential spending as % of inflows")
+
+    # Spending anomaly detection
+    st.markdown("<div class='section-header'>Spending Pattern Anomaly Detection</div>", unsafe_allow_html=True)
+    hist = pd.DataFrame(st.session_state["calc_history"])
+    if len(hist) >= 3:
+        hist["balance"] = pd.to_numeric(hist["balance"], errors="coerce")
+        hist["expenses"] = pd.to_numeric(hist["expenses"], errors="coerce")
+        rolling_avg = hist["expenses"].rolling(3).mean().iloc[-1]
+        current_exp = st.session_state["expenses"]
+        deviation = (current_exp - rolling_avg) / rolling_avg if rolling_avg > 0 else 0
+        if abs(deviation) > 0.10:
+            direction = "above" if deviation > 0 else "below"
+            st.markdown(alert_html(f"Spending Anomaly Detected: Current outflows are {abs(deviation)*100:.1f}% {direction} the 3-run rolling average ({usd(rolling_avg)}). Review expense categories for unusual activity.", "warn"), unsafe_allow_html=True)
         else:
-            st.success(f"- If you pay **{rp:.0f}%** of salary (~{money(m_contrib)}/month), you clear in about **{yrs:.1f} years**.")
+            st.markdown(alert_html(f"Spending within normal range. Current outflows deviate {abs(deviation)*100:.1f}% from 3-run rolling average ({usd(rolling_avg)}).", "ok"), unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+        # Budget deviation tracking
+        fig_hist = go.Figure()
+        fig_hist.add_trace(go.Scatter(x=list(range(len(hist))), y=hist["expenses"],
+                                      mode="lines+markers", name="Monthly Outflows",
+                                      line=dict(color=COLORS["gold"], width=2), marker=dict(size=5)))
+        fig_hist.add_trace(go.Scatter(x=list(range(len(hist))), y=hist["expenses"].rolling(3, min_periods=1).mean(),
+                                      mode="lines", name="3-Run Rolling Avg",
+                                      line=dict(color=COLORS["teal"], width=1.5, dash="dash")))
+        fig_hist.update_layout(title="Outflow Trend & Rolling Average", xaxis_title="Run", yaxis_title="USD", **PLOT_LAYOUT)
+        st.plotly_chart(fig_hist, use_container_width=True)
+    else:
+        st.info("Run Cash Flow Analysis at least 3 times to activate anomaly detection and trend tracking.")
 
-    # Actionable cut suggestions (ranked)
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.markdown("#### Actionable cut suggestions (ranked)")
-    st.write("")
+    st.markdown("<div class='disclaimer'>Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.</div>", unsafe_allow_html=True)
 
-    total_income = float(chosen.get("total_income", 0.0))
-    exp_all = {
-        "Rent": float(chosen.get("rent", 0.0)),
-        "Utilities": float(chosen.get("utilities", 0.0)),
-        "Food": float(chosen.get("food", 0.0)),
-        "Transport": float(chosen.get("transport", 0.0)),
-        "Phone/Internet": float(chosen.get("phone_internet", 0.0)),
-        "Misc basics": float(chosen.get("misc_basic", 0.0)),
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 4: FORECASTING
+# ─────────────────────────────────────────────────────────────────────────────
+elif page == "Forecasting":
+    st.markdown("<div class='page-title'>Financial Forecasting Engine</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Projected monthly balance · Inflation-adjusted spending forecast · Semester affordability projection</div>", unsafe_allow_html=True)
+
+    if not st.session_state["calc_ready"]:
+        st.info("Run Cash Flow Analysis first to activate forecasting modules.")
+        st.stop()
+
+    inc = st.session_state["income"]
+    exp = st.session_state["expenses"]
+    bal = st.session_state["balance"]
+    monthly_net = inc - exp
+
+    f1, f2, f3 = st.columns(3)
+    with f1:
+        forecast_months = st.slider("Forecast horizon (months)", 3, 24, 12)
+    with f2:
+        inflation_override = st.slider("Annual inflation rate (%)", 0.0, 10.0, 3.5, 0.5) / 100
+    with f3:
+        starting_balance = st.number_input("Starting cash balance ($)", min_value=0.0, value=max(0.0, float(bal)), step=100.0)
+
+    df_forecast = forecast_balance(starting_balance, monthly_net, forecast_months, inflation_override)
+
+    # Summary KPIs
+    final_bal = df_forecast["Projected Balance"].iloc[-1]
+    min_bal   = df_forecast["Projected Balance"].min()
+    avg_net   = df_forecast["Monthly Net (Inflation-Adj)"].mean()
+
+    k1, k2, k3, k4 = st.columns(4)
+    with k1: st.metric("Projected Balance (End of Period)", usd(final_bal))
+    with k2: st.metric("Minimum Projected Balance",         usd(min_bal), delta="Lowest point" if min_bal < starting_balance else None)
+    with k3: st.metric("Avg Inflation-Adjusted Monthly Net", usd(avg_net))
+    with k4:
+        semester_months = 4
+        sem_bal = forecast_balance(starting_balance, monthly_net, semester_months, inflation_override)["Projected Balance"].iloc[-1]
+        st.metric("Semester Affordability Projection", usd(sem_bal), delta=f"{semester_months}-month horizon")
+
+    # Forecast chart
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=df_forecast["Month"], y=df_forecast["Projected Balance"],
+        mode="lines+markers", name="Projected Balance",
+        line=dict(color=COLORS["teal"], width=2.5),
+        marker=dict(size=5), fill="tozeroy", fillcolor="rgba(20,184,166,0.06)",
+    ))
+    fig.add_hline(y=0, line_dash="dash", line_color=COLORS["red"], annotation_text="Zero Balance", annotation_font_color=COLORS["red"])
+    fig.add_hline(y=starting_balance, line_dash="dot", line_color=COLORS["slate"], annotation_text="Starting Balance", annotation_font_color=COLORS["slate"])
+    fig.update_layout(title=f"Inflation-Adjusted Balance Forecast ({forecast_months} Months, {inflation_override*100:.1f}% Annual Inflation)",
+                      xaxis_title="Month", yaxis_title="Projected Balance (USD)", **PLOT_LAYOUT)
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Inflation-adjusted net
+    fig2 = go.Figure()
+    fig2.add_trace(go.Bar(
+        x=df_forecast["Month"], y=df_forecast["Monthly Net (Inflation-Adj)"],
+        marker_color=[COLORS["teal"] if v >= 0 else COLORS["red"] for v in df_forecast["Monthly Net (Inflation-Adj)"]],
+        name="Monthly Net (Inflation-Adj)",
+    ))
+    fig2.add_hline(y=0, line_color=COLORS["slate"], line_dash="dash")
+    fig2.update_layout(title="Inflation-Adjusted Monthly Net Liquidity Over Time",
+                       xaxis_title="Month", yaxis_title="Monthly Net (USD)", **PLOT_LAYOUT)
+    st.plotly_chart(fig2, use_container_width=True)
+
+    if min_bal < 0:
+        st.markdown(alert_html(f"Liquidity Warning: Projected balance turns negative at month {df_forecast[df_forecast['Projected Balance']<0]['Month'].iloc[0]}. Consider increasing inflows or reducing outflows to maintain positive liquidity.", "danger"), unsafe_allow_html=True)
+    else:
+        st.markdown(alert_html(f"Positive liquidity maintained throughout the {forecast_months}-month forecast horizon. Projected end balance: {usd(final_bal)}.", "ok"), unsafe_allow_html=True)
+
+    st.markdown("<div class='disclaimer'>Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.</div>", unsafe_allow_html=True)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 5: SCENARIO ANALYSIS
+# ─────────────────────────────────────────────────────────────────────────────
+elif page == "Scenario Analysis":
+    st.markdown("<div class='page-title'>Scenario Analysis Engine</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Rent increase simulation · Tuition pressure · Reduced income · Spending reduction modelling</div>", unsafe_allow_html=True)
+
+    if not st.session_state["calc_ready"]:
+        st.info("Run Cash Flow Analysis first to activate scenario modelling.")
+        st.stop()
+
+    base_inc  = st.session_state["income"]
+    base_exp  = st.session_state["expenses"]
+    base_bal  = st.session_state["balance"]
+    base_rent = st.session_state["rent"]
+
+    st.markdown("<div class='section-header'>Scenario Parameters</div>", unsafe_allow_html=True)
+    s1, s2 = st.columns(2)
+    with s1:
+        rent_increase_pct = st.slider("Rent increase (%)",          0, 50, 0, 5)
+        tuition_increase  = st.slider("Tuition increase ($/month)", 0, 500, 0, 25)
+    with s2:
+        income_reduction_pct = st.slider("Income reduction (%)",       0, 50, 0, 5)
+        spending_reduction   = st.slider("Spending reduction ($/month)", 0, 500, 0, 25)
+
+    # Compute scenario
+    scen_rent = base_rent * (1 + rent_increase_pct / 100)
+    scen_inc  = base_inc * (1 - income_reduction_pct / 100)
+    scen_exp  = base_exp + (scen_rent - base_rent) + tuition_increase - spending_reduction
+    scen_bal  = scen_inc - scen_exp
+    delta_bal = scen_bal - base_bal
+
+    st.markdown("<div class='section-header'>Scenario vs Baseline Comparison</div>", unsafe_allow_html=True)
+    c1, c2, c3, c4 = st.columns(4)
+    with c1: st.metric("Baseline Net Liquidity",  usd(base_bal))
+    with c2: st.metric("Scenario Net Liquidity",  usd(scen_bal), delta=usd(delta_bal))
+    with c3: st.metric("Scenario Total Inflows",  usd(scen_inc), delta=usd(scen_inc - base_inc))
+    with c4: st.metric("Scenario Total Outflows", usd(scen_exp), delta=usd(scen_exp - base_exp))
+
+    # Waterfall chart
+    fig = go.Figure(go.Waterfall(
+        name="Impact Analysis",
+        orientation="v",
+        measure=["absolute", "relative", "relative", "relative", "relative", "total"],
+        x=["Baseline Balance", "Rent Increase", "Tuition Increase", "Income Reduction", "Spending Reduction", "Scenario Balance"],
+        y=[base_bal,
+           -(scen_rent - base_rent),
+           -tuition_increase,
+           -(base_inc - scen_inc),
+           spending_reduction,
+           0],
+        connector=dict(line=dict(color=COLORS["slate"])),
+        increasing=dict(marker=dict(color=COLORS["teal"])),
+        decreasing=dict(marker=dict(color=COLORS["red"])),
+        totals=dict(marker=dict(color=COLORS["gold"])),
+        text=[usd(base_bal), usd(-(scen_rent - base_rent)), usd(-tuition_increase),
+              usd(-(base_inc - scen_inc)), usd(spending_reduction), usd(scen_bal)],
+        textposition="outside",
+    ))
+    fig.update_layout(title="Scenario Impact Waterfall Analysis", yaxis_title="USD", **PLOT_LAYOUT)
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Scenario risk assessment
+    st.markdown("<div class='section-header'>Scenario Risk Assessment</div>", unsafe_allow_html=True)
+    scen_score, scen_bd = financial_health_score(scen_inc, scen_exp, scen_rent, scen_bal)
+    scen_rr = scen_bd.get("rent_ratio", 0)
+    scen_sr = scen_bd.get("savings_rate", 0)
+    scen_bm = scen_bd.get("buffer_months", 0)
+
+    r1, r2, r3, r4 = st.columns(4)
+    with r1: st.metric("Scenario Health Score",    f"{scen_score}/100", delta=f"{scen_score - st.session_state['health_score']:+d} vs baseline")
+    with r2: st.metric("Scenario Rent Burden",     pct(scen_rr), delta=pct(scen_rr - st.session_state["rent_ratio"]))
+    with r3: st.metric("Scenario Cash Reserve",    pct(scen_sr), delta=pct(scen_sr - st.session_state["savings_rate"]))
+    with r4: st.metric("Scenario Fund Coverage",   f"{scen_bm:.1f} mo", delta=f"{scen_bm - st.session_state['buffer_months']:.1f} mo")
+
+    if scen_bal < 0:
+        st.markdown(alert_html("Scenario results in a cashflow deficit. This combination of changes is financially unsustainable without additional income or significant expense reduction.", "danger"), unsafe_allow_html=True)
+    elif scen_bal < base_bal * 0.5:
+        st.markdown(alert_html("Scenario significantly reduces net liquidity. Financial resilience is materially weakened under these conditions.", "warn"), unsafe_allow_html=True)
+    else:
+        st.markdown(alert_html("Scenario remains financially viable. Net liquidity is positive and within acceptable parameters.", "ok"), unsafe_allow_html=True)
+
+    # Recurring expense monitoring
+    st.markdown("<div class='section-header'>Recurring Expense Monitoring</div>", unsafe_allow_html=True)
+    recurring = {
+        "Rent": st.session_state["rent"],
+        "Utilities": st.session_state["utilities"],
+        "Phone/Internet": st.session_state["phone_internet"],
     }
+    variable = {
+        "Food": st.session_state["food"],
+        "Transport": st.session_state["transport"],
+        "Essential Misc": st.session_state["misc_basic"],
+        "Discretionary": st.session_state["discretionary"],
+    }
+    rec_total = sum(recurring.values())
+    var_total = sum(variable.values())
 
-    rows = []
-    for k, v in exp_all.items():
-        share = (float(v) / total_income) if total_income > 0 else 0.0
-        rows.append({"Expense": k, "Amount": float(v), "ShareOfIncome": share})
-    exp_rank = pd.DataFrame(rows).sort_values("ShareOfIncome", ascending=False, ignore_index=True).head(2)
+    rc1, rc2 = st.columns(2)
+    with rc1:
+        st.markdown(f"**Fixed / Recurring Outflows** — {usd(rec_total)} ({pct(rec_total / base_inc if base_inc > 0 else 0)} of inflows)")
+        for k, v in recurring.items():
+            st.markdown(f"- {k}: **{usd(v)}** ({pct(v / base_inc if base_inc > 0 else 0)})")
+    with rc2:
+        st.markdown(f"**Variable Outflows** — {usd(var_total)} ({pct(var_total / base_inc if base_inc > 0 else 0)} of inflows)")
+        for k, v in variable.items():
+            st.markdown(f"- {k}: **{usd(v)}** ({pct(v / base_inc if base_inc > 0 else 0)})")
 
-    if exp_rank.empty:
-        st.info("No expenses found to rank.")
-    else:
-        st.markdown("<ul>", unsafe_allow_html=True)
-        for _, rrow in exp_rank.iterrows():
-            cut_amount = 0.10 * float(rrow["Amount"])
-            new_balance = monthly_balance + cut_amount
-            st.markdown(
-                f"""
-                <li>
-                    Cut <strong>{money(cut_amount)}</strong> from <strong>{rrow['Expense']}</strong>.
-                    <br>
-                    <span style="opacity:0.8;">
-                        This moves your monthly balance from <strong>{money(monthly_balance)}</strong>
-                        to <strong>{money(new_balance)}</strong>.
-                    </span>
-                </li>
-                """,
-                unsafe_allow_html=True,
-            )
-        st.markdown("</ul>", unsafe_allow_html=True)
+    st.markdown("<div class='disclaimer'>Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.</div>", unsafe_allow_html=True)
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 6: CITY ANALYTICS
+# ─────────────────────────────────────────────────────────────────────────────
+elif page == "City Analytics":
+    st.markdown("<div class='page-title'>City Cost Analytics</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Multi-city cost-of-living comparison · Semester-phase analysis · Inflation-adjusted spending trends</div>", unsafe_allow_html=True)
+
+    data = safe_csv("data/student_costs.csv")
+    if data is None:
+        data = safe_csv("../data/student_costs.csv")
+    if data is None:
+        st.error("Could not load data/student_costs.csv.")
+        st.stop()
+
+    data["month_dt"] = pd.to_datetime(data["month"], format="%Y-%m", errors="coerce")
+    data["total_income"]   = data["campus_job_income"] + data["stipend_income"]
+    data["total_expenses"] = data[EXPENSE_COLS].sum(axis=1)
+    if "discretionary" in data.columns:
+        data["total_expenses"] += data["discretionary"]
+    if "emergency_expense" in data.columns:
+        data["total_expenses"] += data["emergency_expense"]
+    if "tuition_monthly" in data.columns:
+        data["total_expenses"] += data["tuition_monthly"]
+    data["balance"] = data["total_income"] - data["total_expenses"]
+    data["rent_burden"] = data["rent"] / data["total_income"]
+
+    cities = sorted(data["city"].dropna().unique().tolist())
+    months = sorted(data["month"].dropna().unique().tolist())
+
+    f1, f2, f3 = st.columns(3)
+    with f1: sel_cities = st.multiselect("Cities", cities, default=cities)
+    with f2: start_m    = st.selectbox("From", months, index=0)
+    with f3: end_m      = st.selectbox("To",   months, index=len(months)-1)
+
+    mask = (data["city"].isin(sel_cities)) & (data["month"] >= start_m) & (data["month"] <= end_m)
+    df = data[mask].copy()
+
+    if df.empty:
+        st.warning("No data for selected filters.")
+        st.stop()
+
+    # Summary KPIs per city
+    st.markdown("<div class='section-header'>City Performance Summary</div>", unsafe_allow_html=True)
+    summary = df.groupby("city").agg(
+        Avg_Inflows=("total_income", "mean"),
+        Avg_Outflows=("total_expenses", "mean"),
+        Avg_Balance=("balance", "mean"),
+        Avg_Rent_Burden=("rent_burden", "mean"),
+        Min_Balance=("balance", "min"),
+    ).reset_index()
+
+    for _, row in summary.iterrows():
+        with st.expander(f"📍 {row['city']}", expanded=True):
+            cc1, cc2, cc3, cc4, cc5 = st.columns(5)
+            cc1.metric("Avg Monthly Inflows",  usd(row["Avg_Inflows"]))
+            cc2.metric("Avg Monthly Outflows", usd(row["Avg_Outflows"]))
+            cc3.metric("Avg Net Liquidity",    usd(row["Avg_Balance"]))
+            cc4.metric("Avg Rent Burden",      pct(row["Avg_Rent_Burden"]))
+            cc5.metric("Worst Month Balance",  usd(row["Min_Balance"]))
+
+    # Balance trend
+    st.markdown("<div class='section-header'>Monthly Net Liquidity Trend</div>", unsafe_allow_html=True)
+    fig = px.line(df, x="month", y="balance", color="city",
+                  color_discrete_map={"Saint Louis": COLORS["teal"], "Chicago": COLORS["gold"], "New York City": COLORS["red"]},
+                  markers=True, title="Monthly Net Liquidity by City")
+    fig.add_hline(y=0, line_dash="dash", line_color=COLORS["slate"])
+    fig.update_layout(xaxis_title="Month", yaxis_title="Net Liquidity (USD)", **PLOT_LAYOUT)
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Expense breakdown by city
+    ch1, ch2 = st.columns(2)
+    with ch1:
+        avg_exp = df.groupby("city")[EXPENSE_COLS].mean().reset_index()
+        fig2 = px.bar(avg_exp.melt(id_vars="city", var_name="Category", value_name="Amount"),
+                      x="city", y="Amount", color="Category", barmode="stack",
+                      title="Average Monthly Expense Breakdown by City",
+                      color_discrete_sequence=[COLORS["red"], COLORS["gold"], COLORS["teal"], COLORS["blue"], COLORS["purple"], COLORS["green"]])
+        fig2.update_layout(**PLOT_LAYOUT)
+        st.plotly_chart(fig2, use_container_width=True)
+
+    with ch2:
+        fig3 = px.line(df, x="month", y="rent_burden", color="city",
+                       color_discrete_map={"Saint Louis": COLORS["teal"], "Chicago": COLORS["gold"], "New York City": COLORS["red"]},
+                       title="Rent Burden Ratio Over Time", markers=True)
+        fig3.add_hline(y=0.30, line_dash="dot", line_color=COLORS["green"], annotation_text="30% Healthy")
+        fig3.add_hline(y=0.40, line_dash="dot", line_color=COLORS["red"],   annotation_text="40% Critical")
+        fig3.update_layout(xaxis_title="Month", yaxis_title="Rent Burden Ratio", **PLOT_LAYOUT)
+        st.plotly_chart(fig3, use_container_width=True)
+
+    # Semester phase analysis
+    if "semester_phase" in df.columns:
+        st.markdown("<div class='section-header'>Semester-Phase Financial Analysis</div>", unsafe_allow_html=True)
+        phase_summary = df.groupby(["city", "semester_phase"]).agg(
+            Avg_Balance=("balance", "mean"),
+            Avg_Outflows=("total_expenses", "mean"),
+        ).reset_index()
+        fig4 = px.bar(phase_summary, x="semester_phase", y="Avg_Balance", color="city", barmode="group",
+                      title="Average Net Liquidity by Semester Phase",
+                      color_discrete_map={"Saint Louis": COLORS["teal"], "Chicago": COLORS["gold"], "New York City": COLORS["red"]})
+        fig4.add_hline(y=0, line_dash="dash", line_color=COLORS["slate"])
+        fig4.update_layout(xaxis_title="Phase", yaxis_title="Avg Net Liquidity (USD)", **PLOT_LAYOUT)
+        st.plotly_chart(fig4, use_container_width=True)
+
+    st.markdown("<div class='disclaimer'>Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.</div>", unsafe_allow_html=True)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 7: CASE STUDY
+# ─────────────────────────────────────────────────────────────────────────────
+elif page == "Case Study":
+    st.markdown("<div class='page-title'>Portfolio Case Study</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Student Financial Intelligence Dashboard · Financial Analyst Portfolio · Joseph Amegashie</div>", unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class='glass-card'>
+        <div class='section-header'>Problem Statement</div>
+        <p style='color:#94a3b8; font-size:0.9rem; line-height:1.75;'>
+        Students navigating academic and living expenses face compounding financial pressures — rising housing costs,
+        tuition obligations, variable income streams, and limited financial planning infrastructure. Without structured
+        analytical tools, students lack visibility into their <strong style='color:#e2e8f0;'>affordability position</strong>,
+        <strong style='color:#e2e8f0;'>spending behaviour patterns</strong>, and <strong style='color:#e2e8f0;'>long-term financial sustainability</strong>.
+        This creates reactive rather than proactive financial decision-making.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class='glass-card'>
+        <div class='section-header'>Solution</div>
+        <p style='color:#94a3b8; font-size:0.9rem; line-height:1.75;'>
+        Developed a <strong style='color:#14b8a6;'>financial intelligence platform</strong> combining spending analytics,
+        affordability monitoring, inflation-adjusted forecasting, and scenario simulation. The system transforms raw
+        financial inputs into structured decision-support outputs — enabling data-driven financial planning aligned
+        with institutional analytics standards.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<div class='section-header'>System Features</div>", unsafe_allow_html=True)
+    feat_cols = st.columns(3)
+    features = [
+        ("📊", "Cash Flow Analysis",      "Monthly inflow/outflow decomposition, fixed vs variable expense categorisation, savings trajectory modelling"),
+        ("🔍", "Cost Burden Analysis",     "Rent burden ratio, tuition pressure indicator, transportation and food cost ratios with threshold-based alerts"),
+        ("💡", "Financial Health Scoring", "Composite 0–100 stability indicator covering balance position, rent burden, savings rate, and emergency fund coverage"),
+        ("📈", "Forecasting Engine",       "Inflation-adjusted 24-month balance projection, semester affordability modelling, liquidity risk detection"),
+        ("⚙️", "Scenario Simulation",     "Rent increase, tuition pressure, income reduction, and spending cut scenarios with waterfall impact analysis"),
+        ("🏙️", "City Analytics",          "Multi-city cost-of-living comparison across 18 months of realistic data with semester-phase financial analysis"),
+    ]
+    for i, (icon, title, desc) in enumerate(features):
+        with feat_cols[i % 3]:
+            st.markdown(f"""
+            <div class='glass-card' style='min-height:130px;'>
+                <div style='font-size:1.4rem; margin-bottom:0.4rem;'>{icon}</div>
+                <div style='font-size:0.88rem; font-weight:600; color:#e2e8f0; margin-bottom:0.4rem;'>{title}</div>
+                <div style='font-size:0.80rem; color:#64748b; line-height:1.55;'>{desc}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    st.markdown("<div class='section-header'>Technical Architecture</div>", unsafe_allow_html=True)
+    tech_data = {
+        "Component": ["Language", "Framework", "Data Processing", "Visualisation", "Forecasting Model", "Analytics", "Deployment"],
+        "Technology": ["Python 3.11", "Streamlit", "Pandas / NumPy", "Plotly (interactive)", "Inflation-adjusted projection model", "Cost burden ratios, affordability scoring, anomaly detection", "GitHub / Streamlit Cloud"],
+        "Purpose": ["Core analytical logic", "Interactive financial dashboard", "Data transformation and aggregation", "Bloomberg-style dark finance charts", "Multi-period balance and liquidity forecasting", "Financial health indicators and behavioural alerts", "Version control and live deployment"],
+    }
+    st.dataframe(pd.DataFrame(tech_data), use_container_width=True, hide_index=True)
+
+    st.markdown("<div class='section-header'>Impact & Outcomes</div>", unsafe_allow_html=True)
+    i1, i2, i3, i4 = st.columns(4)
+    with i1: st.markdown(kpi_tile("Financial Visibility", "360°", "Full income-expense-forecast view", "kpi-teal"), unsafe_allow_html=True)
+    with i2: st.markdown(kpi_tile("Analytical Depth", "5 Modules", "CF, Cost, Health, Forecast, Scenario", "kpi-gold"), unsafe_allow_html=True)
+    with i3: st.markdown(kpi_tile("Data Realism", "18 Months", "3 cities, semester phases, inflation", "kpi-green"), unsafe_allow_html=True)
+    with i4: st.markdown(kpi_tile("Decision Support", "Real-time", "Scenario simulation & alerts", "kpi-teal"), unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class='glass-card' style='margin-top:1rem;'>
+        <div class='section-header'>Analytical Workflow</div>
+    """, unsafe_allow_html=True)
+    wf2 = st.columns([1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1])
+    steps2 = ["Income Inputs", "Expense Categorisation", "Cash Flow Analysis", "Forecast Modelling", "Risk & Affordability Analysis", "Financial Planning Insights"]
+    for i, step in enumerate(steps2):
+        with wf2[i * 2]:
+            st.markdown(f"<div class='workflow-step'>{step}</div>", unsafe_allow_html=True)
+        if i < len(steps2) - 1:
+            with wf2[i * 2 + 1]:
+                st.markdown("<div class='workflow-arrow'>→</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # All saved calculations table
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.markdown("#### All saved calculations")
-    st.write("")
+    st.markdown("<div class='disclaimer'>Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.</div>", unsafe_allow_html=True)
 
-    saved_df = pd.DataFrame(saved)
-    if not saved_df.empty:
-        show_cols = ["label", "city", "run_date", "total_income", "total_expenses", "balance"]
-        for c in show_cols:
-            if c not in saved_df.columns:
-                saved_df[c] = None
-        saved_df = saved_df[show_cols].rename(
-            columns={
-                "label": "Label",
-                "city": "City",
-                "run_date": "Run date",
-                "total_income": "Total income",
-                "total_expenses": "Total expenses",
-                "balance": "Balance",
-            }
-        )
-        st.dataframe(saved_df, use_container_width=True, hide_index=True)
-    else:
-        st.caption("No saved calculations to display.")
-    st.markdown("</div>", unsafe_allow_html=True)
 
-# PAGE E: SETTINGS
-elif page == "Settings":
-    st.subheader("Settings")
-    st.write("")
-    st.info("Preferences and configuration coming soon.")
+# ─────────────────────────────────────────────────────────────────────────────
+# SCORE LABEL (used in Overview)
+# ─────────────────────────────────────────────────────────────────────────────
+def score_label(score):
+    if score >= 80: return "Excellent"
+    if score >= 60: return "Good"
+    if score >= 40: return "Risky"
+    return "Critical"
