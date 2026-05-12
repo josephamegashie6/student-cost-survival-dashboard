@@ -25,7 +25,8 @@ from data_model import (
 )
 from decision_engine import evaluate_scenario
 from providers import (
-    metro_names, university_names, get_metro, get_university
+    metro_names, university_names, get_metro, get_university,
+    metro_names_by_country, university_names_by_country, metro_countries, university_countries
 )
 
 # ─── shared style helpers
@@ -292,8 +293,8 @@ def page_decision_planner():
     st.markdown("<div style='font-size:1.55rem;font-weight:700;color:#f8fafc;letter-spacing:0.03em;margin-bottom:0.25rem;'>Decision Planner</div>", unsafe_allow_html=True)
     st.markdown("<div style='font-size:0.88rem;color:#94a3b8;margin-bottom:1.2rem;'>Build a financial plan for one school or city. Get a bottom-line recommendation, safe rent ceiling, and risk assessment.</div>", unsafe_allow_html=True)
 
-    metros = metro_names()
-    unis = university_names()
+    all_countries = metro_countries()
+    all_uni_countries = university_countries()
 
     # ── Planning mode
     mode = st.radio("Planning mode", ["By University", "By City / Metro"], horizontal=True)
@@ -303,7 +304,9 @@ def page_decision_planner():
         section("Location & School")
         label = st.text_input("Plan label (e.g. WashU Option A)", value="My Plan")
         if mode == "By University":
-            uni_name = st.selectbox("University", unis)
+            uni_country = st.selectbox("Country", all_uni_countries, key="dp_uni_country")
+            unis = university_names_by_country(uni_country)
+            uni_name = st.selectbox("University", unis, key="dp_uni_name")
             uni = get_university(uni_name)
             if uni:
                 metro_default = uni.metro
@@ -311,11 +314,14 @@ def page_decision_planner():
                 if uni.notes:
                     st.markdown(f"<div style='font-size:0.78rem;color:#475569;margin-bottom:0.8rem;font-style:italic;'>{uni.notes}</div>", unsafe_allow_html=True)
             else:
+                metros = metro_names()
                 metro_default = metros[0]
             metro_name = metro_default
         else:
             uni = None
-            metro_name = st.selectbox("Metro / City", metros)
+            metro_country = st.selectbox("Country", all_countries, key="dp_metro_country")
+            metros = metro_names_by_country(metro_country)
+            metro_name = st.selectbox("Metro / City", metros, key="dp_metro_name")
 
         metro = get_metro(metro_name)
 
@@ -878,15 +884,19 @@ def page_movein_shock():
     st.markdown("<div style='font-size:1.55rem;font-weight:700;color:#f8fafc;letter-spacing:0.03em;margin-bottom:0.25rem;'>Move-In Shock Calculator</div>", unsafe_allow_html=True)
     st.markdown("<div style='font-size:0.88rem;color:#94a3b8;margin-bottom:1.2rem;'>Calculate your total arrival cost, cash runway, and 6-month projection after move-in.</div>", unsafe_allow_html=True)
 
-    metros = metro_names()
-    unis = university_names()
+    all_countries = metro_countries()
+    all_uni_countries = university_countries()
 
     col_left, col_right = st.columns([1, 1], gap="large")
 
     with col_left:
         section("Location")
+        mi_country = st.selectbox("Country", all_countries, key="movein_country")
+        metros = metro_names_by_country(mi_country)
         metro_name = st.selectbox("Metro / City", metros, key="movein_metro")
         metro = get_metro(metro_name)
+        mi_uni_country = st.selectbox("University Country", all_uni_countries, key="movein_uni_country")
+        unis = university_names_by_country(mi_uni_country)
         uni_name = st.selectbox("University (optional)", ["— None —"] + unis, key="movein_uni")
         uni = get_university(uni_name) if uni_name != "— None —" else None
 

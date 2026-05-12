@@ -1,36 +1,200 @@
-university,short_name,metro,state,tuition_annual,fees_annual,health_insurance_annual,on_campus_room_board,assistantship_stipend_annual,assistantship_probability,assistantship_covers_tuition,program_type,i20_cost_estimate,notes
-Washington University in St. Louis,WashU,Saint Louis,MO,62550,1650,3200,18200,22000,0.65,True,Masters/PhD,85000,Strong financial aid for PhD; Masters mostly self-funded
-Saint Louis University,SLU,Saint Louis,MO,48200,1400,2800,14500,18000,0.45,True,Masters/PhD,72000,Jesuit university; moderate assistantship availability
-University of Illinois Urbana-Champaign,UIUC,Champaign,IL,32000,3200,2600,12800,22000,0.70,True,Masters/PhD,58000,Strong STEM programs; high assistantship rate for PhD
-Northwestern University,Northwestern,Evanston,IL,63000,1800,3400,19500,28000,0.60,True,Masters/PhD,95000,Top-ranked; strong PhD funding; Masters expensive
-University of Chicago,UChicago,Chicago,IL,64000,1900,3500,19800,30000,0.55,True,Masters/PhD,98000,Elite research university; strong PhD stipends
-DePaul University,DePaul,Chicago,IL,42000,1200,2800,16000,0,0.15,False,Masters,68000,Primarily Masters; limited assistantships
-Arizona State University,ASU,Tempe,AZ,28000,1200,2400,12000,18000,0.50,True,Masters/PhD,52000,Large public university; growing international enrollment
-University of Massachusetts Boston,UMass Boston,Boston,MA,16000,2800,3000,0,16000,0.40,True,Masters/PhD,55000,Public university; lower tuition; no on-campus housing
-Boston University,BU,Boston,MA,60000,1600,3200,18500,22000,0.45,True,Masters/PhD,90000,Private; strong programs; expensive city
-Northeastern University,Northeastern,Boston,MA,58000,1500,3100,18000,0,0.20,False,Masters,88000,Co-op focused; mostly self-funded Masters
-Harvard University,Harvard,Boston,MA,54000,4000,3800,22000,35000,0.50,True,Masters/PhD,105000,Elite; strong PhD funding; very competitive
-MIT,MIT,Boston,MA,57000,3800,3600,21000,38000,0.65,True,PhD,108000,Strong STEM PhD funding; Masters less funded
-New York University,NYU,New York City,NY,58000,2400,3500,22000,22000,0.35,True,Masters/PhD,98000,Expensive city; strong programs; limited assistantships
-Columbia University,Columbia,New York City,NY,63000,2600,3800,24000,28000,0.45,True,Masters/PhD,105000,Ivy League; NYC premium; strong PhD funding
-CUNY Graduate Center,CUNY,New York City,NY,12000,2000,3000,0,18000,0.55,True,PhD,48000,Public; affordable tuition; no on-campus housing
-University of Washington,UW,Seattle,WA,38000,1800,3200,14500,24000,0.65,True,Masters/PhD,72000,Strong research; good PhD funding; expensive city
-Carnegie Mellon University,CMU,Pittsburgh,PA,58000,1600,3200,16500,28000,0.55,True,Masters/PhD,88000,Top CS/engineering; strong PhD funding
-University of Pittsburgh,Pitt,Pittsburgh,PA,30000,1400,2800,13500,20000,0.50,True,Masters/PhD,58000,Public; affordable; good research programs
-University of Michigan,UMich,Ann Arbor,MI,50000,1500,3000,15500,26000,0.65,True,Masters/PhD,82000,Top public university; strong PhD funding
-Michigan State University,MSU,Ann Arbor,MI,26000,1200,2600,12000,18000,0.55,True,Masters/PhD,52000,Large public; affordable; strong agriculture/STEM
-Ohio State University,OSU,Columbus,OH,32000,1400,2800,13000,20000,0.55,True,Masters/PhD,58000,Large public; good funding; affordable city
-Georgia Tech,GT,Atlanta,GA,32000,2000,3000,13500,22000,0.65,True,Masters/PhD,62000,Top engineering school; strong PhD funding
-Emory University,Emory,Atlanta,GA,56000,1600,3200,17500,26000,0.50,True,Masters/PhD,88000,Private; strong health/social sciences
-University of Texas Austin,UT Austin,Austin,TX,20000,2000,2800,12500,20000,0.55,True,Masters/PhD,52000,Public flagship; affordable tuition; growing city
-Rice University,Rice,Houston,TX,56000,1500,3000,16500,28000,0.55,True,Masters/PhD,88000,Small elite university; strong PhD funding
-University of Houston,UH,Houston,TX,18000,1800,2600,11000,16000,0.45,True,Masters/PhD,46000,Public; very affordable; large international community
-Duke University,Duke,Durham,NC,62000,1800,3400,18500,30000,0.55,True,Masters/PhD,98000,Elite; strong PhD funding; Research Triangle
-UNC Chapel Hill,UNC,Durham,NC,18000,2000,3000,13000,20000,0.55,True,Masters/PhD,52000,Top public; affordable; Research Triangle
-University of Minnesota,UMinn,Minneapolis,MN,30000,1600,2800,12500,20000,0.55,True,Masters/PhD,58000,Large public; cold winters; good funding
-Penn State University,Penn State,Philadelphia,PA,36000,1400,2800,13500,20000,0.50,True,Masters/PhD,65000,Large public; multiple campuses
-University of Pennsylvania,UPenn,Philadelphia,PA,62000,2000,3600,18500,30000,0.50,True,Masters/PhD,98000,Ivy League; strong PhD funding
-University of Maryland,UMD,Washington DC,DC,18000,2000,2800,13000,20000,0.55,True,Masters/PhD,52000,Public flagship; DC proximity; good value
-Georgetown University,Georgetown,Washington DC,DC,60000,1800,3400,18000,26000,0.40,True,Masters/PhD,95000,Private; DC location premium; policy/law focus
-University of Miami,UM,Miami,FL,56000,1600,3200,17500,22000,0.40,True,Masters/PhD,88000,Private; warm climate; expensive city
-Vanderbilt University,Vanderbilt,Nashville,TN,58000,1600,3200,17500,28000,0.55,True,Masters/PhD,90000,Elite private; strong PhD funding; affordable city
+university,short_name,metro,state,country,tuition_annual,fees_annual,health_insurance_annual,on_campus_room_board,assistantship_stipend_annual,assistantship_probability,assistantship_covers_tuition,program_type,i20_cost_estimate,notes
+Washington University in St. Louis,WashU,St. Louis,MO,USA,62550,1650,3200,18200,22000,0.65,True,Masters/PhD,85000,Strong financial aid for PhD; Masters mostly self-funded
+Saint Louis University,SLU,St. Louis,MO,USA,48200,1400,2800,14500,18000,0.45,True,Masters/PhD,72000,Jesuit university; moderate assistantship availability
+University of Illinois Urbana-Champaign,UIUC,Champaign,IL,USA,32000,3200,2600,12800,22000,0.70,True,Masters/PhD,58000,Strong STEM programs; high assistantship rate for PhD
+Northwestern University,Northwestern,Evanston,IL,USA,63000,1800,3400,19500,28000,0.60,True,Masters/PhD,95000,Top-ranked; strong PhD funding; Masters expensive
+University of Chicago,UChicago,Chicago,IL,USA,64000,1900,3500,19800,30000,0.55,True,Masters/PhD,98000,Elite research university; strong PhD stipends
+DePaul University,DePaul,Chicago,IL,USA,42000,1200,2800,16000,0,0.15,False,Masters,68000,Primarily Masters; limited assistantships
+Arizona State University,ASU,Tempe,AZ,USA,28000,1200,2400,12000,18000,0.50,True,Masters/PhD,52000,Large public university; growing international enrollment
+University of Massachusetts Boston,UMass Boston,Boston,MA,USA,16000,2800,3000,0,16000,0.40,True,Masters/PhD,55000,Public university; lower tuition; no on-campus housing
+Boston University,BU,Boston,MA,USA,60000,1600,3200,18500,22000,0.45,True,Masters/PhD,90000,Private; strong programs; expensive city
+Northeastern University,Northeastern,Boston,MA,USA,58000,1500,3100,18000,0,0.20,False,Masters,88000,Co-op focused; mostly self-funded Masters
+Harvard University,Harvard,Cambridge,MA,USA,54000,4000,3800,22000,35000,0.50,True,Masters/PhD,105000,Elite; strong PhD funding; very competitive
+Massachusetts Institute of Technology,MIT,Cambridge,MA,USA,57000,3800,3600,21000,38000,0.65,True,PhD,108000,Strong STEM PhD funding; Masters less funded
+New York University,NYU,New York City,NY,USA,58000,2400,3500,22000,22000,0.35,True,Masters/PhD,98000,Expensive city; strong programs; limited assistantships
+Columbia University,Columbia,New York City,NY,USA,63000,2600,3800,24000,28000,0.45,True,Masters/PhD,105000,Ivy League; NYC premium; strong PhD funding
+CUNY Graduate Center,CUNY,New York City,NY,USA,12000,2000,3000,0,18000,0.55,True,PhD,48000,Public; affordable tuition; no on-campus housing
+Fordham University,Fordham,New York City,NY,USA,56000,1800,3200,20000,18000,0.30,True,Masters/PhD,88000,Jesuit; NYC location; strong social sciences
+New York Institute of Technology,NYIT,New York City,NY,USA,38000,1600,3000,16000,0,0.10,False,Masters,68000,Applied focus; engineering/business
+Yeshiva University,YU,New York City,NY,USA,42000,1800,3000,18000,0,0.15,False,Masters,72000,Private; NYC; strong health sciences
+University of Washington,UW,Seattle,WA,USA,38000,1800,3200,14500,24000,0.65,True,Masters/PhD,72000,Strong research; good PhD funding; expensive city
+Seattle University,Seattle U,Seattle,WA,USA,44000,1400,3000,16000,0,0.15,False,Masters,72000,Jesuit; Seattle premium; strong business/law
+Carnegie Mellon University,CMU,Pittsburgh,PA,USA,58000,1600,3200,16500,28000,0.55,True,Masters/PhD,88000,Top CS/engineering; strong PhD funding
+University of Pittsburgh,Pitt,Pittsburgh,PA,USA,30000,1400,2800,13500,20000,0.50,True,Masters/PhD,58000,Public; affordable; good research programs
+University of Michigan,UMich,Ann Arbor,MI,USA,50000,1500,3000,15500,26000,0.65,True,Masters/PhD,82000,Top public university; strong PhD funding
+Michigan State University,MSU,Ann Arbor,MI,USA,26000,1200,2600,12000,18000,0.55,True,Masters/PhD,52000,Large public; affordable; strong agriculture/STEM
+Ohio State University,OSU,Columbus,OH,USA,32000,1400,2800,13000,20000,0.55,True,Masters/PhD,58000,Large public; good funding; affordable city
+Georgia Tech,GT,Atlanta,GA,USA,32000,2000,3000,13500,22000,0.65,True,Masters/PhD,62000,Top engineering school; strong PhD funding
+Emory University,Emory,Atlanta,GA,USA,56000,1600,3200,17500,26000,0.50,True,Masters/PhD,88000,Private; strong health/social sciences
+University of Texas Austin,UT Austin,Austin,TX,USA,20000,2000,2800,12500,20000,0.55,True,Masters/PhD,52000,Public flagship; affordable tuition; growing city
+Texas A&M University,TAMU,College Station,TX,USA,16000,1800,2600,11500,20000,0.60,True,Masters/PhD,48000,Large public; strong engineering/agriculture
+Rice University,Rice,Houston,TX,USA,56000,1500,3000,16500,28000,0.55,True,Masters/PhD,88000,Small elite university; strong PhD funding
+University of Houston,UH,Houston,TX,USA,18000,1800,2600,11000,16000,0.45,True,Masters/PhD,46000,Public; very affordable; large international community
+Duke University,Duke,Durham,NC,USA,62000,1800,3400,18500,30000,0.55,True,Masters/PhD,98000,Elite; strong PhD funding; Research Triangle
+UNC Chapel Hill,UNC,Chapel Hill,NC,USA,18000,2000,3000,13000,20000,0.55,True,Masters/PhD,52000,Top public; affordable; Research Triangle
+North Carolina State University,NC State,Raleigh,NC,USA,18000,2200,2800,12500,20000,0.55,True,Masters/PhD,52000,Strong STEM; Research Triangle; affordable
+University of Minnesota,UMinn,Minneapolis,MN,USA,30000,1600,2800,12500,20000,0.55,True,Masters/PhD,58000,Large public; cold winters; good funding
+Penn State University,Penn State,Philadelphia,PA,USA,36000,1400,2800,13500,20000,0.50,True,Masters/PhD,65000,Large public; multiple campuses
+University of Pennsylvania,UPenn,Philadelphia,PA,USA,62000,2000,3600,18500,30000,0.50,True,Masters/PhD,98000,Ivy League; strong PhD funding
+Temple University,Temple,Philadelphia,PA,USA,26000,1400,2800,14000,18000,0.45,True,Masters/PhD,52000,Public; affordable; urban campus
+Drexel University,Drexel,Philadelphia,PA,USA,52000,1600,3000,17000,0,0.20,False,Masters,82000,Co-op focused; engineering/health sciences
+University of Maryland,UMD,Washington DC,DC,USA,18000,2000,2800,13000,20000,0.55,True,Masters/PhD,52000,Public flagship; DC proximity; good value
+Georgetown University,Georgetown,Washington DC,DC,USA,60000,1800,3400,18000,26000,0.40,True,Masters/PhD,95000,Private; DC location premium; policy/law focus
+George Washington University,GWU,Washington DC,DC,USA,58000,1800,3200,18000,22000,0.35,True,Masters/PhD,90000,Private; DC location; policy/international focus
+American University,AU,Washington DC,DC,USA,52000,1600,3000,17000,20000,0.35,True,Masters/PhD,82000,Private; DC location; strong public affairs
+Howard University,Howard,Washington DC,DC,USA,28000,1400,2800,14000,18000,0.40,True,Masters/PhD,55000,HBCU; DC location; strong professional programs
+University of Miami,UM,Miami,FL,USA,56000,1600,3200,17500,22000,0.40,True,Masters/PhD,88000,Private; warm climate; expensive city
+Florida International University,FIU,Miami,FL,USA,18000,1800,2600,12000,16000,0.40,True,Masters/PhD,46000,Public; large international community; affordable
+University of Florida,UF,Gainesville,FL,USA,16000,1800,2600,11500,18000,0.55,True,Masters/PhD,48000,Top public; strong research; affordable
+Florida State University,FSU,Tallahassee,FL,USA,14000,1600,2400,11000,16000,0.50,True,Masters/PhD,44000,Public; affordable; strong programs
+University of South Florida,USF,Tampa,FL,USA,14000,1600,2400,11000,16000,0.45,True,Masters/PhD,44000,Public; growing research profile; affordable
+Vanderbilt University,Vanderbilt,Nashville,TN,USA,58000,1600,3200,17500,28000,0.55,True,Masters/PhD,90000,Elite private; strong PhD funding; affordable city
+University of Tennessee,UT,Knoxville,TN,USA,16000,1600,2400,11000,16000,0.50,True,Masters/PhD,44000,Public flagship; affordable; strong STEM
+Princeton University,Princeton,Princeton,NJ,USA,57000,2000,3200,18500,36000,0.60,True,PhD,105000,Elite; mostly PhD; very strong funding
+Rutgers University,Rutgers,New Brunswick,NJ,USA,22000,2200,2800,14000,18000,0.50,True,Masters/PhD,52000,Large public; affordable; strong programs
+Yale University,Yale,New Haven,CT,USA,62000,2200,3600,20000,34000,0.55,True,Masters/PhD,105000,Ivy League; strong PhD funding
+University of Connecticut,UConn,Hartford,CT,USA,18000,2000,2800,13000,18000,0.50,True,Masters/PhD,52000,Public; affordable; strong STEM/business
+Brown University,Brown,Providence,RI,USA,62000,2000,3400,19500,32000,0.55,True,Masters/PhD,100000,Ivy League; strong PhD funding
+University of Rhode Island,URI,Providence,RI,USA,16000,1800,2600,12000,16000,0.45,True,Masters/PhD,46000,Public; affordable; coastal location
+Dartmouth College,Dartmouth,Hanover,NH,USA,60000,2000,3200,19000,30000,0.55,True,Masters/PhD,98000,Ivy League; strong PhD funding; rural
+University of New Hampshire,UNH,Manchester,NH,USA,18000,2000,2800,13000,16000,0.45,True,Masters/PhD,50000,Public; New England location
+University of Vermont,UVM,Burlington,VT,USA,20000,2000,2800,13500,16000,0.45,True,Masters/PhD,52000,Public; scenic; strong environmental programs
+Cornell University,Cornell,Ithaca,NY,USA,32000,2000,3200,16000,28000,0.60,True,Masters/PhD,72000,Ivy League; strong STEM/agriculture; rural
+University at Buffalo,UB,Buffalo,NY,USA,16000,2000,2600,12000,16000,0.50,True,Masters/PhD,46000,Public; affordable; strong STEM
+University of Rochester,Rochester,Rochester,NY,USA,58000,1800,3200,17000,26000,0.50,True,Masters/PhD,90000,Private; strong optics/biomedical; affordable city
+Syracuse University,Syracuse,Syracuse,NY,USA,52000,1600,3000,16000,20000,0.40,True,Masters/PhD,82000,Private; strong communications/architecture
+Stony Brook University,Stony Brook,New York City,NY,USA,18000,2200,2800,14000,20000,0.55,True,Masters/PhD,52000,Public; strong STEM; NYC proximity
+University of Delaware,Delaware,Philadelphia,PA,USA,18000,1800,2600,13000,18000,0.50,True,Masters/PhD,50000,Public; affordable; strong chemical engineering
+Johns Hopkins University,JHU,Baltimore,MD,USA,60000,1800,3400,18000,30000,0.55,True,Masters/PhD,95000,Elite; strong biomedical/public health
+University of Virginia,UVA,Charlottesville,VA,USA,18000,2400,3000,13500,20000,0.55,True,Masters/PhD,52000,Top public; strong programs; beautiful campus
+Virginia Tech,VT,Roanoke,VA,USA,16000,1800,2600,11500,18000,0.55,True,Masters/PhD,46000,Strong engineering/STEM; affordable
+George Mason University,GMU,Washington DC,DC,USA,20000,2000,2800,13000,16000,0.40,True,Masters/PhD,50000,Public; DC proximity; growing research
+West Virginia University,WVU,Charleston,WV,USA,12000,1600,2400,11000,14000,0.45,True,Masters/PhD,40000,Public; very affordable; strong STEM
+University of Kentucky,UK,Lexington,KY,USA,16000,1600,2400,11000,16000,0.50,True,Masters/PhD,44000,Public; affordable; strong health sciences
+University of Louisville,UofL,Louisville,KY,USA,16000,1600,2400,11000,14000,0.45,True,Masters/PhD,42000,Public; affordable; strong health sciences
+Indiana University,IU,Indianapolis,IN,USA,18000,1800,2600,12000,16000,0.50,True,Masters/PhD,48000,Public; strong business/social sciences
+Purdue University,Purdue,Indianapolis,IN,USA,18000,1800,2600,12000,20000,0.60,True,Masters/PhD,50000,Strong engineering/STEM; affordable
+University of Notre Dame,Notre Dame,South Bend,IN,USA,58000,1600,3200,17000,28000,0.50,True,Masters/PhD,90000,Elite Catholic; strong business/law
+University of Wisconsin Madison,UW-Madison,Madison,WI,USA,18000,1800,2800,12500,20000,0.60,True,Masters/PhD,52000,Top public; strong research; cold winters
+Marquette University,Marquette,Milwaukee,WI,USA,44000,1400,2800,15000,16000,0.30,True,Masters/PhD,70000,Jesuit; Milwaukee; strong engineering/law
+University of Iowa,Iowa,Iowa City,IA,USA,16000,1600,2600,11500,18000,0.50,True,Masters/PhD,46000,Public; affordable; strong health sciences
+Iowa State University,ISU,Des Moines,IA,USA,14000,1600,2400,11000,16000,0.55,True,Masters/PhD,42000,Strong engineering/agriculture; affordable
+University of Missouri,Mizzou,Columbia,MO,USA,16000,1600,2400,11000,16000,0.50,True,Masters/PhD,44000,Public; affordable; strong journalism
+University of Kansas,KU,Kansas City,MO,USA,14000,1600,2400,11000,16000,0.50,True,Masters/PhD,42000,Public; affordable; strong health sciences
+Kansas State University,K-State,Kansas City,MO,USA,14000,1600,2400,11000,14000,0.45,True,Masters/PhD,40000,Public; affordable; strong agriculture
+University of Nebraska,UNL,Omaha,NE,USA,12000,1600,2400,11000,16000,0.50,True,Masters/PhD,40000,Public; very affordable; strong STEM
+University of Oklahoma,OU,Oklahoma City,OK,USA,12000,1600,2400,11000,14000,0.45,True,Masters/PhD,38000,Public; affordable; strong energy/petroleum
+Oklahoma State University,OSU,Oklahoma City,OK,USA,12000,1600,2400,11000,14000,0.45,True,Masters/PhD,38000,Public; affordable; strong agriculture/engineering
+Texas Tech University,TTU,Lubbock,TX,USA,12000,1600,2400,11000,14000,0.45,True,Masters/PhD,38000,Public; affordable; strong engineering
+Baylor University,Baylor,Dallas,TX,USA,48000,1400,2800,15000,18000,0.35,True,Masters/PhD,75000,Private Baptist; strong health sciences
+Southern Methodist University,SMU,Dallas,TX,USA,56000,1600,3000,17000,20000,0.35,True,Masters/PhD,88000,Private; Dallas; strong business/law
+University of North Texas,UNT,Dallas,TX,USA,12000,1600,2400,11000,14000,0.40,True,Masters/PhD,38000,Public; affordable; strong music/arts
+University of Texas Dallas,UTD,Dallas,TX,USA,14000,1800,2600,11500,18000,0.50,True,Masters/PhD,44000,Public; strong STEM/business; growing
+University of Texas San Antonio,UTSA,San Antonio,TX,USA,12000,1600,2400,11000,14000,0.40,True,Masters/PhD,38000,Public; affordable; growing research
+University of New Mexico,UNM,Albuquerque,NM,USA,12000,1600,2400,11000,14000,0.45,True,Masters/PhD,38000,Public; affordable; strong Southwest culture
+New Mexico State University,NMSU,Albuquerque,NM,USA,10000,1600,2400,11000,12000,0.40,True,Masters/PhD,35000,Public; very affordable; strong agriculture
+University of Arizona,UArizona,Tucson,AZ,USA,16000,1800,2600,12000,16000,0.50,True,Masters/PhD,46000,Public; strong optics/astronomy; affordable
+University of Nevada Las Vegas,UNLV,Las Vegas,NV,USA,12000,1600,2400,11000,14000,0.40,True,Masters/PhD,38000,Public; affordable; hospitality/gaming focus
+University of Nevada Reno,UNR,Reno,NV,USA,12000,1600,2400,11000,14000,0.40,True,Masters/PhD,38000,Public; affordable; strong mining/engineering
+University of Colorado Boulder,CU Boulder,Denver,CO,USA,16000,1800,2800,12500,18000,0.50,True,Masters/PhD,48000,Public; strong aerospace/STEM; outdoor culture
+Colorado State University,CSU,Denver,CO,USA,14000,1800,2600,12000,16000,0.50,True,Masters/PhD,44000,Public; strong agriculture/environmental; affordable
+University of Utah,Utah,Salt Lake City,UT,USA,14000,1800,2600,12000,16000,0.50,True,Masters/PhD,44000,Public; strong STEM/health; outdoor culture
+Brigham Young University,BYU,Salt Lake City,UT,USA,6000,1200,2200,10000,12000,0.35,True,Masters/PhD,30000,Private; very affordable; strong STEM
+University of Oregon,UO,Portland,OR,USA,18000,1800,2800,12500,16000,0.45,True,Masters/PhD,50000,Public; strong arts/business; outdoor culture
+Oregon State University,OSU,Portland,OR,USA,16000,1800,2600,12000,18000,0.55,True,Masters/PhD,46000,Public; strong STEM/agriculture; affordable
+Portland State University,PSU,Portland,OR,USA,14000,1600,2400,11000,14000,0.40,True,Masters/PhD,42000,Public; urban; affordable; strong sustainability
+Washington State University,WSU,Spokane,WA,USA,16000,1800,2600,12000,16000,0.50,True,Masters/PhD,46000,Public; strong agriculture/STEM; affordable
+University of Idaho,UI,Boise,ID,USA,12000,1600,2400,11000,14000,0.45,True,Masters/PhD,38000,Public; affordable; strong STEM
+Boise State University,BSU,Boise,ID,USA,10000,1600,2400,11000,12000,0.35,False,Masters,36000,Public; affordable; growing programs
+Montana State University,MSU,Helena,MT,USA,10000,1600,2400,11000,14000,0.40,True,Masters/PhD,36000,Public; affordable; strong STEM/agriculture
+University of Wyoming,UWyo,Cheyenne,WY,USA,8000,1600,2400,11000,14000,0.45,True,Masters/PhD,34000,Public; very affordable; strong energy/STEM
+University of South Dakota,USD,Sioux Falls,SD,USA,10000,1600,2400,11000,12000,0.40,True,Masters/PhD,35000,Public; affordable; strong health sciences
+University of North Dakota,UND,Bismarck,ND,USA,10000,1600,2400,11000,12000,0.40,True,Masters/PhD,35000,Public; affordable; strong aviation/energy
+University of Alaska Anchorage,UAA,Anchorage,AK,USA,12000,1600,2600,12000,12000,0.30,False,Masters,40000,Public; remote; strong Arctic/environmental
+University of Hawaii,UH Manoa,Honolulu,HI,USA,16000,1800,2800,14000,16000,0.45,True,Masters/PhD,50000,Public; tropical; strong marine/Pacific studies
+University of Maine,UMaine,Portland,ME,USA,14000,1800,2600,12000,14000,0.45,True,Masters/PhD,42000,Public; affordable; strong marine/forestry
+University of Vermont,UVM,Burlington,VT,USA,20000,2000,2800,13500,16000,0.45,True,Masters/PhD,52000,Public; scenic; strong environmental programs
+University of Georgia,UGA,Atlanta,GA,USA,14000,1800,2600,12000,18000,0.55,True,Masters/PhD,44000,Public flagship; strong programs; affordable
+Georgia State University,GSU,Atlanta,GA,USA,12000,1800,2400,11000,14000,0.40,True,Masters/PhD,38000,Public; urban; affordable; diverse
+Clemson University,Clemson,Charlotte,NC,USA,18000,1800,2600,12000,18000,0.50,True,Masters/PhD,50000,Public; strong engineering; growing research
+University of South Carolina,USC,Columbia,SC,USA,16000,1800,2600,12000,16000,0.45,True,Masters/PhD,46000,Public; affordable; strong international business
+University of Alabama,Alabama,Birmingham,AL,USA,14000,1600,2400,11000,14000,0.45,True,Masters/PhD,42000,Public; affordable; strong STEM/health
+Auburn University,Auburn,Birmingham,AL,USA,16000,1800,2600,12000,16000,0.50,True,Masters/PhD,46000,Public; strong engineering/agriculture
+University of Mississippi,Ole Miss,Memphis,TN,USA,12000,1600,2400,11000,12000,0.40,True,Masters/PhD,38000,Public; affordable; strong law/pharmacy
+Mississippi State University,MSU,Memphis,TN,USA,12000,1600,2400,11000,14000,0.45,True,Masters/PhD,38000,Public; affordable; strong STEM/agriculture
+Louisiana State University,LSU,Baton Rouge,LA,USA,12000,1600,2400,11000,16000,0.50,True,Masters/PhD,40000,Public; affordable; strong STEM/petroleum
+Tulane University,Tulane,New Orleans,LA,USA,56000,1600,3000,17000,22000,0.45,True,Masters/PhD,88000,Private; New Orleans culture; strong health/law
+University of Arkansas,UArk,Fayetteville,AR,USA,12000,1600,2400,11000,14000,0.45,True,Masters/PhD,38000,Public; affordable; strong business/STEM
+University of Oxford,Oxford,Oxford,England,UK,12000,500,1200,12000,18000,0.55,True,DPhil/MSc,42000,Elite; DPhil fully funded; MSc competitive
+University of Cambridge,Cambridge,Cambridge,England,UK,12000,500,1200,12000,18000,0.55,True,PhD/MPhil,42000,Elite; PhD well funded; MPhil competitive
+Imperial College London,Imperial,London,England,UK,13000,500,1200,14000,18000,0.50,True,PhD/MSc,46000,Top STEM; London premium; strong industry links
+London School of Economics,LSE,London,England,UK,12000,500,1200,14000,16000,0.40,True,PhD/MSc,44000,Top social sciences; London premium; competitive
+University College London,UCL,London,England,UK,12000,500,1200,14000,16000,0.45,True,PhD/MSc,44000,Top research; London premium; diverse programs
+King's College London,KCL,London,England,UK,11000,500,1200,14000,14000,0.40,True,PhD/MSc,42000,Strong health/law/humanities; London premium
+University of Edinburgh,Edinburgh,Edinburgh,Scotland,UK,11000,500,1100,12000,14000,0.45,True,PhD/MSc,40000,Top Scottish university; strong research; historic city
+University of Manchester,Manchester,Manchester,England,UK,10000,500,1100,11000,12000,0.40,True,PhD/MSc,36000,Strong research; affordable city; large international community
+University of Bristol,Bristol,Bristol,England,UK,10000,500,1100,11000,12000,0.40,True,PhD/MSc,36000,Strong STEM/social sciences; vibrant city
+University of Warwick,Warwick,Coventry,England,UK,10000,500,1100,11000,12000,0.40,True,PhD/MSc,36000,Strong STEM/business; campus university
+University of Glasgow,Glasgow,Glasgow,Scotland,UK,9000,500,1100,11000,12000,0.40,True,PhD/MSc,34000,Strong research; affordable city; historic
+University of Birmingham,Birmingham,Birmingham,England,UK,9000,500,1100,11000,12000,0.40,True,PhD/MSc,34000,Strong STEM/health; affordable city
+University of Leeds,Leeds,Leeds,England,UK,9000,500,1100,11000,12000,0.40,True,PhD/MSc,34000,Strong STEM/social sciences; affordable city
+University of Sheffield,Sheffield,Sheffield,England,UK,9000,500,1100,11000,12000,0.40,True,PhD/MSc,34000,Strong STEM/social sciences; affordable city
+University of Nottingham,Nottingham,Nottingham,England,UK,9000,500,1100,11000,12000,0.40,True,PhD/MSc,34000,Strong STEM/pharmacy; affordable city
+University of Southampton,Southampton,Southampton,England,UK,9000,500,1100,11000,12000,0.40,True,PhD/MSc,34000,Strong engineering/oceanography; affordable
+Durham University,Durham,Newcastle,England,UK,9000,500,1100,11000,12000,0.40,True,PhD/MSc,34000,Collegiate; strong humanities/STEM; historic
+University of Exeter,Exeter,Exeter,England,UK,9000,500,1100,11000,12000,0.40,True,PhD/MSc,34000,Strong STEM/business; scenic location
+University of Bath,Bath,Bristol,England,UK,9000,500,1100,11000,12000,0.40,True,PhD/MSc,34000,Strong engineering/business; beautiful city
+Newcastle University,Newcastle,Newcastle,England,UK,8500,500,1100,10500,10000,0.35,True,PhD/MSc,32000,Strong STEM/medicine; affordable city
+University of Liverpool,Liverpool,Liverpool,England,UK,8500,500,1100,10500,10000,0.35,True,PhD/MSc,32000,Strong STEM/health; affordable; cultural city
+University of Leicester,Leicester,Leicester,England,UK,8500,500,1000,10500,10000,0.35,True,PhD/MSc,32000,Strong STEM/social sciences; affordable
+Loughborough University,Loughborough,Leicester,England,UK,8500,500,1000,10500,10000,0.35,True,PhD/MSc,32000,Top sports/engineering; campus university
+Queen Mary University of London,QMUL,London,England,UK,10000,500,1200,13000,12000,0.35,True,PhD/MSc,40000,Strong STEM/medicine; London; affordable vs peers
+Brunel University London,Brunel,London,England,UK,9000,500,1200,12000,10000,0.30,True,PhD/MSc,36000,Strong engineering/design; West London
+City University of London,City,London,England,UK,9500,500,1200,12000,10000,0.30,True,PhD/MSc,38000,Strong business/journalism; London
+Heriot-Watt University,Heriot-Watt,Edinburgh,Scotland,UK,8500,500,1100,11000,10000,0.35,True,PhD/MSc,32000,Strong engineering/business; Edinburgh
+University of Strathclyde,Strathclyde,Glasgow,Scotland,UK,8500,500,1100,11000,10000,0.35,True,PhD/MSc,32000,Strong STEM/business; Glasgow
+University of Aberdeen,Aberdeen,Aberdeen,Scotland,UK,8000,500,1100,10500,10000,0.35,True,PhD/MSc,30000,Strong medicine/petroleum; affordable
+University of St Andrews,St Andrews,Edinburgh,Scotland,UK,9000,500,1100,11000,10000,0.35,True,PhD/MSc,34000,Historic; strong STEM/humanities; scenic
+Queen's University Belfast,QUB,Belfast,Northern Ireland,UK,8000,500,1000,10000,10000,0.35,True,PhD/MSc,30000,Strong STEM/medicine; affordable; Northern Ireland
+Cardiff University,Cardiff,Cardiff,Wales,UK,8500,500,1000,10500,10000,0.35,True,PhD/MSc,32000,Strong STEM/health; Welsh capital
+Swansea University,Swansea,Cardiff,Wales,UK,8000,500,1000,10000,10000,0.30,True,PhD/MSc,30000,Strong engineering/health; coastal Wales
+Aston University,Aston,Birmingham,England,UK,8500,500,1100,11000,10000,0.30,True,PhD/MSc,32000,Strong business/engineering; Birmingham
+University of Surrey,Surrey,London,England,UK,9000,500,1100,11500,10000,0.30,True,PhD/MSc,34000,Strong STEM/hospitality; London proximity
+University of Kent,Kent,Canterbury,England,UK,8500,500,1100,11000,10000,0.30,True,PhD/MSc,32000,Strong humanities/social sciences; historic city
+University of Reading,Reading,London,England,UK,8500,500,1100,11000,10000,0.30,True,PhD/MSc,32000,Strong meteorology/agriculture; London proximity
+Coventry University,Coventry,Coventry,England,UK,7500,500,1000,10000,0,0.10,False,Masters,28000,Strong applied programs; affordable; international focus
+University of Salford,Salford,Manchester,England,UK,7500,500,1100,10000,0,0.10,False,Masters,28000,Strong media/engineering; Manchester proximity
+University of Huddersfield,Huddersfield,Leeds,England,UK,7500,500,1100,10000,0,0.10,False,Masters,28000,Strong applied programs; affordable
+University of Toronto,UofT,Toronto,Ontario,Canada,8000,1500,1200,14000,20000,0.60,True,PhD/MSc,44000,Top Canadian; strong research; expensive city
+University of British Columbia,UBC,Vancouver,BC,Canada,8000,1500,1200,14000,18000,0.55,True,PhD/MSc,42000,Top Canadian; strong research; expensive city
+McGill University,McGill,Montreal,Quebec,Canada,8000,1200,1100,13000,18000,0.55,True,PhD/MSc,40000,Elite; bilingual city; affordable vs Toronto/Vancouver
+University of Alberta,UAlberta,Edmonton,Alberta,Canada,7000,1200,1100,12000,16000,0.55,True,PhD/MSc,36000,Strong STEM/energy; affordable city
+University of Calgary,UCalgary,Calgary,Alberta,Canada,7000,1200,1100,12000,16000,0.55,True,PhD/MSc,36000,Strong STEM/energy; growing city
+McMaster University,McMaster,Hamilton,Ontario,Canada,7000,1200,1100,12000,16000,0.55,True,PhD/MSc,36000,Strong health sciences/engineering; Hamilton
+University of Waterloo,Waterloo,Waterloo,Ontario,Canada,7500,1200,1100,12000,18000,0.60,True,PhD/MSc,38000,Top STEM/co-op; tech hub proximity
+Western University,Western,London,Ontario,Canada,7000,1200,1100,12000,16000,0.50,True,PhD/MSc,36000,Strong business/health; London Ontario
+Queen's University,Queens,Kingston,Ontario,Canada,7500,1200,1100,12000,16000,0.50,True,PhD/MSc,38000,Strong engineering/business; historic Kingston
+Dalhousie University,Dal,Halifax,NS,Canada,7000,1200,1100,12000,14000,0.50,True,PhD/MSc,36000,Strong health/ocean sciences; affordable Halifax
+University of Ottawa,UOttawa,Ottawa,Ontario,Canada,7000,1200,1100,12000,14000,0.50,True,PhD/MSc,36000,Bilingual; Ottawa; strong law/social sciences
+Carleton University,Carleton,Ottawa,Ontario,Canada,7000,1200,1100,12000,14000,0.45,True,PhD/MSc,36000,Strong journalism/engineering; Ottawa
+Simon Fraser University,SFU,Vancouver,BC,Canada,7000,1200,1200,13000,14000,0.50,True,PhD/MSc,38000,Strong STEM/social sciences; Vancouver proximity
+University of Victoria,UVic,Victoria,BC,Canada,7000,1200,1200,13000,14000,0.50,True,PhD/MSc,38000,Strong STEM/law; scenic Victoria
+University of Manitoba,UManitoba,Winnipeg,Manitoba,Canada,6500,1200,1000,11000,12000,0.45,True,PhD/MSc,34000,Public; affordable; strong health/agriculture
+University of Saskatchewan,USask,Saskatoon,Saskatchewan,Canada,6500,1200,1000,11000,12000,0.45,True,PhD/MSc,34000,Public; affordable; strong agriculture/health
+University of Guelph,Guelph,Guelph,Ontario,Canada,7000,1200,1100,12000,14000,0.50,True,PhD/MSc,36000,Strong agriculture/biological sciences; Guelph
+York University,York,Toronto,Ontario,Canada,7000,1200,1100,13000,12000,0.40,True,PhD/MSc,38000,Strong social sciences/arts; Toronto
+Concordia University,Concordia,Montreal,Quebec,Canada,7000,1200,1100,12000,12000,0.40,True,PhD/MSc,36000,Strong arts/engineering; Montreal; affordable
+Universite de Montreal,UdeM,Montreal,Quebec,Canada,4000,1000,1100,12000,14000,0.50,True,PhD/MSc,32000,French-language; affordable; strong research
+Universite Laval,Laval,Quebec City,Quebec,Canada,4000,1000,1000,11000,12000,0.45,True,PhD/MSc,30000,French-language; affordable; Quebec City
+Universite de Sherbrooke,USherbrooke,Montreal,Quebec,Canada,4000,1000,1000,11000,12000,0.45,True,PhD/MSc,30000,French-language; affordable; strong engineering
+Ryerson University,Ryerson,Toronto,Ontario,Canada,7500,1200,1100,13000,0,0.15,False,Masters,38000,Applied focus; Toronto; strong business/engineering
+Brock University,Brock,Hamilton,Ontario,Canada,6500,1200,1100,11000,10000,0.35,True,PhD/MSc,34000,Affordable; wine country; strong STEM/business
+Wilfrid Laurier University,Laurier,Waterloo,Ontario,Canada,7000,1200,1100,12000,10000,0.30,False,Masters,36000,Strong business/social sciences; Waterloo
+University of New Brunswick,UNB,Fredericton,NB,Canada,6500,1200,1000,11000,12000,0.40,True,PhD/MSc,34000,Public; affordable; strong engineering/forestry
+Memorial University of Newfoundland,MUN,St. John's,NL,Canada,5500,1200,1000,11000,12000,0.40,True,PhD/MSc,30000,Public; very affordable; strong ocean sciences
+Lakehead University,Lakehead,Thunder Bay,Ontario,Canada,6000,1200,1000,11000,10000,0.35,True,PhD/MSc,32000,Public; affordable; strong forestry/health
+Trent University,Trent,Kingston,Ontario,Canada,6500,1200,1000,11000,10000,0.35,True,PhD/MSc,32000,Strong environmental/indigenous studies; affordable
+University of Windsor,Windsor,Hamilton,Ontario,Canada,6500,1200,1100,11000,10000,0.35,True,PhD/MSc,34000,Strong engineering/law; Windsor-Detroit corridor
+Laurentian University,Laurentian,Sudbury,Ontario,Canada,6000,1200,1000,11000,10000,0.30,True,PhD/MSc,30000,Bilingual; affordable; strong mining/health
+Athabasca University,Athabasca,Edmonton,Alberta,Canada,7000,1000,1000,0,0,0.10,False,Masters,22000,Online-focused; flexible; affordable
+Royal Roads University,Royal Roads,Victoria,BC,Canada,10000,1000,1200,0,0,0.10,False,Masters,28000,Applied focus; leadership/sustainability; online/hybrid
