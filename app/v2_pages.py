@@ -1,36 +1,39 @@
 """
-v2_pages.py — V2 Decision Tool Pages
-Student Financial Intelligence Dashboard
+v2_pages.py — V2/V3 Decision Tool Pages  (Pass 2)
+CostCompass — Plan. Manage. Thrive.
 
 Pages:
-  - Decision Planner
-  - Admit Comparison
+  - Decision Planner      (+ FX risk toggle)
+  - Admit Comparison      (+ PDF export)
   - Stress Test
   - Move-In Shock Calculator
+
+Pass 2 additions:
+  - Entry-screen decision flow (4-path landing on Overview)
+  - FX depreciation risk toggle in Decision Planner
+  - Admit Comparison PDF memo export
+  - Session-persistent saved plans (survives page navigation)
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
-
+import io
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-import plotly.express as px
 from data_model import (
     PlanningScenario, FundingInputs, LivingCosts, MoveInCosts
 )
 from decision_engine import evaluate_scenario
 from providers import (
-    load_metro_benchmarks, load_university_profiles,
     metro_names, university_names, get_metro, get_university
 )
 
-# ─── shared style helpers (duplicated from app.py to keep module self-contained)
+# ─── shared style helpers
 TEAL   = "#14b8a6"
 GOLD   = "#f59e0b"
 GREEN  = "#10b981"
 RED    = "#ef4444"
 NAVY   = "#050a14"
-
 PLOT_LAYOUT = dict(
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(5,10,20,0.6)",
@@ -40,11 +43,9 @@ PLOT_LAYOUT = dict(
     yaxis=dict(gridcolor="rgba(30,40,64,0.5)", showgrid=True),
 )
 
-
 def usd(x):
     if x is None: return "—"
     return f"${x:,.0f}" if x >= 0 else f"-${abs(x):,.0f}"
-
 
 def score_color(s):
     if s >= 75: return GREEN
@@ -52,17 +53,14 @@ def score_color(s):
     if s >= 35: return "#f97316"
     return RED
 
-
 def score_label(s):
     if s >= 75: return "Strong"
     if s >= 55: return "Viable"
     if s >= 35: return "Fragile"
     return "Critical"
 
-
 def flag_icon(severity):
     return {"danger": "🔴", "warning": "🟡", "info": "🔵"}.get(severity, "⚪")
-
 
 def flag_bg(severity):
     return {
@@ -71,7 +69,6 @@ def flag_bg(severity):
         "info":    "rgba(20,184,166,0.08)",
     }.get(severity, "rgba(255,255,255,0.04)")
 
-
 def flag_border(severity):
     return {
         "danger":  "rgba(239,68,68,0.35)",
@@ -79,10 +76,8 @@ def flag_border(severity):
         "info":    "rgba(20,184,166,0.35)",
     }.get(severity, "rgba(255,255,255,0.1)")
 
-
 def flag_text(severity):
     return {"danger": "#f87171", "warning": "#fbbf24", "info": "#2dd4bf"}.get(severity, "#94a3b8")
-
 
 def render_flag(flag):
     st.markdown(f"""
@@ -91,7 +86,6 @@ def render_flag(flag):
     color:{flag_text(flag.severity)};font-size:0.88rem;line-height:1.5;'>
         {flag_icon(flag.severity)} {flag.message}
     </div>""", unsafe_allow_html=True)
-
 
 def kpi(label, value, sub=None, color=TEAL):
     sub_html = f"<div style='font-size:0.78rem;color:#64748b;margin-top:0.15rem;'>{sub}</div>" if sub else ""
@@ -103,7 +97,6 @@ def kpi(label, value, sub=None, color=TEAL):
         {sub_html}
     </div>"""
 
-
 def section(title):
     st.markdown(f"""
     <div style='background:linear-gradient(90deg,rgba(20,184,166,0.12) 0%,rgba(5,10,20,0) 100%);
@@ -111,7 +104,6 @@ def section(title):
     margin-bottom:1rem;font-size:1.05rem;font-weight:600;letter-spacing:0.04em;color:#e2e8f0;'>
         {title}
     </div>""", unsafe_allow_html=True)
-
 
 def advisor_box(text):
     st.markdown(f"""
@@ -121,11 +113,9 @@ def advisor_box(text):
         💬 {text}
     </div>""", unsafe_allow_html=True)
 
-
 # ─────────────────────────────────────────────────────────────────────────────
 # SESSION STATE INIT
 # ─────────────────────────────────────────────────────────────────────────────
-
 def init_v2_state():
     if "v2_saved_scenarios" not in st.session_state:
         st.session_state["v2_saved_scenarios"] = []   # list of (PlanningScenario, DecisionResult)
@@ -133,12 +123,170 @@ def init_v2_state():
         st.session_state["v2_current_result"] = None
     if "v2_current_scenario" not in st.session_state:
         st.session_state["v2_current_scenario"] = None
+    # Entry screen: which path was chosen
+    if "v2_entry_path" not in st.session_state:
+        st.session_state["v2_entry_path"] = None
 
+# ─────────────────────────────────────────────────────────────────────────────
+# ENTRY SCREEN — 4-path decision flow (called from Overview page)
+# ─────────────────────────────────────────────────────────────────────────────
+def render_entry_screen():
+    """
+    Renders the 4-path decision entry screen at the bottom of the Overview page.
+    Each path pre-routes the user to the right tool with context.
+    """
+    init_v2_state()
+    st.markdown("""
+    <div style='margin-top:2rem;margin-bottom:0.5rem;'>
+        <div style='font-size:1.3rem;font-weight:700;color:#f8fafc;letter-spacing:0.03em;'>
+            What do you need to figure out?
+        </div>
+        <div style='font-size:0.88rem;color:#64748b;margin-top:0.3rem;'>
+            Choose your question — we'll take you to the right tool.
+        </div>
+    </div>""", unsafe_allow_html=True)
+
+    paths = [
+        {
+            "icon": "🏙️",
+            "title": "Can I afford this city?",
+            "desc": "Check if your funding covers living costs in a specific metro area.",
+            "route": "Decision Planner",
+            "key": "entry_city",
+            "color": TEAL,
+        },
+        {
+            "icon": "🏠",
+            "title": "How much rent can I safely pay?",
+            "desc": "Find your safe rent ceiling based on your income and expenses.",
+            "route": "Decision Planner",
+            "key": "entry_rent",
+            "color": GREEN,
+        },
+        {
+            "icon": "🎓",
+            "title": "Which school is financially better?",
+            "desc": "Compare two or more admit offers side by side with stress testing.",
+            "route": "Compare Offers",
+            "key": "entry_compare",
+            "color": GOLD,
+        },
+        {
+            "icon": "⚡",
+            "title": "What if my funding changes?",
+            "desc": "Run a stress test to see how rent increases or income cuts affect your plan.",
+            "route": "Stress Test",
+            "key": "entry_stress",
+            "color": "#f97316",
+        },
+    ]
+
+    cols = st.columns(4, gap="small")
+    for i, (col, path) in enumerate(zip(cols, paths)):
+        with col:
+            st.markdown(f"""
+            <div style='background:rgba(10,20,40,0.9);border:1px solid rgba(20,184,166,0.15);
+            border-radius:14px;padding:1.2rem 1rem;text-align:center;min-height:160px;
+            transition:border-color 0.2s;'>
+                <div style='font-size:2rem;margin-bottom:0.5rem;'>{path["icon"]}</div>
+                <div style='font-size:0.9rem;font-weight:700;color:#e2e8f0;margin-bottom:0.4rem;
+                line-height:1.3;'>{path["title"]}</div>
+                <div style='font-size:0.78rem;color:#64748b;line-height:1.45;'>{path["desc"]}</div>
+            </div>""", unsafe_allow_html=True)
+            if st.button(f"Go →", key=path["key"], use_container_width=True):
+                st.session_state["v2_entry_path"] = path["route"]
+                st.session_state["_nav_target"] = path["route"]
+                st.rerun()
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FX RISK ANALYSIS helper
+# ─────────────────────────────────────────────────────────────────────────────
+def render_fx_risk_section(home_currency_monthly: float, fx_rate: float, monthly_income: float, monthly_surplus: float):
+    """
+    Shows how FX depreciation affects the plan when the user has home currency funding.
+    """
+    if home_currency_monthly <= 0 or fx_rate <= 0:
+        return
+
+    section("FX Depreciation Risk")
+    st.markdown("""
+    <div style='font-size:0.85rem;color:#64748b;margin-bottom:1rem;'>
+    Your plan includes home currency funding. This section shows how currency depreciation
+    affects your monthly income and surplus.
+    </div>""", unsafe_allow_html=True)
+
+    usd_from_home = home_currency_monthly * fx_rate
+    depreciation_levels = [0, 5, 10, 15, 20, 30, 40]
+    rows = []
+    for pct in depreciation_levels:
+        new_rate = fx_rate * (1 - pct / 100)
+        new_usd = home_currency_monthly * new_rate
+        income_change = new_usd - usd_from_home
+        new_income = monthly_income + income_change
+        new_surplus = monthly_surplus + income_change
+        rows.append({
+            "Depreciation": f"{pct}%",
+            "New Rate": f"{new_rate:.4f}",
+            "USD from Home": usd(new_usd),
+            "Monthly Income": usd(new_income),
+            "Monthly Surplus": usd(new_surplus),
+            "Status": "✅ Viable" if new_surplus >= 0 else "❌ Deficit",
+        })
+
+    df = pd.DataFrame(rows)
+    st.dataframe(df, use_container_width=True, hide_index=True)
+
+    # Chart
+    surpluses = []
+    for pct in depreciation_levels:
+        new_rate = fx_rate * (1 - pct / 100)
+        new_usd = home_currency_monthly * new_rate
+        income_change = new_usd - usd_from_home
+        surpluses.append(monthly_surplus + income_change)
+
+    colors_list = [GREEN if s >= 0 else RED for s in surpluses]
+    fig = go.Figure(go.Bar(
+        x=[f"{p}%" for p in depreciation_levels],
+        y=surpluses,
+        marker_color=colors_list,
+        text=[usd(s) for s in surpluses],
+        textposition="outside",
+    ))
+    fig.add_hline(y=0, line_color=RED, line_dash="dash", line_width=1.5)
+    fig.update_layout(
+        title="Monthly Surplus Under FX Depreciation Scenarios",
+        xaxis_title="Home Currency Depreciation",
+        yaxis_title="Monthly Surplus (USD)",
+        **PLOT_LAYOUT
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Advisor note
+    breakeven_pct = None
+    for pct in depreciation_levels:
+        new_rate = fx_rate * (1 - pct / 100)
+        new_usd = home_currency_monthly * new_rate
+        income_change = new_usd - usd_from_home
+        if monthly_surplus + income_change < 0:
+            breakeven_pct = pct
+            break
+
+    if breakeven_pct:
+        advisor_box(
+            f"Your plan breaks under a {breakeven_pct}% depreciation of your home currency. "
+            f"If you are funded from {['GHS', 'NGN', 'KES', 'GHC', 'home currency'][0]}, "
+            f"monitor exchange rate movements closely. A {breakeven_pct}% move is not unusual over a 12-month period. "
+            f"Consider converting a portion of your savings to USD before arrival to reduce this exposure."
+        )
+    else:
+        advisor_box(
+            f"Your plan remains viable even under a 40% depreciation of your home currency. "
+            f"Your USD income sources provide sufficient buffer against FX risk."
+        )
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE: DECISION PLANNER
 # ─────────────────────────────────────────────────────────────────────────────
-
 def page_decision_planner():
     init_v2_state()
     st.markdown("<div style='font-size:1.55rem;font-weight:700;color:#f8fafc;letter-spacing:0.03em;margin-bottom:0.25rem;'>Decision Planner</div>", unsafe_allow_html=True)
@@ -149,13 +297,11 @@ def page_decision_planner():
 
     # ── Planning mode
     mode = st.radio("Planning mode", ["By University", "By City / Metro"], horizontal=True)
-
     col_left, col_right = st.columns([1, 1], gap="large")
 
     with col_left:
         section("Location & School")
         label = st.text_input("Plan label (e.g. WashU Option A)", value="My Plan")
-
         if mode == "By University":
             uni_name = st.selectbox("University", unis)
             uni = get_university(uni_name)
@@ -175,13 +321,14 @@ def page_decision_planner():
 
         section("Funding")
         has_assistantship = st.checkbox("I have (or expect) an assistantship / TA / RA", value=False)
-
+        tuition_covered = False
         if has_assistantship and uni:
             default_stipend = round(uni.assistantship_stipend_annual / 12, 0)
-            tuition_covered = uni.assistantship_covers_tuition
+            tuition_covered = st.checkbox("Assistantship covers tuition", value=uni.assistantship_covers_tuition)
+        elif has_assistantship:
+            default_stipend = 1800.0
         else:
             default_stipend = 0.0
-            tuition_covered = False
 
         stipend = st.number_input("Monthly stipend / assistantship ($)", min_value=0.0, value=float(default_stipend), step=100.0)
         wage = st.number_input("Hourly wage from on-campus job ($)", min_value=0.0, value=12.50, step=0.50)
@@ -194,6 +341,12 @@ def page_decision_planner():
             home_currency = st.number_input("Amount in home currency (monthly)", min_value=0.0, value=0.0, step=100.0)
         with fx_col2:
             fx_rate = st.number_input("Exchange rate (1 home unit = ? USD)", min_value=0.01, value=1.0, step=0.01)
+
+        # FX risk toggle
+        show_fx_risk = False
+        if home_currency > 0:
+            show_fx_risk = st.checkbox("Show FX depreciation risk analysis", value=True,
+                                        help="See how your plan changes if your home currency loses value against USD")
 
         starting_cash = st.number_input("Cash available before arrival ($)", min_value=0.0, value=5000.0, step=500.0)
 
@@ -236,7 +389,6 @@ def page_decision_planner():
     # ── Run engine
     st.markdown("---")
     run_col, save_col = st.columns([1, 1])
-
     with run_col:
         run = st.button("▶  Run Decision Analysis", type="primary", use_container_width=True)
     with save_col:
@@ -293,13 +445,14 @@ def page_decision_planner():
                 st.warning(f"A scenario named '{label}' is already saved. Rename it to save a new version.")
 
     result = st.session_state.get("v2_current_result")
+    scenario_obj = st.session_state.get("v2_current_scenario")
     if not result:
         return
 
     st.markdown("---")
     section("Decision Output")
 
-    # KPI row
+    # KPI row 1
     k1, k2, k3, k4 = st.columns(4)
     aff_color = score_color(result.affordability_score)
     with k1:
@@ -313,6 +466,7 @@ def page_decision_planner():
         runway_color = GREEN if result.emergency_runway_months >= 3 else (GOLD if result.emergency_runway_months >= 2 else RED)
         st.markdown(kpi("Cash Runway", f"{result.emergency_runway_months:.1f} mo", "After move-in", runway_color), unsafe_allow_html=True)
 
+    # KPI row 2
     k5, k6, k7, k8 = st.columns(4)
     with k5:
         st.markdown(kpi("Monthly Income", usd(result.monthly_income), "All sources", TEAL), unsafe_allow_html=True)
@@ -358,6 +512,15 @@ def page_decision_planner():
     fig.update_layout(title="Projected Cash Balance (12 months)", xaxis_title="Month", yaxis_title="USD", **PLOT_LAYOUT)
     st.plotly_chart(fig, use_container_width=True)
 
+    # FX risk section (only shown when user has home currency funding and toggle is on)
+    if show_fx_risk and scenario_obj:
+        render_fx_risk_section(
+            home_currency_monthly=scenario_obj.funding.home_currency_monthly,
+            fx_rate=scenario_obj.funding.fx_rate,
+            monthly_income=result.monthly_income,
+            monthly_surplus=result.monthly_surplus,
+        )
+
     # Risk flags
     if result.risk_flags:
         section("Risk Flags")
@@ -373,38 +536,63 @@ def page_decision_planner():
             Additional funding, reduced spending, or a higher-stipend option is required.
         </div>""", unsafe_allow_html=True)
 
-
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE: ADMIT COMPARISON
 # ─────────────────────────────────────────────────────────────────────────────
-
 def page_admit_comparison():
     init_v2_state()
     st.markdown("<div style='font-size:1.55rem;font-weight:700;color:#f8fafc;letter-spacing:0.03em;margin-bottom:0.25rem;'>Admit Comparison</div>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size:0.88rem;color:#94a3b8;margin-bottom:1.2rem;'>Rank your saved options side by side. See which school or city is financially safer over 12 months.</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:0.88rem;color:#94a3b8;margin-bottom:1.2rem;'>Compare saved financial plans side by side. Save plans from the Decision Planner first.</div>", unsafe_allow_html=True)
 
     saved = st.session_state.get("v2_saved_scenarios", [])
 
+    # Session persistence info
+    n_saved = len(saved)
+    if n_saved > 0:
+        st.markdown(f"""
+        <div style='background:rgba(20,184,166,0.06);border:1px solid rgba(20,184,166,0.2);
+        border-radius:8px;padding:0.6rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:#94a3b8;'>
+            📋 {n_saved} plan{"s" if n_saved != 1 else ""} saved this session:
+            {" · ".join(f"<strong style='color:#14b8a6;'>{r.scenario_label}</strong>" for _, r in saved)}
+        </div>""", unsafe_allow_html=True)
+
     if not saved:
         st.markdown("""
-        <div style='background:rgba(20,184,166,0.06);border:1px solid rgba(20,184,166,0.2);
-        border-radius:10px;padding:1.5rem 2rem;text-align:center;color:#64748b;'>
-            No scenarios saved yet. Go to <strong style='color:#14b8a6;'>Decision Planner</strong>,
-            build a plan, and click <strong style='color:#14b8a6;'>Save to Comparison</strong>.
+        <div style='background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);
+        border-radius:10px;padding:1.5rem;text-align:center;color:#94a3b8;'>
+            <div style='font-size:1.5rem;margin-bottom:0.5rem;'>📊</div>
+            <div style='font-size:0.95rem;'>No plans saved yet.</div>
+            <div style='font-size:0.85rem;margin-top:0.3rem;'>
+                Go to <strong>Decision Planner</strong>, build a scenario, and click
+                <strong>＋ Save to Comparison</strong>.
         </div>""", unsafe_allow_html=True)
         return
 
     results = [r for _, r in saved]
     labels = [r.scenario_label for r in results]
 
-    # Clear button
-    if st.button("🗑  Clear all saved scenarios"):
-        st.session_state["v2_saved_scenarios"] = []
-        st.rerun()
+    # Action buttons row
+    btn_col1, btn_col2, btn_col3 = st.columns([1, 1, 2])
+    with btn_col1:
+        if st.button("🗑  Clear all saved scenarios"):
+            st.session_state["v2_saved_scenarios"] = []
+            st.rerun()
+    with btn_col2:
+        # PDF export
+        try:
+            from pdf_export import generate_admit_comparison_pdf
+            pdf_bytes = generate_admit_comparison_pdf(saved)
+            st.download_button(
+                label="📄  Export PDF Memo",
+                data=pdf_bytes,
+                file_name="admit_comparison_memo.pdf",
+                mime="application/pdf",
+                use_container_width=True,
+            )
+        except Exception as e:
+            st.caption(f"PDF export unavailable: {e}")
 
     section("Side-by-Side Comparison")
-
-    # Build comparison table
     rows = {
         "Monthly Income":       [usd(r.monthly_income) for r in results],
         "Monthly Expenses":     [usd(r.monthly_expenses) for r in results],
@@ -418,7 +606,6 @@ def page_admit_comparison():
         "Severe Stress":        [usd(r.stress_severe) for r in results],
         "Plan Viable":          ["✅ Yes" if r.plan_viable else "❌ No" for r in results],
     }
-
     df = pd.DataFrame(rows, index=labels).T
     df.index.name = "Metric"
     st.dataframe(df, use_container_width=True)
@@ -446,11 +633,11 @@ def page_admit_comparison():
     # Surplus comparison chart
     section("Monthly Surplus Comparison")
     surplus_vals = [r.monthly_surplus for r in results]
-    colors = [GREEN if v >= 0 else RED for v in surplus_vals]
+    colors_list = [GREEN if v >= 0 else RED for v in surplus_vals]
     fig = go.Figure(go.Bar(
         x=labels,
         y=surplus_vals,
-        marker_color=colors,
+        marker_color=colors_list,
         text=[usd(v) for v in surplus_vals],
         textposition="outside",
     ))
@@ -491,94 +678,123 @@ def page_admit_comparison():
             for flag in result.risk_flags:
                 render_flag(flag)
 
-
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE: STRESS TEST
 # ─────────────────────────────────────────────────────────────────────────────
-
 def page_stress_test():
     init_v2_state()
     st.markdown("<div style='font-size:1.55rem;font-weight:700;color:#f8fafc;letter-spacing:0.03em;margin-bottom:0.25rem;'>Stress Test</div>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size:0.88rem;color:#94a3b8;margin-bottom:1.2rem;'>Apply realistic downside pressure to any saved plan. See exactly when and how your finances break.</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:0.88rem;color:#94a3b8;margin-bottom:1.2rem;'>Apply custom shocks to your financial plan and see how your surplus and cash position change.</div>", unsafe_allow_html=True)
 
     saved = st.session_state.get("v2_saved_scenarios", [])
+    current_result = st.session_state.get("v2_current_result")
+    current_scenario = st.session_state.get("v2_current_scenario")
 
-    if not saved:
+    if not current_result and not saved:
         st.markdown("""
-        <div style='background:rgba(20,184,166,0.06);border:1px solid rgba(20,184,166,0.2);
-        border-radius:10px;padding:1.5rem 2rem;text-align:center;color:#64748b;'>
-            No scenarios saved yet. Build and save a plan in <strong style='color:#14b8a6;'>Decision Planner</strong> first.
+        <div style='background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);
+        border-radius:10px;padding:1.5rem;text-align:center;color:#94a3b8;'>
+            <div style='font-size:1.5rem;margin-bottom:0.5rem;'>⚡</div>
+            <div style='font-size:0.95rem;'>No plan loaded yet.</div>
+            <div style='font-size:0.85rem;margin-top:0.3rem;'>
+                Run an analysis in <strong>Decision Planner</strong> first, then return here.
+            </div>
         </div>""", unsafe_allow_html=True)
         return
 
-    labels = [r.scenario_label for _, r in saved]
-    selected_label = st.selectbox("Select a plan to stress test", labels)
-    selected_pair = next((pair for pair in saved if pair[1].scenario_label == selected_label), None)
-    if not selected_pair:
+    # Select which plan to stress test
+    options = []
+    if current_result:
+        options.append(f"Current: {current_result.scenario_label}")
+    for _, r in saved:
+        if not current_result or r.scenario_label != current_result.scenario_label:
+            options.append(r.scenario_label)
+
+    selected_label = st.selectbox("Select plan to stress test", options)
+    if selected_label.startswith("Current: "):
+        base_result = current_result
+        base_scenario = current_scenario
+    else:
+        matches = [(s, r) for s, r in saved if r.scenario_label == selected_label]
+        if matches:
+            base_scenario, base_result = matches[0]
+        else:
+            base_result = current_result
+            base_scenario = current_scenario
+
+    if not base_result:
         return
 
-    scenario, base_result = selected_pair
-
-    section("Baseline Position")
-    b1, b2, b3 = st.columns(3)
-    with b1: st.markdown(kpi("Baseline Surplus", usd(base_result.monthly_surplus), "No stress applied", GREEN if base_result.monthly_surplus >= 0 else RED), unsafe_allow_html=True)
-    with b2: st.markdown(kpi("Affordability Score", f"{base_result.affordability_score}/100", score_label(base_result.affordability_score), score_color(base_result.affordability_score)), unsafe_allow_html=True)
-    with b3: st.markdown(kpi("Cash Runway", f"{base_result.emergency_runway_months:.1f} mo", "After move-in", TEAL), unsafe_allow_html=True)
+    st.markdown(f"""
+    <div style='background:rgba(10,20,40,0.9);border:1px solid rgba(20,184,166,0.15);
+    border-radius:10px;padding:0.8rem 1.2rem;margin-bottom:1rem;'>
+        <span style='color:#64748b;font-size:0.82rem;'>Baseline · </span>
+        <span style='color:#e2e8f0;font-weight:600;'>{base_result.scenario_label}</span>
+        <span style='color:#64748b;font-size:0.82rem;'> · Income: {usd(base_result.monthly_income)} · Expenses: {usd(base_result.monthly_expenses)} · Surplus: {usd(base_result.monthly_surplus)}</span>
+    </div>""", unsafe_allow_html=True)
 
     section("Custom Stress Parameters")
-    st.markdown("<div style='font-size:0.82rem;color:#64748b;margin-bottom:0.8rem;'>Adjust sliders to simulate specific downside scenarios.</div>", unsafe_allow_html=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        rent_shock = st.slider("Rent increase (%)", min_value=0, max_value=50, value=10, step=1)
+        income_shock = st.slider("Income reduction (%)", min_value=0, max_value=50, value=10, step=1)
+    with col2:
+        grocery_shock = st.slider("Grocery/food cost increase (%)", min_value=0, max_value=50, value=5, step=1)
+        utility_shock = st.slider("Utilities increase (%)", min_value=0, max_value=50, value=5, step=1)
 
-    sc1, sc2 = st.columns(2)
-    with sc1:
-        rent_increase = st.slider("Rent increase (%)", 0, 30, 8)
-        income_reduction = st.slider("Income reduction (%)", 0, 50, 10)
-        fx_depreciation = st.slider("FX depreciation (%)", 0, 40, 0)
-    with sc2:
-        emergency_expense = st.slider("One-time emergency expense ($)", 0, 5000, 0, step=100)
-        grocery_inflation = st.slider("Grocery/utilities inflation (%)", 0, 20, 5)
-        work_hours_cut = st.slider("Work hours reduction (hrs/week)", 0, 20, 0)
-
-    # Apply custom stress
+    # Calculate stressed values
     base_income = base_result.monthly_income
     base_expenses = base_result.monthly_expenses
-    base_rent = scenario.living.rent
+    base_surplus = base_result.monthly_surplus
 
-    # Adjust income
-    wage_income = scenario.funding.hourly_wage * max(0, scenario.funding.weekly_work_hours - work_hours_cut) * 4.33
-    fx_income = (scenario.funding.home_currency_monthly / scenario.funding.fx_rate) * (1 - fx_depreciation / 100) if scenario.funding.fx_rate > 0 else 0
-    stressed_income = (scenario.funding.monthly_stipend + wage_income + scenario.funding.family_support_monthly + fx_income) * (1 - income_reduction / 100)
+    # Estimate component breakdown from scenario if available
+    if base_scenario:
+        rent_component = base_scenario.living.rent
+        grocery_component = base_scenario.living.groceries
+        utility_component = base_scenario.living.utilities
+        other_expenses = base_expenses - rent_component - grocery_component - utility_component
+    else:
+        rent_component = base_expenses * 0.35
+        grocery_component = base_expenses * 0.15
+        utility_component = base_expenses * 0.08
+        other_expenses = base_expenses - rent_component - grocery_component - utility_component
 
-    # Adjust expenses
-    rent_stressed = base_rent * (1 + rent_increase / 100)
-    food_stressed = (scenario.living.groceries + scenario.living.utilities) * (1 + grocery_inflation / 100)
-    other_expenses = base_expenses - base_rent - scenario.living.groceries - scenario.living.utilities
-    stressed_expenses = rent_stressed + food_stressed + other_expenses + (emergency_expense / 12)
+    stressed_rent = rent_component * (1 + rent_shock / 100)
+    stressed_groceries = grocery_component * (1 + grocery_shock / 100)
+    stressed_utilities = utility_component * (1 + utility_shock / 100)
+    stressed_income = base_income * (1 - income_shock / 100)
+    stressed_expenses = stressed_rent + stressed_groceries + stressed_utilities + other_expenses
+    stressed_surplus = stressed_income - stressed_expenses
 
-    stressed_surplus = round(stressed_income - stressed_expenses, 2)
-    surplus_delta = stressed_surplus - base_result.monthly_surplus
+    expense_delta = stressed_expenses - base_expenses
+    income_delta = stressed_income - base_income
+    surplus_delta = stressed_surplus - base_surplus
 
-    section("Stress Test Results")
-    r1, r2, r3, r4 = st.columns(4)
-    with r1: st.markdown(kpi("Stressed Income", usd(stressed_income), f"-{income_reduction}% reduction", GOLD), unsafe_allow_html=True)
-    with r2: st.markdown(kpi("Stressed Expenses", usd(stressed_expenses), f"Rent +{rent_increase}%, food +{grocery_inflation}%", GOLD), unsafe_allow_html=True)
-    with r3:
-        s_color = GREEN if stressed_surplus >= 0 else RED
-        st.markdown(kpi("Stressed Surplus", usd(stressed_surplus), "After all adjustments", s_color), unsafe_allow_html=True)
-    with r4:
-        d_color = GREEN if surplus_delta >= 0 else RED
-        st.markdown(kpi("Impact vs Baseline", usd(surplus_delta), "Change from baseline", d_color), unsafe_allow_html=True)
+    section("Stress Impact")
+    k1, k2, k3, k4 = st.columns(4)
+    with k1:
+        st.markdown(kpi("Stressed Income", usd(stressed_income), f"Change: {usd(income_delta)}", TEAL if income_delta >= 0 else RED), unsafe_allow_html=True)
+    with k2:
+        st.markdown(kpi("Stressed Expenses", usd(stressed_expenses), f"Change: +{usd(expense_delta)}", RED if expense_delta > 0 else GREEN), unsafe_allow_html=True)
+    with k3:
+        surplus_color = GREEN if stressed_surplus >= 150 else (GOLD if stressed_surplus >= 0 else RED)
+        st.markdown(kpi("Stressed Surplus", usd(stressed_surplus), f"Change: {usd(surplus_delta)}", surplus_color), unsafe_allow_html=True)
+    with k4:
+        viability = "✅ Viable" if stressed_surplus >= 0 else "❌ Deficit"
+        v_color = GREEN if stressed_surplus >= 0 else RED
+        st.markdown(kpi("Plan Status", viability, "Under stress", v_color), unsafe_allow_html=True)
 
     # Waterfall chart
-    section("Stress Impact Waterfall")
-    rent_impact = -(rent_stressed - base_rent)
-    food_impact = -(food_stressed - (scenario.living.groceries + scenario.living.utilities))
-    income_impact = stressed_income - base_income
-    emergency_impact = -(emergency_expense / 12)
+    section("Waterfall: Baseline → Stressed")
+    waterfall_labels = ["Baseline Surplus", f"Rent +{rent_shock}%", f"Groceries +{grocery_shock}%", f"Utilities +{utility_shock}%", f"Income -{income_shock}%", "Stressed Surplus"]
+    rent_impact = -(stressed_rent - rent_component)
+    grocery_impact = -(stressed_groceries - grocery_component)
+    utility_impact = -(stressed_utilities - utility_component)
+    income_impact = income_delta
 
-    waterfall_labels = ["Baseline Surplus", "Rent Increase", "Food/Utilities", "Income Reduction", "Emergency", "Stressed Surplus"]
-    waterfall_values = [base_result.monthly_surplus, rent_impact, food_impact, income_impact, emergency_impact, stressed_surplus]
+    waterfall_values = [base_surplus, rent_impact, grocery_impact, utility_impact, income_impact, stressed_surplus]
     waterfall_measures = ["absolute", "relative", "relative", "relative", "relative", "total"]
-    waterfall_colors = [TEAL, RED, RED, RED, RED, GREEN if stressed_surplus >= 0 else RED]
+    waterfall_colors = [TEAL, RED, RED, RED, RED if income_impact < 0 else GREEN, GREEN if stressed_surplus >= 0 else RED]
 
     fig = go.Figure(go.Waterfall(
         name="Stress Impact",
@@ -586,134 +802,183 @@ def page_stress_test():
         measure=waterfall_measures,
         x=waterfall_labels,
         y=waterfall_values,
-        connector={"line": {"color": "rgba(94,114,148,0.3)"}},
-        decreasing={"marker": {"color": RED}},
-        increasing={"marker": {"color": GREEN}},
-        totals={"marker": {"color": TEAL}},
+        connector=dict(line=dict(color="rgba(148,163,184,0.3)", width=1, dash="dot")),
+        decreasing=dict(marker_color=RED),
+        increasing=dict(marker_color=GREEN),
+        totals=dict(marker_color=TEAL),
         text=[usd(v) for v in waterfall_values],
         textposition="outside",
     ))
-    fig.update_layout(title="Surplus Waterfall Under Stress", yaxis_title="USD", **PLOT_LAYOUT)
+    fig.add_hline(y=0, line_color=RED, line_dash="dash", line_width=1.5)
+    fig.update_layout(title="Surplus Waterfall Under Custom Stress", yaxis_title="USD", **PLOT_LAYOUT)
     st.plotly_chart(fig, use_container_width=True)
 
-    # Scenario presets
-    section("Preset Stress Scenarios")
-    preset_col1, preset_col2, preset_col3 = st.columns(3)
+    # Multi-scenario stress comparison
+    if len(saved) > 1:
+        section("Compare All Saved Plans Under Same Stress")
+        all_labels = [r.scenario_label for _, r in saved]
+        all_stressed = []
+        for s, r in saved:
+            if s:
+                rc = s.living.rent
+                gc = s.living.groceries
+                uc = s.living.utilities
+                oe = r.monthly_expenses - rc - gc - uc
+            else:
+                rc = r.monthly_expenses * 0.35
+                gc = r.monthly_expenses * 0.15
+                uc = r.monthly_expenses * 0.08
+                oe = r.monthly_expenses * 0.42
+            sr = rc * (1 + rent_shock / 100)
+            sg = gc * (1 + grocery_shock / 100)
+            su = uc * (1 + utility_shock / 100)
+            si = r.monthly_income * (1 - income_shock / 100)
+            se = sr + sg + su + oe
+            all_stressed.append(si - se)
 
-    scenarios_preset = [
-        ("Stipend Delayed 1 Month", base_result.monthly_surplus - base_income, "Income drops to zero for one month"),
-        ("Rent +15%, Income -10%", base_result.monthly_surplus - (base_rent * 0.15) - (base_income * 0.10), "Moderate housing + income shock"),
-        ("Assistantship Lost", base_result.monthly_surplus - scenario.funding.monthly_stipend, "Stipend removed entirely"),
-    ]
-    for col, (label, val, desc) in zip([preset_col1, preset_col2, preset_col3], scenarios_preset):
-        with col:
-            v_color = GREEN if val >= 0 else RED
-            st.markdown(f"""
-            <div style='background:rgba(10,20,40,0.9);border:1px solid rgba(20,184,166,0.15);
-            border-radius:10px;padding:0.9rem 1.1rem;margin-bottom:0.6rem;'>
-                <div style='font-size:0.78rem;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.3rem;'>{label}</div>
-                <div style='font-size:1.3rem;font-weight:700;color:{v_color};'>{usd(val)}</div>
-                <div style='font-size:0.75rem;color:#475569;margin-top:0.2rem;'>{desc}</div>
-            </div>""", unsafe_allow_html=True)
+        fig3 = go.Figure()
+        fig3.add_trace(go.Bar(
+            name="Baseline",
+            x=all_labels,
+            y=[r.monthly_surplus for _, r in saved],
+            marker_color=TEAL,
+        ))
+        fig3.add_trace(go.Bar(
+            name=f"Stressed (rent+{rent_shock}%, income-{income_shock}%)",
+            x=all_labels,
+            y=all_stressed,
+            marker_color=[GREEN if v >= 0 else RED for v in all_stressed],
+        ))
+        fig3.add_hline(y=0, line_color="#475569", line_dash="dash", line_width=1)
+        fig3.update_layout(barmode="group", title="All Plans: Baseline vs Stressed Surplus", yaxis_title="USD", **PLOT_LAYOUT)
+        st.plotly_chart(fig3, use_container_width=True)
 
     # Advisor note
-    if stressed_surplus < 0:
+    section("Stress Analysis Summary")
+    if stressed_surplus >= 0:
         advisor_box(
-            f"Under your custom stress scenario, the plan becomes cash-negative with a surplus of {usd(stressed_surplus)}. "
-            f"The largest single driver is {'rent pressure' if rent_impact < income_impact else 'income reduction'}. "
-            f"To restore viability, consider reducing rent by at least {usd(abs(stressed_surplus) + 100)} or securing an additional income source."
+            f"Under your custom stress scenario (rent +{rent_shock}%, income -{income_shock}%, food +{grocery_shock}%, utilities +{utility_shock}%), "
+            f"the plan remains viable with a surplus of {usd(stressed_surplus)}. "
+            f"The total expense increase is {usd(expense_delta)} and income reduction is {usd(abs(income_delta))}. "
+            f"The plan has adequate resilience to these shocks."
         )
     else:
         advisor_box(
-            f"Under your custom stress scenario, the plan remains viable with a surplus of {usd(stressed_surplus)}. "
-            f"This represents a {abs(surplus_delta / base_result.monthly_surplus * 100):.0f}% reduction from baseline. "
-            f"The plan has adequate resilience to moderate downside pressure."
+            f"Under your custom stress scenario, the plan goes into deficit at {usd(stressed_surplus)} per month. "
+            f"The combined impact of rent +{rent_shock}%, income -{income_shock}%, food +{grocery_shock}%, and utilities +{utility_shock}% "
+            f"creates a {usd(abs(surplus_delta))} swing from baseline. "
+            f"To restore viability, you would need to either increase income by {usd(abs(stressed_surplus))} or cut expenses by the same amount."
         )
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE: MOVE-IN SHOCK CALCULATOR
 # ─────────────────────────────────────────────────────────────────────────────
-
 def page_movein_shock():
     init_v2_state()
     st.markdown("<div style='font-size:1.55rem;font-weight:700;color:#f8fafc;letter-spacing:0.03em;margin-bottom:0.25rem;'>Move-In Shock Calculator</div>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size:0.88rem;color:#94a3b8;margin-bottom:1.2rem;'>Calculate the total cash you need before arriving. Most students underestimate this by $2,000–$4,000.</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:0.88rem;color:#94a3b8;margin-bottom:1.2rem;'>Calculate your total arrival cost, cash runway, and 6-month projection after move-in.</div>", unsafe_allow_html=True)
 
-    col1, col2 = st.columns([1, 1], gap="large")
+    metros = metro_names()
+    unis = university_names()
 
-    with col1:
-        section("Government & Travel Costs")
-        visa_fee = st.number_input("F-1 Visa application fee ($)", value=185.0, step=10.0)
-        sevis_fee = st.number_input("SEVIS I-901 fee ($)", value=350.0, step=10.0)
-        flight = st.number_input("International flight ($)", value=800.0, step=50.0)
+    col_left, col_right = st.columns([1, 1], gap="large")
 
-        section("Housing Setup")
-        monthly_rent = st.number_input("Monthly rent ($)", value=900.0, step=50.0)
-        deposit_months = st.selectbox("Security deposit (months of rent)", [1, 2], index=0)
-        first_last = st.checkbox("First + last month rent required upfront", value=True)
-        housing_deposit = monthly_rent * deposit_months
-        first_last_amount = monthly_rent * 2 if first_last else monthly_rent
+    with col_left:
+        section("Location")
+        metro_name = st.selectbox("Metro / City", metros, key="movein_metro")
+        metro = get_metro(metro_name)
+        uni_name = st.selectbox("University (optional)", ["— None —"] + unis, key="movein_uni")
+        uni = get_university(uni_name) if uni_name != "— None —" else None
 
-        section("Setup & Supplies")
-        furniture = st.number_input("Furniture & bedding setup ($)", value=800.0, step=50.0)
-        winter_clothing = st.number_input("Winter clothing ($)", value=300.0, step=25.0)
-        phone = st.number_input("Phone setup / SIM ($)", value=150.0, step=10.0)
-        transport_setup = st.number_input("Transport setup (transit card, etc.) ($)", value=100.0, step=10.0)
-        laptop = st.number_input("Laptop / study supplies ($)", value=0.0, step=50.0)
-        misc_arrival = st.number_input("Miscellaneous arrival costs ($)", value=200.0, step=25.0)
+        section("Your Savings")
+        starting_cash = st.number_input("Total cash available before arrival ($)", min_value=0.0, value=8000.0, step=500.0, key="movein_cash")
 
-    with col2:
-        section("Financial Context")
-        starting_cash = st.number_input("Total cash available before arrival ($)", value=8000.0, step=500.0)
-        monthly_income = st.number_input("Expected monthly income after arrival ($)", value=1500.0, step=100.0)
-        monthly_expenses_est = st.number_input("Expected monthly expenses ($)", value=1800.0, step=100.0)
+        section("Monthly Income & Expenses (for runway calc)")
+        monthly_income_est = st.number_input("Expected monthly income ($)", min_value=0.0, value=1800.0, step=100.0, key="movein_income")
+        monthly_expenses_est = st.number_input("Expected monthly expenses ($)", min_value=0.0,
+                                                value=float(metro.rent_shared + metro.groceries + metro.utilities + metro.transport_monthly + metro.internet + metro.misc_basic + metro.discretionary if metro else 1400.0),
+                                                step=50.0, key="movein_expenses")
+        monthly_surplus = monthly_income_est - monthly_expenses_est
 
-        # Calculate totals
-        total_movein = (visa_fee + sevis_fee + flight + housing_deposit +
-                        first_last_amount + furniture + winter_clothing +
-                        phone + transport_setup + laptop + misc_arrival)
-        cash_after = starting_cash - total_movein
-        monthly_surplus = monthly_income - monthly_expenses_est
-        runway = cash_after / monthly_expenses_est if monthly_expenses_est > 0 else 0
-        months_to_stabilize = abs(cash_after / monthly_surplus) if monthly_surplus < 0 and monthly_surplus != 0 else 0
+    with col_right:
+        section("Move-In Cost Items")
+        visa_fee = st.number_input("Visa application fee ($)", min_value=0.0, value=185.0, step=5.0)
+        sevis_fee = st.number_input("SEVIS fee ($)", min_value=0.0, value=350.0, step=5.0)
+        flight = st.number_input("International flight ($)", min_value=0.0, value=900.0, step=50.0)
 
-        section("Results")
-        r1, r2 = st.columns(2)
-        with r1:
-            st.markdown(kpi("Total Move-In Cost", usd(total_movein), "All pre-arrival expenses", GOLD), unsafe_allow_html=True)
-            st.markdown(kpi("Cash After Move-In", usd(cash_after), "Starting balance on arrival", GREEN if cash_after >= 0 else RED), unsafe_allow_html=True)
-        with r2:
-            st.markdown(kpi("Emergency Runway", f"{max(0, runway):.1f} months", "Cash ÷ monthly expenses", GREEN if runway >= 3 else (GOLD if runway >= 2 else RED)), unsafe_allow_html=True)
-            st.markdown(kpi("Monthly Surplus", usd(monthly_surplus), "Income minus expenses", GREEN if monthly_surplus >= 0 else RED), unsafe_allow_html=True)
+        rent_default = float(metro.rent_shared) if metro else 800.0
+        housing_deposit = st.number_input("Housing deposit ($)", min_value=0.0, value=rent_default, step=50.0)
 
-        if cash_after < 0:
-            st.markdown(f"""
-            <div style='background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.4);
-            border-radius:8px;padding:0.8rem 1.2rem;margin:0.5rem 0;color:#f87171;font-size:0.9rem;'>
-                ⚠️ You need <strong>{usd(abs(cash_after))}</strong> more before arriving.
-                Your current savings do not cover move-in costs.
-            </div>""", unsafe_allow_html=True)
-        elif runway < 2:
-            st.markdown(f"""
-            <div style='background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);
-            border-radius:8px;padding:0.8rem 1.2rem;margin:0.5rem 0;color:#fbbf24;font-size:0.9rem;'>
-                ⚠️ Cash runway after move-in is only {runway:.1f} months. Aim for at least 3 months buffer.
-            </div>""", unsafe_allow_html=True)
-        else:
-            st.markdown(f"""
-            <div style='background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);
-            border-radius:8px;padding:0.8rem 1.2rem;margin:0.5rem 0;color:#34d399;font-size:0.9rem;'>
-                ✓ You have sufficient funds for move-in with {runway:.1f} months of runway remaining.
-            </div>""", unsafe_allow_html=True)
+        first_last_months = st.radio("First/last month rent required?", ["First month only", "First + Last month"], horizontal=True)
+        first_last_amount = rent_default if first_last_months == "First month only" else rent_default * 2
+
+        furniture = st.number_input("Furniture & household setup ($)", min_value=0.0, value=800.0, step=50.0)
+        winter_clothing = st.number_input("Winter clothing ($)", min_value=0.0, value=300.0, step=25.0)
+        phone = st.number_input("Phone setup / SIM ($)", min_value=0.0, value=150.0, step=10.0)
+        transport_setup = st.number_input("Local transport setup ($)", min_value=0.0, value=100.0, step=10.0)
+        laptop = st.number_input("Laptop / academic supplies ($)", min_value=0.0, value=0.0, step=50.0)
+        misc_arrival = st.number_input("Miscellaneous arrival costs ($)", min_value=0.0, value=200.0, step=25.0)
+
+    # Totals
+    total_movein = (visa_fee + sevis_fee + flight + housing_deposit +
+                    first_last_amount + furniture + winter_clothing +
+                    phone + transport_setup + laptop + misc_arrival)
+    cash_after = starting_cash - total_movein
+    runway = cash_after / monthly_expenses_est if monthly_expenses_est > 0 else 0
+
+    st.markdown("---")
+    section("Arrival Summary")
+
+    k1, k2, k3, k4 = st.columns(4)
+    with k1:
+        st.markdown(kpi("Total Move-In Cost", usd(total_movein), "All pre-arrival items", GOLD), unsafe_allow_html=True)
+    with k2:
+        cash_color = GREEN if cash_after >= 0 else RED
+        st.markdown(kpi("Cash After Move-In", usd(cash_after), "Starting balance", cash_color), unsafe_allow_html=True)
+    with k3:
+        runway_color = GREEN if runway >= 3 else (GOLD if runway >= 2 else RED)
+        st.markdown(kpi("Emergency Runway", f"{max(0, runway):.1f} months", "Cash ÷ monthly expenses", runway_color), unsafe_allow_html=True)
+    with k4:
+        surplus_color = GREEN if monthly_surplus >= 0 else RED
+        st.markdown(kpi("Monthly Surplus", usd(monthly_surplus), "Income minus expenses", surplus_color), unsafe_allow_html=True)
+
+    if cash_after < 0:
+        st.markdown(f"""
+        <div style='background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.4);
+        border-radius:8px;padding:0.8rem 1.2rem;margin:0.5rem 0;color:#f87171;font-size:0.9rem;'>
+            ⚠️ You need <strong>{usd(abs(cash_after))}</strong> more before arriving.
+            Your current savings do not cover move-in costs.
+        </div>""", unsafe_allow_html=True)
+    elif runway < 2:
+        st.markdown(f"""
+        <div style='background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);
+        border-radius:8px;padding:0.8rem 1.2rem;margin:0.5rem 0;color:#fbbf24;font-size:0.9rem;'>
+            ⚠️ Cash runway after move-in is only {runway:.1f} months. Aim for at least 3 months buffer.
+        </div>""", unsafe_allow_html=True)
+    else:
+        st.markdown(f"""
+        <div style='background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);
+        border-radius:8px;padding:0.8rem 1.2rem;margin:0.5rem 0;color:#34d399;font-size:0.9rem;'>
+            ✓ You have sufficient funds for move-in with {runway:.1f} months of runway remaining.
+        </div>""", unsafe_allow_html=True)
 
     # Breakdown chart
     st.markdown("---")
     section("Move-In Cost Breakdown")
-    breakdown_labels = ["Visa & SEVIS", "Flight", "Housing Deposit", "First/Last Rent", "Furniture", "Clothing", "Phone", "Transport", "Laptop/Supplies", "Misc"]
-    breakdown_values = [visa_fee + sevis_fee, flight, housing_deposit, first_last_amount, furniture, winter_clothing, phone, transport_setup, laptop, misc_arrival]
-    breakdown_values = [v for v in breakdown_values if v > 0]
-    breakdown_labels = [l for l, v in zip(breakdown_labels, [visa_fee + sevis_fee, flight, housing_deposit, first_last_amount, furniture, winter_clothing, phone, transport_setup, laptop, misc_arrival]) if v > 0]
+    breakdown_items = [
+        ("Visa & SEVIS", visa_fee + sevis_fee),
+        ("Flight", flight),
+        ("Housing Deposit", housing_deposit),
+        ("First/Last Rent", first_last_amount),
+        ("Furniture", furniture),
+        ("Clothing", winter_clothing),
+        ("Phone", phone),
+        ("Transport Setup", transport_setup),
+        ("Laptop/Supplies", laptop),
+        ("Misc", misc_arrival),
+    ]
+    breakdown_labels = [l for l, v in breakdown_items if v > 0]
+    breakdown_values = [v for l, v in breakdown_items if v > 0]
 
     fig = go.Figure(go.Pie(
         labels=breakdown_labels,

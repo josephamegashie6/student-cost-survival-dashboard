@@ -1,11 +1,11 @@
 """
-Student Financial Intelligence Dashboard
-=========================================
-A financial analytics platform designed to help students monitor spending behaviour,
-forecast living costs, evaluate affordability pressure, and make data-driven financial decisions.
+CostCompass — Plan. Manage. Thrive.
+=====================================
+Your personal financial guide for studying abroad.
+Track your money, plan your move, and make smarter decisions about where and how you live.
 
 Author : Joseph Amegashie
-Version: 2.0 — Financial Intelligence Edition
+Version: 3.0
 """
 
 import streamlit as st
@@ -20,14 +20,14 @@ import numpy as np
 import sys as _sys
 import os as _os
 _sys.path.insert(0, _os.path.dirname(__file__))
-from v2_pages import page_decision_planner, page_admit_comparison, page_stress_test, page_movein_shock
+from v2_pages import page_decision_planner, page_admit_comparison, page_stress_test, page_movein_shock, render_entry_screen, init_v2_state
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE CONFIG
 # ─────────────────────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Student Financial Intelligence Dashboard",
-    page_icon="📊",
+    page_title="CostCompass — Plan. Manage. Thrive.",
+    page_icon="🧭",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -280,6 +280,12 @@ def financial_health_score(income, expenses, rent, balance):
         "bal_pts": bal_pts, "rent_pts": rent_pts, "sav_pts": sav_pts, "buf_pts": buf_pts,
     }
 
+def score_label(score):
+    if score >= 80: return "Excellent"
+    if score >= 60: return "Good"
+    if score >= 40: return "Risky"
+    return "Critical"
+
 def affordability_score(income, rent, tuition_monthly=0):
     if income <= 0: return 0
     housing_burden = rent / income
@@ -327,21 +333,32 @@ for k, v in _defaults.items():
 with st.sidebar:
     st.markdown("""
     <div style='padding: 0.8rem 0 1rem 0;'>
-        <div style='font-size:1.05rem; font-weight:700; color:#14b8a6; letter-spacing:0.04em;'>
-            📊 SFID
+        <div style='font-size:1.15rem; font-weight:700; color:#f59e0b; letter-spacing:0.04em;'>
+            🧭 CostCompass
         </div>
-        <div style='font-size:0.72rem; color:#475569; margin-top:0.2rem; letter-spacing:0.06em;'>
-            STUDENT FINANCIAL INTELLIGENCE DASHBOARD
+        <div style='font-size:0.70rem; color:#475569; margin-top:0.2rem; letter-spacing:0.06em;'>
+            PLAN. MANAGE. THRIVE.
         </div>
     </div>
     """, unsafe_allow_html=True)
 
+    # ── Handle navigation from entry screen buttons
+    init_v2_state()
+    if st.session_state.get("_nav_target"):
+        _target = st.session_state.pop("_nav_target")
+        # We can't change the selected page directly in option_menu, so we store it
+        # and use it as the default_index
+        _nav_options = ["Home", "My Budget", "Spending Breakdown", "Future Forecast", "What If?", "City Guide", "Decision Planner", "Compare Offers", "Stress Test", "Move-In Planner", "How It Works", "Settings"]
+        _nav_default = _nav_options.index(_target) if _target in _nav_options else 0
+    else:
+        _nav_default = 0
+
     page = option_menu(
         menu_title=None,
-        options=["Overview", "Cash Flow Analysis", "Cost Intelligence", "Forecasting", "Scenario Analysis", "City Analytics", "Decision Planner", "Admit Comparison", "Stress Test", "Move-In Shock", "Case Study"],
-        icons=["speedometer2", "bar-chart-line", "pie-chart", "graph-up-arrow", "sliders", "building", "compass", "bar-chart-steps", "activity", "house", "journal-text"],
+        options=["Home", "My Budget", "Spending Breakdown", "Future Forecast", "What If?", "City Guide", "Decision Planner", "Compare Offers", "Stress Test", "Move-In Planner", "How It Works", "Settings"],
+        icons=["house-heart", "wallet2", "pie-chart", "graph-up-arrow", "sliders", "building", "compass", "bar-chart-steps", "activity", "truck", "info-circle", "gear"],
         menu_icon="cast",
-        default_index=0,
+        default_index=_nav_default,
         styles={
             "container":      {"background-color": "transparent", "padding": "0"},
             "icon":           {"color": "#14b8a6", "font-size": "0.85rem"},
@@ -368,18 +385,63 @@ with st.sidebar:
         <div style='font-size:0.75rem; color:#64748b; margin-top:0.2rem;'>Financial Health: {score}/100</div>
         """, unsafe_allow_html=True)
     else:
-        st.markdown("<div style='font-size:0.78rem; color:#475569;'>Run the Cash Flow Analysis to populate live metrics.</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:0.78rem; color:#475569;'>Go to My Budget to set up your finances.</div>", unsafe_allow_html=True)
 
     st.markdown("<hr class='soft'>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size:0.70rem; color:#334155; text-align:center;'>v3.0 · Decision Intelligence Edition</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:0.70rem; color:#334155; text-align:center;'>CostCompass v3.0</div>", unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE 1: OVERVIEW / EXECUTIVE SUMMARY
 # ─────────────────────────────────────────────────────────────────────────────
-if page == "Overview":
-    st.markdown("<div class='page-title'>Student Financial Intelligence Dashboard</div>", unsafe_allow_html=True)
-    st.markdown("<div class='page-subtitle'>Financial Decision-Support System · Cost Intelligence Analytics · Forecasting & Planning Platform</div>", unsafe_allow_html=True)
+if page == "Home":
+    st.markdown("<div class='page-title'>Welcome to CostCompass</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Your financial guide for studying abroad · Plan. Manage. Thrive.</div>", unsafe_allow_html=True)
+
+    # ── Onboarding flow for first-time users
+    if not st.session_state.get("onboarding_done") and not st.session_state.get("calc_ready"):
+        st.markdown("""
+        <div style='background:linear-gradient(135deg,rgba(20,184,166,0.08) 0%,rgba(245,158,11,0.06) 100%);
+        border:1px solid rgba(245,158,11,0.25);border-radius:16px;padding:1.6rem 2rem;margin-bottom:1.5rem;'>
+            <div style='font-size:1.2rem;font-weight:700;color:#f59e0b;margin-bottom:0.4rem;'>👋 Welcome to CostCompass</div>
+            <div style='font-size:0.92rem;color:#94a3b8;line-height:1.7;'>
+            CostCompass helps you understand the real cost of studying abroad — before you arrive and after.
+            Follow these 3 steps to get your full financial picture:
+            </div>
+        </div>""", unsafe_allow_html=True)
+        ob1, ob2, ob3 = st.columns(3)
+        with ob1:
+            st.markdown("""
+            <div style='background:rgba(10,20,40,0.9);border:1px solid rgba(20,184,166,0.2);
+            border-radius:12px;padding:1.2rem;text-align:center;'>
+                <div style='font-size:2rem;margin-bottom:0.5rem;'>💰</div>
+                <div style='font-size:0.95rem;font-weight:700;color:#14b8a6;margin-bottom:0.3rem;'>Step 1</div>
+                <div style='font-size:0.88rem;font-weight:600;color:#e2e8f0;margin-bottom:0.3rem;'>Enter your income</div>
+                <div style='font-size:0.78rem;color:#64748b;'>Go to <strong style='color:#94a3b8;'>My Budget</strong> and add your stipend, wages, or family support.</div>
+            </div>""", unsafe_allow_html=True)
+        with ob2:
+            st.markdown("""
+            <div style='background:rgba(10,20,40,0.9);border:1px solid rgba(245,158,11,0.2);
+            border-radius:12px;padding:1.2rem;text-align:center;'>
+                <div style='font-size:2rem;margin-bottom:0.5rem;'>🏠</div>
+                <div style='font-size:0.95rem;font-weight:700;color:#f59e0b;margin-bottom:0.3rem;'>Step 2</div>
+                <div style='font-size:0.88rem;font-weight:600;color:#e2e8f0;margin-bottom:0.3rem;'>Add your expenses</div>
+                <div style='font-size:0.78rem;color:#64748b;'>Enter rent, groceries, transport, and other monthly costs.</div>
+            </div>""", unsafe_allow_html=True)
+        with ob3:
+            st.markdown("""
+            <div style='background:rgba(10,20,40,0.9);border:1px solid rgba(16,185,129,0.2);
+            border-radius:12px;padding:1.2rem;text-align:center;'>
+                <div style='font-size:2rem;margin-bottom:0.5rem;'>🧭</div>
+                <div style='font-size:0.95rem;font-weight:700;color:#10b981;margin-bottom:0.3rem;'>Step 3</div>
+                <div style='font-size:0.88rem;font-weight:600;color:#e2e8f0;margin-bottom:0.3rem;'>Get your plan</div>
+                <div style='font-size:0.78rem;color:#64748b;'>Use <strong style='color:#94a3b8;'>Decision Planner</strong> to check if your city and school are affordable.</div>
+            </div>""", unsafe_allow_html=True)
+        if st.button("Got it — let's start →", key="onboarding_dismiss", type="primary"):
+            st.session_state["onboarding_done"] = True
+            st.session_state["_nav_target"] = "My Budget"
+            st.rerun()
+        st.markdown("<hr class='soft'>", unsafe_allow_html=True)
 
     # KPI row
     if st.session_state["calc_ready"]:
@@ -422,36 +484,23 @@ if page == "Overview":
 
         # Behavioral alerts
         st.markdown("<hr class='soft'>", unsafe_allow_html=True)
-        st.markdown("<div class='section-header'>Behavioral Finance Alerts</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header'>Your Financial Alerts</div>", unsafe_allow_html=True)
         alerts = []
-        if rr > 0.40: alerts.append(("Rent Shock Risk: Housing cost exceeds 40% of monthly inflows — critical affordability threshold breached.", "danger"))
-        if bal < 0:   alerts.append(("Cashflow Deficit: Monthly outflows exceed inflows — negative net liquidity position.", "danger"))
-        if sr < 0.05: alerts.append(("Savings Erosion: Cash reserve position below 5% — insufficient buffer accumulation.", "warn"))
-        if bm < 1:    alerts.append(("Liquidity Risk: Emergency fund coverage below 1 month — high financial vulnerability.", "warn"))
+        if rr > 0.40: alerts.append(("Rent Warning: Your rent is over 40% of your income. This is a high-risk level — consider a cheaper option or a roommate.", "danger"))
+        if bal < 0:   alerts.append(("Spending More Than You Earn: Your expenses are higher than your income this month. You need to cut costs or find more income.", "danger"))
+        if sr < 0.05: alerts.append(("Low Savings Rate: You are saving less than 5% of your income. Try to build a small buffer each month.", "warn"))
+        if bm < 1:    alerts.append(("No Emergency Buffer: Your savings would not cover even one month of expenses if your income stopped. Try to build at least 1 month of reserves.", "warn"))
         disc = st.session_state.get("discretionary", 0)
-        if inc > 0 and disc / inc > 0.15: alerts.append(("Discretionary Spending Alert: Discretionary outflows exceed 15% of inflows — review non-essential expenditure.", "warn"))
+        if inc > 0 and disc / inc > 0.15: alerts.append(("High Discretionary Spending: More than 15% of your income is going to non-essential spending. Review your social and entertainment budget.", "warn"))
         if not alerts:
-            st.markdown(alert_html("No critical alerts. Financial position within acceptable parameters.", "ok"), unsafe_allow_html=True)
+            st.markdown(alert_html("You are in good shape. No major financial concerns right now.", "ok"), unsafe_allow_html=True)
         else:
             for msg, lvl in alerts:
                 st.markdown(alert_html(msg, lvl), unsafe_allow_html=True)
-    else:
-        st.markdown("""
-        <div class='glass-card'>
-            <div class='section-header'>Platform Overview</div>
-            <p style='color:#94a3b8; font-size:0.9rem; line-height:1.7;'>
-            This financial intelligence platform combines <strong style='color:#14b8a6;'>spending analytics</strong>,
-            <strong style='color:#f59e0b;'>affordability monitoring</strong>, and
-            <strong style='color:#10b981;'>forecasting models</strong> to support data-driven financial planning decisions.
-            Navigate to <strong>Cash Flow Analysis</strong> to input your financial parameters and activate all dashboard modules.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-
-    # Workflow diagram
-    st.markdown("<div class='section-header'>Analytical Workflow</div>", unsafe_allow_html=True)
+    # Workflow diagramm
+    st.markdown("<div class='section-header'>How CostCompass Works</div>", unsafe_allow_html=True)
     wf_cols = st.columns([1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1])
-    steps = ["Income Inputs", "Expense Categorisation", "Cash Flow Analysis", "Forecast Modelling", "Risk & Affordability Analysis", "Financial Planning Insights"]
+    steps = ["Enter Your Income", "Add Your Expenses", "See Your Budget", "Forecast Your Future", "Check Your Risk", "Make Better Decisions"]
     for i, step in enumerate(steps):
         with wf_cols[i * 2]:
             st.markdown(f"<div class='workflow-step'>{step}</div>", unsafe_allow_html=True)
@@ -459,15 +508,17 @@ if page == "Overview":
             with wf_cols[i * 2 + 1]:
                 st.markdown("<div class='workflow-arrow'>→</div>", unsafe_allow_html=True)
 
-    st.markdown("<div class='disclaimer'>Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.</div>", unsafe_allow_html=True)
+    
+    # ── Entry screen: 4-path decision flow
+    render_entry_screen()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE 2: CASH FLOW ANALYSIS
 # ─────────────────────────────────────────────────────────────────────────────
-elif page == "Cash Flow Analysis":
-    st.markdown("<div class='page-title'>Cash Flow Analysis</div>", unsafe_allow_html=True)
-    st.markdown("<div class='page-subtitle'>Monthly inflows vs outflows · Fixed vs variable expense decomposition · Net liquidity position</div>", unsafe_allow_html=True)
+elif page == "My Budget":
+    st.markdown("<div class='page-title'>My Budget</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>See exactly where your money comes from and where it goes each month.</div>", unsafe_allow_html=True)
 
     with st.form("cashflow_form"):
         st.markdown("<div class='section-header'>Income Parameters</div>", unsafe_allow_html=True)
@@ -482,7 +533,7 @@ elif page == "Cash Flow Analysis":
             stipend = st.number_input("Monthly stipend / support ($)", min_value=0.0, value=1500.0, step=50.0)
             tuition_monthly = st.number_input("Monthly tuition allocation ($)", min_value=0.0, value=0.0, step=50.0, help="Tuition amortised monthly for affordability analysis")
 
-        st.markdown("<div class='section-header' style='margin-top:1rem;'>Expense Parameters</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header' style='margin-top:1rem;'>Your Monthly Expenses</div>", unsafe_allow_html=True)
         preset = CITY_EXPENSE_PRESETS.get(city, CITY_EXPENSE_PRESETS["Saint Louis"])
         use_preset = st.checkbox("Populate with city benchmark values")
 
@@ -549,7 +600,7 @@ elif page == "Cash Flow Analysis":
         variable_expenses = food + transport + misc_basic + discretionary
 
         st.markdown("<hr class='soft'>", unsafe_allow_html=True)
-        st.markdown("<div class='section-header'>Monthly Cash Flow Summary</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header'>Monthly Summary</div>", unsafe_allow_html=True)
 
         k1, k2, k3, k4 = st.columns(4)
         with k1: st.metric("Total Monthly Inflows",  usd(total_income))
@@ -559,7 +610,7 @@ elif page == "Cash Flow Analysis":
             st.metric("Projected Net Liquidity", usd(balance), delta=f"{'Surplus' if balance >= 0 else 'Deficit'}")
         with k4: st.metric("Financial Stability Indicator", f"{score}/100")
 
-        st.markdown("<div class='section-header' style='margin-top:1rem;'>Fixed vs Variable Expense Decomposition</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header' style='margin-top:1rem;'>Fixed vs Flexible Spending</div>", unsafe_allow_html=True)
 
         ch1, ch2 = st.columns(2)
         with ch1:
@@ -587,7 +638,7 @@ elif page == "Cash Flow Analysis":
             st.plotly_chart(fig2, use_container_width=True)
 
         # Savings trajectory
-        st.markdown("<div class='section-header'>Savings Trajectory (12-Month Projection)</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header'>Your Savings Over the Next 12 Months</div>", unsafe_allow_html=True)
         months_proj = list(range(1, 13))
         cumulative_savings = [max(0, balance) * m for m in months_proj]
         fig3 = go.Figure()
@@ -600,15 +651,15 @@ elif page == "Cash Flow Analysis":
                            xaxis_title="Month", yaxis_title="Cumulative Balance (USD)", **PLOT_LAYOUT)
         st.plotly_chart(fig3, use_container_width=True)
 
-        st.markdown("<div class='disclaimer'>Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.</div>", unsafe_allow_html=True)
+        
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE 3: COST INTELLIGENCE
 # ─────────────────────────────────────────────────────────────────────────────
-elif page == "Cost Intelligence":
-    st.markdown("<div class='page-title'>Cost Intelligence Analytics</div>", unsafe_allow_html=True)
-    st.markdown("<div class='page-subtitle'>Cost burden analysis · Affordability pressure indicators · Spending pattern anomalies</div>", unsafe_allow_html=True)
+elif page == "Spending Breakdown":
+    st.markdown("<div class='page-title'>Spending Breakdown</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Understand how your spending compares to safe limits — and where the pressure is building.</div>", unsafe_allow_html=True)
 
     if not st.session_state["calc_ready"]:
         st.info("Run Cash Flow Analysis first to activate cost intelligence modules.")
@@ -627,7 +678,7 @@ elif page == "Cost Intelligence":
     bal  = st.session_state["balance"]
 
     # Cost burden ratios
-    st.markdown("<div class='section-header'>Cost Burden Analysis</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Where Your Money Is Going</div>", unsafe_allow_html=True)
     burden_data = [
         ("Rent Burden Ratio",          rent / inc if inc > 0 else 0,       0.30, 0.40, "Housing cost as % of inflows"),
         ("Tuition Pressure Indicator", tuition_monthly / inc if inc > 0 else 0, 0.20, 0.35, "Tuition allocation as % of inflows"),
@@ -657,7 +708,7 @@ elif page == "Cost Intelligence":
             """, unsafe_allow_html=True)
 
     # Financial health indicators
-    st.markdown("<div class='section-header'>Financial Health Indicators</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Your Financial Health</div>", unsafe_allow_html=True)
     score = st.session_state["health_score"]
     rr    = st.session_state["rent_ratio"]
     sr    = st.session_state["savings_rate"]
@@ -672,7 +723,7 @@ elif page == "Cost Intelligence":
     with h4: st.metric("Discretionary Ratio",     pct(discretionary / inc if inc > 0 else 0), help="Non-essential spending as % of inflows")
 
     # Spending anomaly detection
-    st.markdown("<div class='section-header'>Spending Pattern Anomaly Detection</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Spending Warnings</div>", unsafe_allow_html=True)
     hist = pd.DataFrame(st.session_state["calc_history"])
     if len(hist) >= 3:
         hist["balance"] = pd.to_numeric(hist["balance"], errors="coerce")
@@ -699,15 +750,15 @@ elif page == "Cost Intelligence":
     else:
         st.info("Run Cash Flow Analysis at least 3 times to activate anomaly detection and trend tracking.")
 
-    st.markdown("<div class='disclaimer'>Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.</div>", unsafe_allow_html=True)
+    
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE 4: FORECASTING
 # ─────────────────────────────────────────────────────────────────────────────
-elif page == "Forecasting":
-    st.markdown("<div class='page-title'>Financial Forecasting Engine</div>", unsafe_allow_html=True)
-    st.markdown("<div class='page-subtitle'>Projected monthly balance · Inflation-adjusted spending forecast · Semester affordability projection</div>", unsafe_allow_html=True)
+elif page == "Future Forecast":
+    st.markdown("<div class='page-title'>Future Forecast</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>See how your finances will look 6 to 12 months from now — including inflation.</div>", unsafe_allow_html=True)
 
     if not st.session_state["calc_ready"]:
         st.info("Run Cash Flow Analysis first to activate forecasting modules.")
@@ -773,15 +824,15 @@ elif page == "Forecasting":
     else:
         st.markdown(alert_html(f"Positive liquidity maintained throughout the {forecast_months}-month forecast horizon. Projected end balance: {usd(final_bal)}.", "ok"), unsafe_allow_html=True)
 
-    st.markdown("<div class='disclaimer'>Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.</div>", unsafe_allow_html=True)
+    
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE 5: SCENARIO ANALYSIS
 # ─────────────────────────────────────────────────────────────────────────────
-elif page == "Scenario Analysis":
-    st.markdown("<div class='page-title'>Scenario Analysis Engine</div>", unsafe_allow_html=True)
-    st.markdown("<div class='page-subtitle'>Rent increase simulation · Tuition pressure · Reduced income · Spending reduction modelling</div>", unsafe_allow_html=True)
+elif page == "What If?":
+    st.markdown("<div class='page-title'>What If?</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Test how rent increases, income cuts, or extra costs would affect your plan.</div>", unsafe_allow_html=True)
 
     if not st.session_state["calc_ready"]:
         st.info("Run Cash Flow Analysis first to activate scenario modelling.")
@@ -792,7 +843,7 @@ elif page == "Scenario Analysis":
     base_bal  = st.session_state["balance"]
     base_rent = st.session_state["rent"]
 
-    st.markdown("<div class='section-header'>Scenario Parameters</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Set Your Scenario</div>", unsafe_allow_html=True)
     s1, s2 = st.columns(2)
     with s1:
         rent_increase_pct = st.slider("Rent increase (%)",          0, 50, 0, 5)
@@ -808,7 +859,7 @@ elif page == "Scenario Analysis":
     scen_bal  = scen_inc - scen_exp
     delta_bal = scen_bal - base_bal
 
-    st.markdown("<div class='section-header'>Scenario vs Baseline Comparison</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>How This Scenario Changes Your Plan</div>", unsafe_allow_html=True)
     c1, c2, c3, c4 = st.columns(4)
     with c1: st.metric("Baseline Net Liquidity",  usd(base_bal))
     with c2: st.metric("Scenario Net Liquidity",  usd(scen_bal), delta=usd(delta_bal))
@@ -839,7 +890,7 @@ elif page == "Scenario Analysis":
     st.plotly_chart(fig, use_container_width=True)
 
     # Scenario risk assessment
-    st.markdown("<div class='section-header'>Scenario Risk Assessment</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Risk Assessment</div>", unsafe_allow_html=True)
     scen_score, scen_bd = financial_health_score(scen_inc, scen_exp, scen_rent, scen_bal)
     scen_rr = scen_bd.get("rent_ratio", 0)
     scen_sr = scen_bd.get("savings_rate", 0)
@@ -859,7 +910,7 @@ elif page == "Scenario Analysis":
         st.markdown(alert_html("Scenario remains financially viable. Net liquidity is positive and within acceptable parameters.", "ok"), unsafe_allow_html=True)
 
     # Recurring expense monitoring
-    st.markdown("<div class='section-header'>Recurring Expense Monitoring</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Recurring Expenses</div>", unsafe_allow_html=True)
     recurring = {
         "Rent": st.session_state["rent"],
         "Utilities": st.session_state["utilities"],
@@ -884,15 +935,15 @@ elif page == "Scenario Analysis":
         for k, v in variable.items():
             st.markdown(f"- {k}: **{usd(v)}** ({pct(v / base_inc if base_inc > 0 else 0)})")
 
-    st.markdown("<div class='disclaimer'>Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.</div>", unsafe_allow_html=True)
+    
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE 6: CITY ANALYTICS
 # ─────────────────────────────────────────────────────────────────────────────
-elif page == "City Analytics":
-    st.markdown("<div class='page-title'>City Cost Analytics</div>", unsafe_allow_html=True)
-    st.markdown("<div class='page-subtitle'>Multi-city cost-of-living comparison · Semester-phase analysis · Inflation-adjusted spending trends</div>", unsafe_allow_html=True)
+elif page == "City Guide":
+    st.markdown("<div class='page-title'>City Guide</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Compare the real cost of living across cities — rent, food, transport, and more.</div>", unsafe_allow_html=True)
 
     data = safe_csv("data/student_costs.csv")
     if data is None:
@@ -929,7 +980,7 @@ elif page == "City Analytics":
         st.stop()
 
     # Summary KPIs per city
-    st.markdown("<div class='section-header'>City Performance Summary</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>City Comparison Summary</div>", unsafe_allow_html=True)
     summary = df.groupby("city").agg(
         Avg_Inflows=("total_income", "mean"),
         Avg_Outflows=("total_expenses", "mean"),
@@ -948,7 +999,7 @@ elif page == "City Analytics":
             cc5.metric("Worst Month Balance",  usd(row["Min_Balance"]))
 
     # Balance trend
-    st.markdown("<div class='section-header'>Monthly Net Liquidity Trend</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Monthly Net Position by City</div>", unsafe_allow_html=True)
     fig = px.line(df, x="month", y="balance", color="city",
                   color_discrete_map={"Saint Louis": COLORS["teal"], "Chicago": COLORS["gold"], "New York City": COLORS["red"]},
                   markers=True, title="Monthly Net Liquidity by City")
@@ -978,7 +1029,7 @@ elif page == "City Analytics":
 
     # Semester phase analysis
     if "semester_phase" in df.columns:
-        st.markdown("<div class='section-header'>Semester-Phase Financial Analysis</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header'>Semester-by-Semester Breakdown</div>", unsafe_allow_html=True)
         phase_summary = df.groupby(["city", "semester_phase"]).agg(
             Avg_Balance=("balance", "mean"),
             Avg_Outflows=("total_expenses", "mean"),
@@ -990,7 +1041,7 @@ elif page == "City Analytics":
         fig4.update_layout(xaxis_title="Phase", yaxis_title="Avg Net Liquidity (USD)", **PLOT_LAYOUT)
         st.plotly_chart(fig4, use_container_width=True)
 
-    st.markdown("<div class='disclaimer'>Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.</div>", unsafe_allow_html=True)
+    
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -998,19 +1049,19 @@ elif page == "City Analytics":
 # ─────────────────────────────────────────────────────────────────────────────
 elif page == "Decision Planner":
     page_decision_planner()
-elif page == "Admit Comparison":
+elif page == "Compare Offers":
     page_admit_comparison()
 elif page == "Stress Test":
     page_stress_test()
-elif page == "Move-In Shock":
+elif page == "Move-In Planner":
     page_movein_shock()
-elif page == "Case Study":
-    st.markdown("<div class='page-title'>Portfolio Case Study</div>", unsafe_allow_html=True)
-    st.markdown("<div class='page-subtitle'>Student Financial Intelligence Dashboard · Financial Analyst Portfolio · Joseph Amegashie</div>", unsafe_allow_html=True)
+elif page == "How It Works":
+    st.markdown("<div class='page-title'>How CostCompass Works</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>A quick guide to getting the most out of every feature.</div>", unsafe_allow_html=True)
 
     st.markdown("""
     <div class='glass-card'>
-        <div class='section-header'>Problem Statement</div>
+        <div class='section-header'>What CostCompass Does</div>
         <p style='color:#94a3b8; font-size:0.9rem; line-height:1.75;'>
         Students navigating academic and living expenses face compounding financial pressures — rising housing costs,
         tuition obligations, variable income streams, and limited financial planning infrastructure. Without structured
@@ -1023,7 +1074,7 @@ elif page == "Case Study":
 
     st.markdown("""
     <div class='glass-card'>
-        <div class='section-header'>Solution</div>
+        <div class='section-header'>How It Helps You</div>
         <p style='color:#94a3b8; font-size:0.9rem; line-height:1.75;'>
         Developed a <strong style='color:#14b8a6;'>financial intelligence platform</strong> combining spending analytics,
         affordability monitoring, inflation-adjusted forecasting, and scenario simulation. The system transforms raw
@@ -1070,10 +1121,10 @@ elif page == "Case Study":
 
     st.markdown("""
     <div class='glass-card' style='margin-top:1rem;'>
-        <div class='section-header'>Analytical Workflow</div>
+        <div class='section-header'>How CostCompass Works</div>
     """, unsafe_allow_html=True)
     wf2 = st.columns([1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1])
-    steps2 = ["Income Inputs", "Expense Categorisation", "Cash Flow Analysis", "Forecast Modelling", "Risk & Affordability Analysis", "Financial Planning Insights"]
+    steps2 = ["Enter Your Income", "Add Your Expenses", "See Your Budget", "Forecast Your Future", "Check Your Risk", "Make Better Decisions"]
     for i, step in enumerate(steps2):
         with wf2[i * 2]:
             st.markdown(f"<div class='workflow-step'>{step}</div>", unsafe_allow_html=True)
@@ -1082,14 +1133,86 @@ elif page == "Case Study":
                 st.markdown("<div class='workflow-arrow'>→</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("<div class='disclaimer'>Public presentation adapted from a simulated financial planning and cost intelligence workflow for portfolio demonstration purposes.</div>", unsafe_allow_html=True)
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE: SETTINGS
+# ─────────────────────────────────────────────────────────────────────────────
+elif page == "Settings":
+    st.markdown("<div class='page-title'>Settings</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Personalise CostCompass to match your situation.</div>", unsafe_allow_html=True)
+
+    with st.form("settings_form"):
+        st.markdown("<div class='section-header'>Your Profile</div>", unsafe_allow_html=True)
+        c1, c2 = st.columns(2)
+        with c1:
+            home_country = st.selectbox(
+                "Home country",
+                ["Ghana", "Nigeria", "Kenya", "India", "China", "Pakistan", "Bangladesh", "Ethiopia", "South Africa", "Other"],
+                index=["Ghana", "Nigeria", "Kenya", "India", "China", "Pakistan", "Bangladesh", "Ethiopia", "South Africa", "Other"].index(
+                    st.session_state.get("settings_home_country", "Ghana")
+                )
+            )
+        with c2:
+            default_city = st.selectbox(
+                "Default city",
+                ["St. Louis, MO", "Chicago, IL", "New York, NY", "Boston, MA", "Houston, TX", "Atlanta, GA", "Los Angeles, CA", "Seattle, WA", "Austin, TX", "Other"],
+                index=0
+            )
+
+        st.markdown("<div class='section-header' style='margin-top:1rem;'>Currency & FX</div>", unsafe_allow_html=True)
+        c3, c4 = st.columns(2)
+        with c3:
+            home_currency = st.selectbox(
+                "Home currency",
+                ["GHS (Ghana Cedi)", "NGN (Nigerian Naira)", "KES (Kenyan Shilling)", "INR (Indian Rupee)", "CNY (Chinese Yuan)", "PKR (Pakistani Rupee)", "USD (US Dollar)", "Other"],
+                index=["GHS (Ghana Cedi)", "NGN (Nigerian Naira)", "KES (Kenyan Shilling)", "INR (Indian Rupee)", "CNY (Chinese Yuan)", "PKR (Pakistani Rupee)", "USD (US Dollar)", "Other"].index(
+                    st.session_state.get("settings_home_currency", "GHS (Ghana Cedi)")
+                )
+            )
+        with c4:
+            fx_rate = st.number_input(
+                "Exchange rate (1 home unit = ? USD)",
+                min_value=0.0001, max_value=100.0,
+                value=float(st.session_state.get("settings_fx_rate", 0.067)),
+                step=0.001, format="%.4f"
+            )
+
+        st.markdown("<div class='section-header' style='margin-top:1rem;'>Display</div>", unsafe_allow_html=True)
+        c5, c6 = st.columns(2)
+        with c5:
+            show_tips = st.toggle("Show financial tips on dashboard", value=st.session_state.get("settings_show_tips", True))
+        with c6:
+            compact_mode = st.toggle("Compact mode (fewer charts)", value=st.session_state.get("settings_compact", False))
+
+        st.markdown("<div class='section-header' style='margin-top:1rem;'>Data</div>", unsafe_allow_html=True)
+        reset_confirm = st.checkbox("I want to reset all my saved data")
+
+        saved = st.form_submit_button("Save Settings", use_container_width=True)
+
+    if saved:
+        st.session_state["settings_home_country"] = home_country
+        st.session_state["settings_default_city"] = default_city
+        st.session_state["settings_home_currency"] = home_currency
+        st.session_state["settings_fx_rate"] = fx_rate
+        st.session_state["settings_show_tips"] = show_tips
+        st.session_state["settings_compact"] = compact_mode
+        if reset_confirm:
+            keys_to_keep = {k for k in st.session_state if k.startswith("settings_")}
+            for k in list(st.session_state.keys()):
+                if k not in keys_to_keep:
+                    del st.session_state[k]
+            st.success("All data has been reset. Your settings have been saved.")
+        else:
+            st.success("Settings saved.")
+
+    st.markdown("<hr class='soft'>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='font-size:0.78rem; color:#475569; text-align:center; padding:1rem 0;'>
+        CostCompass v3.0 &nbsp;·&nbsp; Built by Joseph Amegashie &nbsp;·&nbsp;
+        <a href='mailto:amegashie@wustl.edu' style='color:#f59e0b; text-decoration:none;'>amegashie@wustl.edu</a>
+    </div>
+    """, unsafe_allow_html=True)
+
+    
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# SCORE LABEL (used in Overview)
-# ─────────────────────────────────────────────────────────────────────────────
-def score_label(score):
-    if score >= 80: return "Excellent"
-    if score >= 60: return "Good"
-    if score >= 40: return "Risky"
-    return "Critical"
+
