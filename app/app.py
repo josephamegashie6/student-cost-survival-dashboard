@@ -1215,7 +1215,7 @@ elif page == "City Guide":
             rows.append({
                 "City": city_name,
                 "Rent (Shared)": m.rent_shared,
-                "Rent (Private)": m.rent_private,
+                "Rent (1BR)": m.rent_1br,
                 "Groceries": m.groceries,
                 "Utilities": m.utilities,
                 "Transport": m.transport_monthly,
@@ -1223,8 +1223,8 @@ elif page == "City Guide":
                 "Misc Essentials": m.misc_basic,
                 "Discretionary": m.discretionary,
                 "Total Monthly": total_monthly,
-                "Cost Index": m.cost_index,
-                "Avg Stipend": m.avg_grad_stipend,
+                "Cost Tier": m.cost_tier,
+                "Transit Score": m.transit_score,
                 "State/Region": m.state,
             })
     if not rows:
@@ -1236,21 +1236,22 @@ elif page == "City Guide":
     # ── KPI summary cards
     st.markdown("<div class='section-header'>Cost of Living Snapshot</div>", unsafe_allow_html=True)
     for _, row in cg_df.iterrows():
-        with st.expander(f"📍 {row['City']} — {row['State/Region']}", expanded=len(sel_cities) <= 3):
+        with st.expander(f"📍 {row['City']} — {row['State/Region']} ({row['Cost Tier']})", expanded=len(sel_cities) <= 3):
             c1, c2, c3, c4, c5 = st.columns(5)
             c1.metric("Monthly Total", usd(row["Total Monthly"]))
             c2.metric("Rent (Shared)", usd(row["Rent (Shared)"]))
-            c3.metric("Groceries", usd(row["Groceries"]))
-            c4.metric("Avg Stipend", usd(row["Avg Stipend"]))
-            surplus = row["Avg Stipend"] - row["Total Monthly"]
-            c5.metric("Stipend Surplus", usd(surplus), delta=f"{'+' if surplus >= 0 else ''}{usd(surplus)}")
+            c3.metric("Rent (1BR)", usd(row["Rent (1BR)"]))
+            c4.metric("Groceries", usd(row["Groceries"]))
+            c5.metric("Transit Score", f"{row['Transit Score']}/10")
 
     # ── Total monthly cost comparison bar chart
     st.markdown("<div class='section-header'>Monthly Cost Comparison</div>", unsafe_allow_html=True)
+    cost_tier_order = {"Very Low": 1, "Low": 2, "Medium": 3, "High": 4, "Very High": 5}
+    cg_df["Cost Tier Num"] = cg_df["Cost Tier"].map(cost_tier_order).fillna(3)
     fig_total = px.bar(
         cg_df.sort_values("Total Monthly"),
         x="City", y="Total Monthly",
-        color="Cost Index",
+        color="Cost Tier Num",
         color_continuous_scale=[[0, COLORS["teal"]], [0.5, COLORS["gold"]], [1, COLORS["red"]]],
         title="Estimated Total Monthly Cost (Shared Rent)",
         text="Total Monthly",
@@ -1262,6 +1263,8 @@ elif page == "City Guide":
     # ── Expense breakdown stacked bar
     st.markdown("<div class='section-header'>Expense Breakdown by Category</div>", unsafe_allow_html=True)
     breakdown_cols = ["Rent (Shared)", "Groceries", "Utilities", "Transport", "Internet", "Misc Essentials", "Discretionary"]
+    # ensure all breakdown cols exist
+    breakdown_cols = [c for c in breakdown_cols if c in cg_df.columns]
     melted = cg_df[["City"] + breakdown_cols].melt(id_vars="City", var_name="Category", value_name="Amount")
     fig_breakdown = px.bar(
         melted, x="City", y="Amount", color="Category", barmode="stack",
@@ -1274,39 +1277,33 @@ elif page == "City Guide":
     # ── Rent burden analysis
     ch1, ch2 = st.columns(2)
     with ch1:
-        st.markdown("<div class='section-header'>Rent Burden (% of Avg Stipend)</div>", unsafe_allow_html=True)
-        cg_df["Rent Burden %"] = (cg_df["Rent (Shared)"] / cg_df["Avg Stipend"].replace(0, 1)) * 100
-        fig_rb = px.bar(
-            cg_df.sort_values("Rent Burden %"),
-            x="City", y="Rent Burden %",
-            color="Rent Burden %",
-            color_continuous_scale=[[0, COLORS["teal"]], [0.3, COLORS["gold"]], [0.5, COLORS["red"]]],
-            title="Rent as % of Average Grad Stipend",
+        st.markdown("<div class='section-header'>Shared Rent vs. 1BR Rent</div>", unsafe_allow_html=True)
+        rent_compare = cg_df[["City", "Rent (Shared)", "Rent (1BR)"]].melt(id_vars="City", var_name="Type", value_name="Rent")
+        fig_rc = px.bar(
+            rent_compare.sort_values("Rent"),
+            x="City", y="Rent", color="Type", barmode="group",
+            title="Shared vs. 1BR Monthly Rent by City",
+            color_discrete_map={"Rent (Shared)": COLORS["teal"], "Rent (1BR)": COLORS["gold"]},
         )
-        fig_rb.add_hline(y=30, line_dash="dot", line_color=COLORS["green"], annotation_text="30% Healthy")
-        fig_rb.add_hline(y=40, line_dash="dot", line_color=COLORS["red"],   annotation_text="40% Critical")
-        fig_rb.update_layout(**PLOT_LAYOUT)
-        st.plotly_chart(fig_rb, use_container_width=True)
+        fig_rc.update_layout(**PLOT_LAYOUT)
+        st.plotly_chart(fig_rc, use_container_width=True)
     with ch2:
-        st.markdown("<div class='section-header'>Stipend vs. Total Monthly Cost</div>", unsafe_allow_html=True)
-        fig_sv = px.scatter(
-            cg_df, x="Total Monthly", y="Avg Stipend", text="City",
-            color="Cost Index",
-            color_continuous_scale=[[0, COLORS["teal"]], [0.5, COLORS["gold"]], [1, COLORS["red"]]],
-            title="Stipend vs. Monthly Cost (above diagonal = surplus)",
-            size_max=18,
+        st.markdown("<div class='section-header'>Transit Score by City</div>", unsafe_allow_html=True)
+        fig_ts = px.bar(
+            cg_df.sort_values("Transit Score", ascending=False),
+            x="City", y="Transit Score",
+            color="Transit Score",
+            color_continuous_scale=[[0, COLORS["red"]], [0.5, COLORS["gold"]], [1, COLORS["teal"]]],
+            title="Public Transit Score (10 = best)",
         )
-        max_val = max(cg_df["Total Monthly"].max(), cg_df["Avg Stipend"].max()) * 1.1
-        fig_sv.add_shape(type="line", x0=0, y0=0, x1=max_val, y1=max_val,
-                         line=dict(color=COLORS["slate"], dash="dash"))
-        fig_sv.update_traces(textposition="top center")
-        fig_sv.update_layout(**PLOT_LAYOUT)
-        st.plotly_chart(fig_sv, use_container_width=True)
+        fig_ts.add_hline(y=7, line_dash="dot", line_color=COLORS["green"], annotation_text="Good Transit")
+        fig_ts.update_layout(**PLOT_LAYOUT)
+        st.plotly_chart(fig_ts, use_container_width=True)
 
     # ── Full data table
     st.markdown("<div class='section-header'>Full Benchmark Table</div>", unsafe_allow_html=True)
-    display_df = cg_df[["City", "State/Region", "Rent (Shared)", "Rent (Private)", "Groceries", "Utilities", "Transport", "Total Monthly", "Avg Stipend", "Cost Index"]].copy()
-    for col in ["Rent (Shared)", "Rent (Private)", "Groceries", "Utilities", "Transport", "Total Monthly", "Avg Stipend"]:
+    display_df = cg_df[["City", "State/Region", "Cost Tier", "Rent (Shared)", "Rent (1BR)", "Groceries", "Utilities", "Transport", "Total Monthly", "Transit Score"]].copy()
+    for col in ["Rent (Shared)", "Rent (1BR)", "Groceries", "Utilities", "Transport", "Total Monthly"]:
         display_df[col] = display_df[col].apply(lambda x: f"${x:,.0f}")
     st.dataframe(display_df, use_container_width=True, hide_index=True)
 
