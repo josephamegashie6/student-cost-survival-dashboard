@@ -17,6 +17,10 @@ from streamlit_option_menu import option_menu
 from datetime import date, timedelta, datetime
 import math
 import numpy as np
+import sys as _sys
+import os as _os
+_sys.path.insert(0, _os.path.dirname(__file__))
+from v2_pages import page_decision_planner, page_admit_comparison, page_stress_test, page_movein_shock
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE CONFIG
@@ -334,8 +338,8 @@ with st.sidebar:
 
     page = option_menu(
         menu_title=None,
-        options=["Overview", "Cash Flow Analysis", "Cost Intelligence", "Forecasting", "Scenario Analysis", "City Analytics", "Case Study"],
-        icons=["speedometer2", "bar-chart-line", "pie-chart", "graph-up-arrow", "sliders", "building", "journal-text"],
+        options=["Overview", "Cash Flow Analysis", "Cost Intelligence", "Forecasting", "Scenario Analysis", "City Analytics", "Decision Planner", "Admit Comparison", "Stress Test", "Move-In Shock", "Case Study"],
+        icons=["speedometer2", "bar-chart-line", "pie-chart", "graph-up-arrow", "sliders", "building", "compass", "bar-chart-steps", "activity", "house", "journal-text"],
         menu_icon="cast",
         default_index=0,
         styles={
@@ -367,7 +371,7 @@ with st.sidebar:
         st.markdown("<div style='font-size:0.78rem; color:#475569;'>Run the Cash Flow Analysis to populate live metrics.</div>", unsafe_allow_html=True)
 
     st.markdown("<hr class='soft'>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size:0.70rem; color:#334155; text-align:center;'>v2.0 · Financial Intelligence Edition</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:0.70rem; color:#334155; text-align:center;'>v3.0 · Decision Intelligence Edition</div>", unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -992,6 +996,14 @@ elif page == "City Analytics":
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE 7: CASE STUDY
 # ─────────────────────────────────────────────────────────────────────────────
+elif page == "Decision Planner":
+    page_decision_planner()
+elif page == "Admit Comparison":
+    page_admit_comparison()
+elif page == "Stress Test":
+    page_stress_test()
+elif page == "Move-In Shock":
+    page_movein_shock()
 elif page == "Case Study":
     st.markdown("<div class='page-title'>Portfolio Case Study</div>", unsafe_allow_html=True)
     st.markdown("<div class='page-subtitle'>Student Financial Intelligence Dashboard · Financial Analyst Portfolio · Joseph Amegashie</div>", unsafe_allow_html=True)

@@ -1,0 +1,36 @@
+university,short_name,metro,state,tuition_annual,fees_annual,health_insurance_annual,on_campus_room_board,assistantship_stipend_annual,assistantship_probability,assistantship_covers_tuition,program_type,i20_cost_estimate,notes
+Washington University in St. Louis,WashU,Saint Louis,MO,62550,1650,3200,18200,22000,0.65,True,Masters/PhD,85000,Strong financial aid for PhD; Masters mostly self-funded
+Saint Louis University,SLU,Saint Louis,MO,48200,1400,2800,14500,18000,0.45,True,Masters/PhD,72000,Jesuit university; moderate assistantship availability
+University of Illinois Urbana-Champaign,UIUC,Champaign,IL,32000,3200,2600,12800,22000,0.70,True,Masters/PhD,58000,Strong STEM programs; high assistantship rate for PhD
+Northwestern University,Northwestern,Evanston,IL,63000,1800,3400,19500,28000,0.60,True,Masters/PhD,95000,Top-ranked; strong PhD funding; Masters expensive
+University of Chicago,UChicago,Chicago,IL,64000,1900,3500,19800,30000,0.55,True,Masters/PhD,98000,Elite research university; strong PhD stipends
+DePaul University,DePaul,Chicago,IL,42000,1200,2800,16000,0,0.15,False,Masters,68000,Primarily Masters; limited assistantships
+Arizona State University,ASU,Tempe,AZ,28000,1200,2400,12000,18000,0.50,True,Masters/PhD,52000,Large public university; growing international enrollment
+University of Massachusetts Boston,UMass Boston,Boston,MA,16000,2800,3000,0,16000,0.40,True,Masters/PhD,55000,Public university; lower tuition; no on-campus housing
+Boston University,BU,Boston,MA,60000,1600,3200,18500,22000,0.45,True,Masters/PhD,90000,Private; strong programs; expensive city
+Northeastern University,Northeastern,Boston,MA,58000,1500,3100,18000,0,0.20,False,Masters,88000,Co-op focused; mostly self-funded Masters
+Harvard University,Harvard,Boston,MA,54000,4000,3800,22000,35000,0.50,True,Masters/PhD,105000,Elite; strong PhD funding; very competitive
+MIT,MIT,Boston,MA,57000,3800,3600,21000,38000,0.65,True,PhD,108000,Strong STEM PhD funding; Masters less funded
+New York University,NYU,New York City,NY,58000,2400,3500,22000,22000,0.35,True,Masters/PhD,98000,Expensive city; strong programs; limited assistantships
+Columbia University,Columbia,New York City,NY,63000,2600,3800,24000,28000,0.45,True,Masters/PhD,105000,Ivy League; NYC premium; strong PhD funding
+CUNY Graduate Center,CUNY,New York City,NY,12000,2000,3000,0,18000,0.55,True,PhD,48000,Public; affordable tuition; no on-campus housing
+University of Washington,UW,Seattle,WA,38000,1800,3200,14500,24000,0.65,True,Masters/PhD,72000,Strong research; good PhD funding; expensive city
+Carnegie Mellon University,CMU,Pittsburgh,PA,58000,1600,3200,16500,28000,0.55,True,Masters/PhD,88000,Top CS/engineering; strong PhD funding
+University of Pittsburgh,Pitt,Pittsburgh,PA,30000,1400,2800,13500,20000,0.50,True,Masters/PhD,58000,Public; affordable; good research programs
+University of Michigan,UMich,Ann Arbor,MI,50000,1500,3000,15500,26000,0.65,True,Masters/PhD,82000,Top public university; strong PhD funding
+Michigan State University,MSU,Ann Arbor,MI,26000,1200,2600,12000,18000,0.55,True,Masters/PhD,52000,Large public; affordable; strong agriculture/STEM
+Ohio State University,OSU,Columbus,OH,32000,1400,2800,13000,20000,0.55,True,Masters/PhD,58000,Large public; good funding; affordable city
+Georgia Tech,GT,Atlanta,GA,32000,2000,3000,13500,22000,0.65,True,Masters/PhD,62000,Top engineering school; strong PhD funding
+Emory University,Emory,Atlanta,GA,56000,1600,3200,17500,26000,0.50,True,Masters/PhD,88000,Private; strong health/social sciences
+University of Texas Austin,UT Austin,Austin,TX,20000,2000,2800,12500,20000,0.55,True,Masters/PhD,52000,Public flagship; affordable tuition; growing city
+Rice University,Rice,Houston,TX,56000,1500,3000,16500,28000,0.55,True,Masters/PhD,88000,Small elite university; strong PhD funding
+University of Houston,UH,Houston,TX,18000,1800,2600,11000,16000,0.45,True,Masters/PhD,46000,Public; very affordable; large international community
+Duke University,Duke,Durham,NC,62000,1800,3400,18500,30000,0.55,True,Masters/PhD,98000,Elite; strong PhD funding; Research Triangle
+UNC Chapel Hill,UNC,Durham,NC,18000,2000,3000,13000,20000,0.55,True,Masters/PhD,52000,Top public; affordable; Research Triangle
+University of Minnesota,UMinn,Minneapolis,MN,30000,1600,2800,12500,20000,0.55,True,Masters/PhD,58000,Large public; cold winters; good funding
+Penn State University,Penn State,Philadelphia,PA,36000,1400,2800,13500,20000,0.50,True,Masters/PhD,65000,Large public; multiple campuses
+University of Pennsylvania,UPenn,Philadelphia,PA,62000,2000,3600,18500,30000,0.50,True,Masters/PhD,98000,Ivy League; strong PhD funding
+University of Maryland,UMD,Washington DC,DC,18000,2000,2800,13000,20000,0.55,True,Masters/PhD,52000,Public flagship; DC proximity; good value
+Georgetown University,Georgetown,Washington DC,DC,60000,1800,3400,18000,26000,0.40,True,Masters/PhD,95000,Private; DC location premium; policy/law focus
+University of Miami,UM,Miami,FL,56000,1600,3200,17500,22000,0.40,True,Masters/PhD,88000,Private; warm climate; expensive city
+Vanderbilt University,Vanderbilt,Nashville,TN,58000,1600,3200,17500,28000,0.55,True,Masters/PhD,90000,Elite private; strong PhD funding; affordable city

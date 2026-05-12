@@ -1,0 +1,29 @@
+metro,state,rent_studio,rent_1br,rent_shared,groceries,utilities,transport_monthly,internet,misc_basic,discretionary,cost_tier,transit_score,car_dependency
+Saint Louis,MO,980,1200,650,310,125,65,65,120,180,Low,6,Medium
+Chicago,IL,1400,1750,850,380,145,105,70,140,220,High,9,Low
+New York City,NY,2100,2800,1100,480,160,130,80,180,280,Very High,10,Very Low
+Boston,MA,1900,2400,950,420,155,90,75,165,250,Very High,8,Low
+Austin,TX,1350,1700,780,340,135,85,65,130,210,Medium,5,High
+Seattle,WA,1650,2100,900,390,150,95,70,155,240,High,7,Medium
+Los Angeles,CA,1850,2350,950,400,130,110,70,160,260,Very High,6,Medium
+San Francisco,CA,2400,3100,1200,450,140,120,75,190,300,Very High,8,Low
+Atlanta,GA,1250,1600,720,330,130,80,65,125,200,Medium,5,High
+Houston,TX,1150,1450,680,320,125,75,65,120,190,Low,4,High
+Pittsburgh,PA,1050,1300,620,300,120,60,65,115,175,Low,6,Medium
+Ann Arbor,MI,1200,1500,700,315,130,55,65,120,185,Medium,5,Medium
+Columbus,OH,1050,1300,620,295,118,55,65,112,170,Low,5,Medium
+Minneapolis,MN,1200,1500,700,320,140,70,65,125,195,Medium,7,Medium
+Denver,CO,1450,1850,820,350,138,80,65,135,215,Medium,6,Medium
+Philadelphia,PA,1350,1700,780,360,140,85,70,135,210,Medium,7,Medium
+Washington DC,DC,1900,2400,950,410,150,100,75,165,255,Very High,9,Low
+Miami,FL,1700,2100,880,380,135,85,70,150,240,High,6,Medium
+Nashville,TN,1300,1650,750,330,128,70,65,125,200,Medium,4,High
+Raleigh,NC,1150,1450,680,310,122,65,65,115,185,Low,4,High
+Madison,WI,1100,1380,650,305,125,55,65,115,175,Low,6,Medium
+Champaign,IL,900,1100,550,280,115,45,60,105,160,Very Low,4,High
+Amherst,MA,1000,1250,600,290,120,50,65,110,170,Low,3,High
+College Station,TX,850,1050,500,270,110,45,60,100,155,Very Low,3,Very High
+Tempe,AZ,1150,1450,680,310,120,65,65,115,185,Low,5,High
+Evanston,IL,1350,1700,780,345,138,85,70,130,205,Medium,8,Low
+Baltimore,MD,1200,1500,700,330,130,70,65,120,190,Medium,6,Medium
+Durham,NC,1200,1500,700,315,122,65,65,118,185,Low,4,High
