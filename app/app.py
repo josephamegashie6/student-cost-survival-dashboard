@@ -780,7 +780,7 @@ elif page == "My Budget":
             tuition_monthly = st.number_input("Monthly tuition allocation ($)", min_value=0.0, value=0.0, step=50.0, help="Tuition amortised monthly for affordability analysis")
 
         st.markdown("<div class='section-header' style='margin-top:1rem;'>Your Monthly Expenses</div>", unsafe_allow_html=True)
-        preset = CITY_EXPENSE_PRESETS.get(city, CITY_EXPENSE_PRESETS["Saint Louis"])
+        preset = CITY_EXPENSE_PRESETS.get(city, CITY_EXPENSE_PRESETS.get("St. Louis", next(iter(CITY_EXPENSE_PRESETS), {})))
         use_preset = st.checkbox("Populate with city benchmark values")
 
         e1, e2, e3, e4 = st.columns(4)
@@ -1189,103 +1189,126 @@ elif page == "What If?":
 # ─────────────────────────────────────────────────────────────────────────────
 elif page == "City Guide":
     st.markdown("<div class='page-title'>City Guide</div>", unsafe_allow_html=True)
-    st.markdown("<div class='page-subtitle'>Compare the real cost of living across cities — rent, food, transport, and more.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Compare the real cost of living across 126 cities in the US, UK, and Canada.</div>", unsafe_allow_html=True)
 
-    data = safe_csv("data/student_costs.csv")
-    if data is None:
-        data = safe_csv("../data/student_costs.csv")
-    if data is None:
-        st.error("Could not load data/student_costs.csv.")
+    from providers import metro_countries, metro_names_by_country, get_metro
+
+    # ── Filters
+    fg1, fg2 = st.columns([1, 3])
+    with fg1:
+        cg_country = st.selectbox("Country", metro_countries(), key="cg_country")
+    with fg2:
+        all_cg_metros = metro_names_by_country(cg_country)
+        default_sel = all_cg_metros[:5] if len(all_cg_metros) >= 5 else all_cg_metros
+        sel_cities = st.multiselect("Cities (select up to 10)", all_cg_metros, default=default_sel, key="cg_cities")
+
+    if not sel_cities:
+        st.info("Select at least one city to compare.")
         st.stop()
 
-    data["month_dt"] = pd.to_datetime(data["month"], format="%Y-%m", errors="coerce")
-    data["total_income"]   = data["campus_job_income"] + data["stipend_income"]
-    data["total_expenses"] = data[EXPENSE_COLS].sum(axis=1)
-    if "discretionary" in data.columns:
-        data["total_expenses"] += data["discretionary"]
-    if "emergency_expense" in data.columns:
-        data["total_expenses"] += data["emergency_expense"]
-    if "tuition_monthly" in data.columns:
-        data["total_expenses"] += data["tuition_monthly"]
-    data["balance"] = data["total_income"] - data["total_expenses"]
-    data["rent_burden"] = data["rent"] / data["total_income"]
-
-    cities = sorted(data["city"].dropna().unique().tolist())
-    months = sorted(data["month"].dropna().unique().tolist())
-
-    f1, f2, f3 = st.columns(3)
-    with f1: sel_cities = st.multiselect("Cities", cities, default=cities)
-    with f2: start_m    = st.selectbox("From", months, index=0)
-    with f3: end_m      = st.selectbox("To",   months, index=len(months)-1)
-
-    mask = (data["city"].isin(sel_cities)) & (data["month"] >= start_m) & (data["month"] <= end_m)
-    df = data[mask].copy()
-
-    if df.empty:
-        st.warning("No data for selected filters.")
+    # Build comparison dataframe from metro benchmarks
+    rows = []
+    for city_name in sel_cities:
+        m = get_metro(city_name)
+        if m:
+            total_monthly = m.rent_shared + m.groceries + m.utilities + m.transport_monthly + m.internet + m.misc_basic + m.discretionary
+            rows.append({
+                "City": city_name,
+                "Rent (Shared)": m.rent_shared,
+                "Rent (Private)": m.rent_private,
+                "Groceries": m.groceries,
+                "Utilities": m.utilities,
+                "Transport": m.transport_monthly,
+                "Internet": m.internet,
+                "Misc Essentials": m.misc_basic,
+                "Discretionary": m.discretionary,
+                "Total Monthly": total_monthly,
+                "Cost Index": m.cost_index,
+                "Avg Stipend": m.avg_grad_stipend,
+                "State/Region": m.state,
+            })
+    if not rows:
+        st.warning("No benchmark data available for selected cities.")
         st.stop()
 
-    # Summary KPIs per city
-    st.markdown("<div class='section-header'>City Comparison Summary</div>", unsafe_allow_html=True)
-    summary = df.groupby("city").agg(
-        Avg_Inflows=("total_income", "mean"),
-        Avg_Outflows=("total_expenses", "mean"),
-        Avg_Balance=("balance", "mean"),
-        Avg_Rent_Burden=("rent_burden", "mean"),
-        Min_Balance=("balance", "min"),
-    ).reset_index()
+    cg_df = pd.DataFrame(rows)
 
-    for _, row in summary.iterrows():
-        with st.expander(f"📍 {row['city']}", expanded=True):
-            cc1, cc2, cc3, cc4, cc5 = st.columns(5)
-            cc1.metric("Avg Monthly Inflows",  usd(row["Avg_Inflows"]))
-            cc2.metric("Avg Monthly Outflows", usd(row["Avg_Outflows"]))
-            cc3.metric("Avg Net Liquidity",    usd(row["Avg_Balance"]))
-            cc4.metric("Avg Rent Burden",      pct(row["Avg_Rent_Burden"]))
-            cc5.metric("Worst Month Balance",  usd(row["Min_Balance"]))
+    # ── KPI summary cards
+    st.markdown("<div class='section-header'>Cost of Living Snapshot</div>", unsafe_allow_html=True)
+    for _, row in cg_df.iterrows():
+        with st.expander(f"📍 {row['City']} — {row['State/Region']}", expanded=len(sel_cities) <= 3):
+            c1, c2, c3, c4, c5 = st.columns(5)
+            c1.metric("Monthly Total", usd(row["Total Monthly"]))
+            c2.metric("Rent (Shared)", usd(row["Rent (Shared)"]))
+            c3.metric("Groceries", usd(row["Groceries"]))
+            c4.metric("Avg Stipend", usd(row["Avg Stipend"]))
+            surplus = row["Avg Stipend"] - row["Total Monthly"]
+            c5.metric("Stipend Surplus", usd(surplus), delta=f"{'+' if surplus >= 0 else ''}{usd(surplus)}")
 
-    # Balance trend
-    st.markdown("<div class='section-header'>Monthly Net Position by City</div>", unsafe_allow_html=True)
-    fig = px.line(df, x="month", y="balance", color="city",
-                  color_discrete_map={"Saint Louis": COLORS["teal"], "Chicago": COLORS["gold"], "New York City": COLORS["red"]},
-                  markers=True, title="Monthly Net Liquidity by City")
-    fig.add_hline(y=0, line_dash="dash", line_color=COLORS["slate"])
-    fig.update_layout(xaxis_title="Month", yaxis_title="Net Liquidity (USD)", **PLOT_LAYOUT)
-    st.plotly_chart(fig, use_container_width=True)
+    # ── Total monthly cost comparison bar chart
+    st.markdown("<div class='section-header'>Monthly Cost Comparison</div>", unsafe_allow_html=True)
+    fig_total = px.bar(
+        cg_df.sort_values("Total Monthly"),
+        x="City", y="Total Monthly",
+        color="Cost Index",
+        color_continuous_scale=[[0, COLORS["teal"]], [0.5, COLORS["gold"]], [1, COLORS["red"]]],
+        title="Estimated Total Monthly Cost (Shared Rent)",
+        text="Total Monthly",
+    )
+    fig_total.update_traces(texttemplate="$%{text:,.0f}", textposition="outside")
+    fig_total.update_layout(**PLOT_LAYOUT)
+    st.plotly_chart(fig_total, use_container_width=True)
 
-    # Expense breakdown by city
+    # ── Expense breakdown stacked bar
+    st.markdown("<div class='section-header'>Expense Breakdown by Category</div>", unsafe_allow_html=True)
+    breakdown_cols = ["Rent (Shared)", "Groceries", "Utilities", "Transport", "Internet", "Misc Essentials", "Discretionary"]
+    melted = cg_df[["City"] + breakdown_cols].melt(id_vars="City", var_name="Category", value_name="Amount")
+    fig_breakdown = px.bar(
+        melted, x="City", y="Amount", color="Category", barmode="stack",
+        title="Monthly Expense Breakdown by City",
+        color_discrete_sequence=[COLORS["red"], COLORS["gold"], COLORS["teal"], COLORS["blue"], COLORS["purple"], COLORS["green"], COLORS["slate"]],
+    )
+    fig_breakdown.update_layout(**PLOT_LAYOUT)
+    st.plotly_chart(fig_breakdown, use_container_width=True)
+
+    # ── Rent burden analysis
     ch1, ch2 = st.columns(2)
     with ch1:
-        avg_exp = df.groupby("city")[EXPENSE_COLS].mean().reset_index()
-        fig2 = px.bar(avg_exp.melt(id_vars="city", var_name="Category", value_name="Amount"),
-                      x="city", y="Amount", color="Category", barmode="stack",
-                      title="Average Monthly Expense Breakdown by City",
-                      color_discrete_sequence=[COLORS["red"], COLORS["gold"], COLORS["teal"], COLORS["blue"], COLORS["purple"], COLORS["green"]])
-        fig2.update_layout(**PLOT_LAYOUT)
-        st.plotly_chart(fig2, use_container_width=True)
-
+        st.markdown("<div class='section-header'>Rent Burden (% of Avg Stipend)</div>", unsafe_allow_html=True)
+        cg_df["Rent Burden %"] = (cg_df["Rent (Shared)"] / cg_df["Avg Stipend"].replace(0, 1)) * 100
+        fig_rb = px.bar(
+            cg_df.sort_values("Rent Burden %"),
+            x="City", y="Rent Burden %",
+            color="Rent Burden %",
+            color_continuous_scale=[[0, COLORS["teal"]], [0.3, COLORS["gold"]], [0.5, COLORS["red"]]],
+            title="Rent as % of Average Grad Stipend",
+        )
+        fig_rb.add_hline(y=30, line_dash="dot", line_color=COLORS["green"], annotation_text="30% Healthy")
+        fig_rb.add_hline(y=40, line_dash="dot", line_color=COLORS["red"],   annotation_text="40% Critical")
+        fig_rb.update_layout(**PLOT_LAYOUT)
+        st.plotly_chart(fig_rb, use_container_width=True)
     with ch2:
-        fig3 = px.line(df, x="month", y="rent_burden", color="city",
-                       color_discrete_map={"Saint Louis": COLORS["teal"], "Chicago": COLORS["gold"], "New York City": COLORS["red"]},
-                       title="Rent Burden Ratio Over Time", markers=True)
-        fig3.add_hline(y=0.30, line_dash="dot", line_color=COLORS["green"], annotation_text="30% Healthy")
-        fig3.add_hline(y=0.40, line_dash="dot", line_color=COLORS["red"],   annotation_text="40% Critical")
-        fig3.update_layout(xaxis_title="Month", yaxis_title="Rent Burden Ratio", **PLOT_LAYOUT)
-        st.plotly_chart(fig3, use_container_width=True)
+        st.markdown("<div class='section-header'>Stipend vs. Total Monthly Cost</div>", unsafe_allow_html=True)
+        fig_sv = px.scatter(
+            cg_df, x="Total Monthly", y="Avg Stipend", text="City",
+            color="Cost Index",
+            color_continuous_scale=[[0, COLORS["teal"]], [0.5, COLORS["gold"]], [1, COLORS["red"]]],
+            title="Stipend vs. Monthly Cost (above diagonal = surplus)",
+            size_max=18,
+        )
+        max_val = max(cg_df["Total Monthly"].max(), cg_df["Avg Stipend"].max()) * 1.1
+        fig_sv.add_shape(type="line", x0=0, y0=0, x1=max_val, y1=max_val,
+                         line=dict(color=COLORS["slate"], dash="dash"))
+        fig_sv.update_traces(textposition="top center")
+        fig_sv.update_layout(**PLOT_LAYOUT)
+        st.plotly_chart(fig_sv, use_container_width=True)
 
-    # Semester phase analysis
-    if "semester_phase" in df.columns:
-        st.markdown("<div class='section-header'>Semester-by-Semester Breakdown</div>", unsafe_allow_html=True)
-        phase_summary = df.groupby(["city", "semester_phase"]).agg(
-            Avg_Balance=("balance", "mean"),
-            Avg_Outflows=("total_expenses", "mean"),
-        ).reset_index()
-        fig4 = px.bar(phase_summary, x="semester_phase", y="Avg_Balance", color="city", barmode="group",
-                      title="Average Net Liquidity by Semester Phase",
-                      color_discrete_map={"Saint Louis": COLORS["teal"], "Chicago": COLORS["gold"], "New York City": COLORS["red"]})
-        fig4.add_hline(y=0, line_dash="dash", line_color=COLORS["slate"])
-        fig4.update_layout(xaxis_title="Phase", yaxis_title="Avg Net Liquidity (USD)", **PLOT_LAYOUT)
-        st.plotly_chart(fig4, use_container_width=True)
+    # ── Full data table
+    st.markdown("<div class='section-header'>Full Benchmark Table</div>", unsafe_allow_html=True)
+    display_df = cg_df[["City", "State/Region", "Rent (Shared)", "Rent (Private)", "Groceries", "Utilities", "Transport", "Total Monthly", "Avg Stipend", "Cost Index"]].copy()
+    for col in ["Rent (Shared)", "Rent (Private)", "Groceries", "Utilities", "Transport", "Total Monthly", "Avg Stipend"]:
+        display_df[col] = display_df[col].apply(lambda x: f"${x:,.0f}")
+    st.dataframe(display_df, use_container_width=True, hide_index=True)
 
     
 
