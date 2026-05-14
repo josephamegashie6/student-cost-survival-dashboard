@@ -1,118 +1,63 @@
-# Student Financial Intelligence Dashboard
+# CostCompass — Plan. Manage. Thrive.
 
-**A financial decision-support system for cost-of-living analytics, affordability monitoring, and financial planning.**
+**The professional financial intelligence platform for international students.**
 
 ---
 
 ## Overview
 
-The **Student Financial Intelligence Dashboard** is a financial analytics platform designed to help students monitor spending behaviour, forecast living costs, evaluate affordability pressure, and make data-driven financial decisions. Built with a Bloomberg-inspired dark finance aesthetic, the system transforms raw financial inputs into structured decision-support outputs across five analytical modules.
+**CostCompass** is a high-performance financial analytics platform designed to help international students navigate the complexities of studying abroad. By transforming raw financial data into structured decision-support outputs, CostCompass enables students to monitor spending, forecast long-term costs, and evaluate the financial viability of different universities and cities with professional-grade precision.
 
-> *"A financial intelligence platform — not a budgeting app."*
-
----
-
-## Problem Statement
-
-Students navigating academic and living expenses face compounding financial pressures: rising housing costs, tuition obligations, variable income streams, and limited financial planning infrastructure. Without structured analytical tools, students lack visibility into their affordability position, spending behaviour patterns, and long-term financial sustainability — resulting in reactive rather than proactive financial decision-making.
+> *"Financial intelligence for the next generation of global scholars."*
 
 ---
 
-## Solution
+## The Challenge
 
-Developed a financial intelligence platform combining:
-
-- **Spending analytics** — monthly cash flow decomposition and expense categorisation
-- **Affordability monitoring** — rent burden ratios, tuition pressure indicators, and cost burden analysis
-- **Forecasting models** — inflation-adjusted 24-month balance projections and semester affordability modelling
-- **Scenario simulation** — rent increase, tuition pressure, income reduction, and spending cut scenarios
-- **Behavioural finance alerts** — overspending detection, anomaly identification, and financial stress indicators
+International students face unique financial pressures: fluctuating exchange rates, rising housing costs, complex tuition structures, and the need for long-term cash runway. Traditional budgeting apps often fail to account for the multi-year, multi-country nature of the international student experience.
 
 ---
 
-## System Features
+## The CostCompass Solution
 
-| Module | Description |
+CostCompass provides a comprehensive suite of tools designed for every stage of the student journey:
+
+- **Decision Planner** — Evaluate the total cost of attendance and living for specific universities and cities.
+- **Admit Comparison** — Side-by-side financial analysis of multiple admission offers with professional PDF memo export.
+- **Forecasting Engine** — 24-month, inflation-adjusted liquidity projections to ensure your funding lasts until graduation.
+- **Risk & Stress Testing** — Simulate the impact of rent hikes, currency depreciation, or funding cuts before they happen.
+- **Move-In Planner** — Calculate the true "landing cost" of moving to a new country, from security deposits to initial groceries.
+
+---
+
+## Core Features
+
+| Module | Capability |
 |---|---|
-| **Cash Flow Analysis** | Monthly inflow/outflow decomposition, fixed vs variable expense categorisation, 12-month savings trajectory |
-| **Cost Intelligence** | Rent burden ratio, tuition pressure indicator, transportation and food cost ratios, spending anomaly detection |
-| **Financial Health Indicators** | Composite 0–100 stability score, emergency fund coverage, affordability score, financial stress level |
-| **Forecasting Engine** | Inflation-adjusted balance projection, semester affordability projection, liquidity risk detection |
-| **Scenario Analysis** | Rent increase simulation, tuition pressure, income reduction, spending reduction with waterfall impact analysis |
-| **City Analytics** | Multi-city cost-of-living comparison across 18 months with semester-phase financial analysis |
+| **Global Benchmarks** | Real-time cost-of-living data for 120+ metros across the US, UK, and Canada. |
+| **University Profiles** | Integrated data for 190+ global universities, including estimated tuition and local stipends. |
+| **FX Risk Management** | Built-in currency conversion and depreciation risk modeling for home-country funding. |
+| **Affordability Scoring** | Proprietary 0–100 stability index based on rent burden, savings rate, and emergency coverage. |
+| **Scenario Simulation** | Interactive "What If" analysis for rent increases, tuition changes, and income shifts. |
 
 ---
 
-## Analytical Workflow
+## Technical Foundation
 
-```
-Income Inputs
-     ↓
-Expense Categorisation
-     ↓
-Cash Flow Analysis
-     ↓
-Forecast Modelling
-     ↓
-Risk & Affordability Analysis
-     ↓
-Financial Planning Insights
-```
+CostCompass is built on a robust analytical stack designed for accuracy and speed:
+
+- **Engine:** Python 3.11 with Pandas & NumPy for high-fidelity financial modeling.
+- **Interface:** Streamlit-powered interactive dashboard with a Bloomberg-inspired dark finance aesthetic.
+- **Visuals:** Dynamic Plotly charts for multi-dimensional data exploration.
+- **Reports:** Professional PDF generation via ReportLab for decision-support memos.
 
 ---
 
-## Technical Architecture
+## Get Started
 
-| Component | Technology |
-|---|---|
-| Language | Python 3.11 |
-| Framework | Streamlit |
-| Data Processing | Pandas, NumPy |
-| Visualisation | Plotly (interactive, dark finance theme) |
-| Forecasting | Inflation-adjusted multi-period projection model |
-| Analytics | Cost burden ratios, affordability scoring, behavioural anomaly detection |
-| Deployment | GitHub + Streamlit Cloud |
+Plan your future with confidence.
+
+**Live Application:** [https://international-student-cost-dashboard.streamlit.app/](https://international-student-cost-dashboard.streamlit.app/)
 
 ---
-
-## Dataset
-
-The platform uses a realistic 18-month dataset across three US cities (Saint Louis, Chicago, New York City) with:
-
-- Irregular expense spikes and semester-based variations
-- Housing pressure differences by market
-- Unexpected spending events (emergency expenses)
-- Inflation-adjusted cost progression
-- Semester phase categorisation (Pre-Arrival, Fall, Spring, Summer, Winter Break)
-
----
-
-## KPI Language
-
-| Standard Term | Platform Term |
-|---|---|
-| Monthly Spending | Total Monthly Outflows |
-| Money Left | Projected Net Liquidity |
-| Budget Health | Financial Stability Indicator |
-| Savings | Cash Reserve Position |
-| Rent % | Rent Burden Ratio |
-| Emergency Buffer | Emergency Fund Coverage |
-
----
-
-## Portfolio Positioning
-
-This project demonstrates competency in:
-
-- Financial analytics and decision-support system design
-- Cost modelling and affordability analysis
-- Data-driven forecasting and scenario planning
-- Behavioural finance indicators and risk alerting
-- Interactive dashboard development with professional finance aesthetics
-
-Suitable for roles in **financial analysis**, **business analytics**, **fintech**, **operational analytics**, and **data-driven financial planning**.
-
----
-
-*App is Live Here*
-https://international-student-cost-dashboard.streamlit.app/
+© 2026 CostCompass. Professional Financial Intelligence for Students.

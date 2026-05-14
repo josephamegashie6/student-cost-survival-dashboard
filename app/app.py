@@ -468,6 +468,132 @@ CITY_EXPENSE_PRESETS = {
     "Guelph": {"rent": 1250, "utilities": 142, "food": 315, "transport": 82, "phone_internet": 65, "misc_basic": 115, "discretionary": 175},
     "St. Catharines": {"rent": 1200, "utilities": 140, "food": 308, "transport": 78, "phone_internet": 60, "misc_basic": 110, "discretionary": 168},
     "Kelowna": {"rent": 1380, "utilities": 138, "food": 325, "transport": 82, "phone_internet": 65, "misc_basic": 118, "discretionary": 182},
+},
+    "Los Angeles": {"rent": 2350, "utilities": 130, "food": 400, "transport": 110, "phone_internet": 70, "misc_basic": 160, "discretionary": 260},
+    "Chicago": {"rent": 1750, "utilities": 145, "food": 380, "transport": 105, "phone_internet": 70, "misc_basic": 140, "discretionary": 220},
+    "Houston": {"rent": 1450, "utilities": 125, "food": 320, "transport": 75, "phone_internet": 65, "misc_basic": 120, "discretionary": 190},
+    "Phoenix": {"rent": 1400, "utilities": 120, "food": 310, "transport": 65, "phone_internet": 65, "misc_basic": 115, "discretionary": 185},
+    "Philadelphia": {"rent": 1700, "utilities": 140, "food": 360, "transport": 85, "phone_internet": 70, "misc_basic": 135, "discretionary": 210},
+    "San Antonio": {"rent": 1200, "utilities": 118, "food": 300, "transport": 60, "phone_internet": 65, "misc_basic": 112, "discretionary": 175},
+    "San Diego": {"rent": 2150, "utilities": 128, "food": 390, "transport": 100, "phone_internet": 70, "misc_basic": 150, "discretionary": 235},
+    "Dallas": {"rent": 1500, "utilities": 122, "food": 325, "transport": 70, "phone_internet": 65, "misc_basic": 118, "discretionary": 190},
+    "San Jose": {"rent": 2600, "utilities": 140, "food": 420, "transport": 105, "phone_internet": 75, "misc_basic": 170, "discretionary": 270},
+    "Austin": {"rent": 1700, "utilities": 135, "food": 340, "transport": 85, "phone_internet": 65, "misc_basic": 130, "discretionary": 210},
+    "Jacksonville": {"rent": 1300, "utilities": 118, "food": 295, "transport": 60, "phone_internet": 65, "misc_basic": 110, "discretionary": 170},
+    "Fort Worth": {"rent": 1300, "utilities": 120, "food": 300, "transport": 62, "phone_internet": 65, "misc_basic": 112, "discretionary": 172},
+    "Columbus": {"rent": 1300, "utilities": 118, "food": 295, "transport": 55, "phone_internet": 65, "misc_basic": 112, "discretionary": 170},
+    "Charlotte": {"rent": 1380, "utilities": 120, "food": 305, "transport": 65, "phone_internet": 65, "misc_basic": 115, "discretionary": 180},
+    "Indianapolis": {"rent": 1100, "utilities": 115, "food": 285, "transport": 55, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
+    "San Francisco": {"rent": 3100, "utilities": 140, "food": 450, "transport": 120, "phone_internet": 75, "misc_basic": 190, "discretionary": 300},
+    "Seattle": {"rent": 2100, "utilities": 150, "food": 390, "transport": 95, "phone_internet": 70, "misc_basic": 155, "discretionary": 240},
+    "Denver": {"rent": 1850, "utilities": 138, "food": 350, "transport": 80, "phone_internet": 65, "misc_basic": 135, "discretionary": 215},
+    "Nashville": {"rent": 1650, "utilities": 128, "food": 330, "transport": 70, "phone_internet": 65, "misc_basic": 125, "discretionary": 200},
+    "Oklahoma City": {"rent": 1000, "utilities": 112, "food": 275, "transport": 55, "phone_internet": 60, "misc_basic": 105, "discretionary": 160},
+    "El Paso": {"rent": 950, "utilities": 110, "food": 265, "transport": 52, "phone_internet": 60, "misc_basic": 100, "discretionary": 155},
+    "Washington DC": {"rent": 2400, "utilities": 150, "food": 410, "transport": 100, "phone_internet": 75, "misc_basic": 165, "discretionary": 255},
+    "Boston": {"rent": 2400, "utilities": 155, "food": 420, "transport": 90, "phone_internet": 75, "misc_basic": 165, "discretionary": 250},
+    "Memphis": {"rent": 1000, "utilities": 112, "food": 275, "transport": 55, "phone_internet": 60, "misc_basic": 105, "discretionary": 158},
+    "Louisville": {"rent": 1050, "utilities": 113, "food": 278, "transport": 55, "phone_internet": 60, "misc_basic": 106, "discretionary": 160},
+    "Portland": {"rent": 1700, "utilities": 140, "food": 365, "transport": 90, "phone_internet": 65, "misc_basic": 130, "discretionary": 210},
+    "Las Vegas": {"rent": 1400, "utilities": 125, "food": 315, "transport": 70, "phone_internet": 65, "misc_basic": 115, "discretionary": 182},
+    "Milwaukee": {"rent": 1150, "utilities": 118, "food": 285, "transport": 60, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
+    "Albuquerque": {"rent": 1150, "utilities": 118, "food": 285, "transport": 60, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
+    "Tucson": {"rent": 1050, "utilities": 118, "food": 278, "transport": 58, "phone_internet": 60, "misc_basic": 105, "discretionary": 160},
+    "Fresno": {"rent": 1150, "utilities": 120, "food": 285, "transport": 60, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
+    "Sacramento": {"rent": 1600, "utilities": 130, "food": 340, "transport": 78, "phone_internet": 65, "misc_basic": 125, "discretionary": 195},
+    "Mesa": {"rent": 1300, "utilities": 118, "food": 300, "transport": 62, "phone_internet": 65, "misc_basic": 112, "discretionary": 172},
+    "Kansas City": {"rent": 1200, "utilities": 118, "food": 290, "transport": 58, "phone_internet": 60, "misc_basic": 110, "discretionary": 170},
+    "Atlanta": {"rent": 1600, "utilities": 130, "food": 330, "transport": 80, "phone_internet": 65, "misc_basic": 125, "discretionary": 200},
+    "Omaha": {"rent": 1050, "utilities": 115, "food": 278, "transport": 55, "phone_internet": 60, "misc_basic": 106, "discretionary": 160},
+    "Colorado Springs": {"rent": 1300, "utilities": 120, "food": 300, "transport": 62, "phone_internet": 65, "misc_basic": 112, "discretionary": 172},
+    "Raleigh": {"rent": 1450, "utilities": 122, "food": 310, "transport": 65, "phone_internet": 65, "misc_basic": 115, "discretionary": 185},
+    "Virginia Beach": {"rent": 1380, "utilities": 120, "food": 305, "transport": 62, "phone_internet": 65, "misc_basic": 112, "discretionary": 178},
+    "Minneapolis": {"rent": 1500, "utilities": 140, "food": 320, "transport": 70, "phone_internet": 65, "misc_basic": 125, "discretionary": 195},
+    "Tampa": {"rent": 1500, "utilities": 125, "food": 320, "transport": 68, "phone_internet": 65, "misc_basic": 118, "discretionary": 185},
+    "New Orleans": {"rent": 1250, "utilities": 122, "food": 295, "transport": 62, "phone_internet": 65, "misc_basic": 112, "discretionary": 172},
+    "Miami": {"rent": 2100, "utilities": 135, "food": 380, "transport": 85, "phone_internet": 70, "misc_basic": 150, "discretionary": 240},
+    "Orlando": {"rent": 1500, "utilities": 125, "food": 320, "transport": 68, "phone_internet": 65, "misc_basic": 118, "discretionary": 185},
+    "Baltimore": {"rent": 1500, "utilities": 130, "food": 330, "transport": 70, "phone_internet": 65, "misc_basic": 120, "discretionary": 190},
+    "Pittsburgh": {"rent": 1300, "utilities": 120, "food": 300, "transport": 60, "phone_internet": 65, "misc_basic": 115, "discretionary": 175},
+    "Cincinnati": {"rent": 1150, "utilities": 115, "food": 285, "transport": 55, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
+    "Cleveland": {"rent": 1050, "utilities": 115, "food": 278, "transport": 55, "phone_internet": 60, "misc_basic": 106, "discretionary": 160},
+    "Detroit": {"rent": 1050, "utilities": 118, "food": 278, "transport": 55, "phone_internet": 60, "misc_basic": 106, "discretionary": 160},
+    "St. Louis": {"rent": 1200, "utilities": 125, "food": 310, "transport": 65, "phone_internet": 65, "misc_basic": 120, "discretionary": 180},
+    "Salt Lake City": {"rent": 1450, "utilities": 122, "food": 315, "transport": 68, "phone_internet": 65, "misc_basic": 115, "discretionary": 182},
+    "Hartford": {"rent": 1500, "utilities": 128, "food": 320, "transport": 68, "phone_internet": 65, "misc_basic": 118, "discretionary": 185},
+    "Providence": {"rent": 1450, "utilities": 125, "food": 315, "transport": 68, "phone_internet": 65, "misc_basic": 115, "discretionary": 182},
+    "Buffalo": {"rent": 1050, "utilities": 118, "food": 278, "transport": 55, "phone_internet": 60, "misc_basic": 106, "discretionary": 160},
+    "Rochester": {"rent": 1000, "utilities": 115, "food": 272, "transport": 52, "phone_internet": 60, "misc_basic": 104, "discretionary": 158},
+    "Albany": {"rent": 1200, "utilities": 118, "food": 285, "transport": 58, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
+    "Baton Rouge": {"rent": 1200, "utilities": 118, "food": 285, "transport": 58, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
+    "Des Moines": {"rent": 1050, "utilities": 115, "food": 275, "transport": 55, "phone_internet": 60, "misc_basic": 106, "discretionary": 160},
+    "Madison": {"rent": 1380, "utilities": 125, "food": 305, "transport": 55, "phone_internet": 65, "misc_basic": 115, "discretionary": 175},
+    "Ann Arbor": {"rent": 1500, "utilities": 130, "food": 315, "transport": 55, "phone_internet": 65, "misc_basic": 120, "discretionary": 185},
+    "Champaign": {"rent": 1100, "utilities": 115, "food": 280, "transport": 45, "phone_internet": 60, "misc_basic": 105, "discretionary": 160},
+    "Amherst": {"rent": 1250, "utilities": 120, "food": 290, "transport": 50, "phone_internet": 65, "misc_basic": 110, "discretionary": 170},
+    "College Station": {"rent": 1050, "utilities": 110, "food": 270, "transport": 45, "phone_internet": 60, "misc_basic": 100, "discretionary": 155},
+    "Tempe": {"rent": 1450, "utilities": 120, "food": 310, "transport": 65, "phone_internet": 65, "misc_basic": 115, "discretionary": 185},
+    "Evanston": {"rent": 1700, "utilities": 138, "food": 345, "transport": 85, "phone_internet": 70, "misc_basic": 130, "discretionary": 205},
+    "Durham": {"rent": 1500, "utilities": 122, "food": 315, "transport": 65, "phone_internet": 65, "misc_basic": 118, "discretionary": 185},
+    "Chapel Hill": {"rent": 1450, "utilities": 120, "food": 310, "transport": 62, "phone_internet": 65, "misc_basic": 115, "discretionary": 182},
+    "Charlottesville": {"rent": 1300, "utilities": 118, "food": 295, "transport": 58, "phone_internet": 65, "misc_basic": 112, "discretionary": 172},
+    "Knoxville": {"rent": 1050, "utilities": 115, "food": 275, "transport": 55, "phone_internet": 60, "misc_basic": 106, "discretionary": 160},
+    "Gainesville": {"rent": 1150, "utilities": 118, "food": 280, "transport": 58, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
+    "Tallahassee": {"rent": 1050, "utilities": 115, "food": 275, "transport": 55, "phone_internet": 60, "misc_basic": 105, "discretionary": 160},
+    "Lexington": {"rent": 1000, "utilities": 113, "food": 272, "transport": 52, "phone_internet": 60, "misc_basic": 104, "discretionary": 158},
+    "Richmond": {"rent": 1300, "utilities": 118, "food": 295, "transport": 60, "phone_internet": 65, "misc_basic": 112, "discretionary": 172},
+    "Anchorage": {"rent": 1450, "utilities": 175, "food": 380, "transport": 72, "phone_internet": 70, "misc_basic": 130, "discretionary": 195},
+    "Honolulu": {"rent": 2200, "utilities": 175, "food": 420, "transport": 85, "phone_internet": 70, "misc_basic": 160, "discretionary": 250},
+    "Birmingham": {"rent": 1000, "utilities": 112, "food": 270, "transport": 52, "phone_internet": 60, "misc_basic": 102, "discretionary": 155},
+    "Tucson": {"rent": 1050, "utilities": 118, "food": 278, "transport": 58, "phone_internet": 60, "misc_basic": 105, "discretionary": 160},
+    "Fayetteville": {"rent": 1000, "utilities": 110, "food": 268, "transport": 50, "phone_internet": 60, "misc_basic": 100, "discretionary": 155},
+    "Lincoln": {"rent": 1000, "utilities": 112, "food": 270, "transport": 52, "phone_internet": 60, "misc_basic": 102, "discretionary": 155},
+    "Sioux Falls": {"rent": 1000, "utilities": 112, "food": 268, "transport": 50, "phone_internet": 60, "misc_basic": 100, "discretionary": 155},
+    "Bismarck": {"rent": 1000, "utilities": 115, "food": 268, "transport": 50, "phone_internet": 60, "misc_basic": 100, "discretionary": 155},
+    "Cheyenne": {"rent": 1050, "utilities": 115, "food": 270, "transport": 52, "phone_internet": 60, "misc_basic": 102, "discretionary": 158},
+    "Helena": {"rent": 1050, "utilities": 115, "food": 272, "transport": 52, "phone_internet": 60, "misc_basic": 102, "discretionary": 158},
+    "Boise": {"rent": 1300, "utilities": 118, "food": 295, "transport": 58, "phone_internet": 60, "misc_basic": 110, "discretionary": 168},
+    "Portland": {"rent": 1380, "utilities": 122, "food": 305, "transport": 60, "phone_internet": 65, "misc_basic": 112, "discretionary": 175},
+    "Burlington": {"rent": 1380, "utilities": 122, "food": 305, "transport": 58, "phone_internet": 65, "misc_basic": 112, "discretionary": 175},
+    "Concord": {"rent": 1300, "utilities": 120, "food": 295, "transport": 55, "phone_internet": 65, "misc_basic": 110, "discretionary": 170},
+    "Manchester": {"rent": 1300, "utilities": 120, "food": 295, "transport": 55, "phone_internet": 65, "misc_basic": 110, "discretionary": 170},
+    "London": {"rent": 2200, "utilities": 180, "food": 400, "transport": 150, "phone_internet": 70, "misc_basic": 165, "discretionary": 260},
+    "Manchester": {"rent": 1200, "utilities": 158, "food": 330, "transport": 105, "phone_internet": 65, "misc_basic": 128, "discretionary": 198},
+    "Birmingham": {"rent": 1150, "utilities": 155, "food": 320, "transport": 100, "phone_internet": 65, "misc_basic": 125, "discretionary": 192},
+    "Edinburgh": {"rent": 1400, "utilities": 162, "food": 340, "transport": 110, "phone_internet": 65, "misc_basic": 132, "discretionary": 205},
+    "Glasgow": {"rent": 1150, "utilities": 155, "food": 320, "transport": 105, "phone_internet": 65, "misc_basic": 125, "discretionary": 192},
+    "Leeds": {"rent": 1150, "utilities": 152, "food": 315, "transport": 100, "phone_internet": 65, "misc_basic": 122, "discretionary": 188},
+    "Bristol": {"rent": 1300, "utilities": 158, "food": 330, "transport": 105, "phone_internet": 65, "misc_basic": 128, "discretionary": 198},
+    "Sheffield": {"rent": 1000, "utilities": 148, "food": 305, "transport": 95, "phone_internet": 60, "misc_basic": 118, "discretionary": 180},
+    "Nottingham": {"rent": 1000, "utilities": 148, "food": 302, "transport": 92, "phone_internet": 60, "misc_basic": 116, "discretionary": 178},
+    "Southampton": {"rent": 1150, "utilities": 152, "food": 315, "transport": 98, "phone_internet": 65, "misc_basic": 120, "discretionary": 185},
+    "Cardiff": {"rent": 1000, "utilities": 148, "food": 302, "transport": 92, "phone_internet": 60, "misc_basic": 116, "discretionary": 178},
+    "Oxford": {"rent": 1600, "utilities": 162, "food": 345, "transport": 108, "phone_internet": 70, "misc_basic": 132, "discretionary": 205},
+    "Cambridge": {"rent": 1600, "utilities": 160, "food": 342, "transport": 106, "phone_internet": 70, "misc_basic": 130, "discretionary": 202},
+    "Coventry": {"rent": 950, "utilities": 145, "food": 295, "transport": 88, "phone_internet": 60, "misc_basic": 112, "discretionary": 172},
+    "Leicester": {"rent": 950, "utilities": 145, "food": 295, "transport": 88, "phone_internet": 60, "misc_basic": 112, "discretionary": 172},
+    "Exeter": {"rent": 1050, "utilities": 150, "food": 308, "transport": 92, "phone_internet": 60, "misc_basic": 118, "discretionary": 180},
+    "Newcastle": {"rent": 1000, "utilities": 148, "food": 305, "transport": 95, "phone_internet": 60, "misc_basic": 118, "discretionary": 180},
+    "Liverpool": {"rent": 1000, "utilities": 148, "food": 305, "transport": 98, "phone_internet": 60, "misc_basic": 118, "discretionary": 180},
+    "Warwick": {"rent": 1050, "utilities": 150, "food": 308, "transport": 92, "phone_internet": 60, "misc_basic": 118, "discretionary": 180},
+    "Toronto": {"rent": 1900, "utilities": 158, "food": 360, "transport": 118, "phone_internet": 70, "misc_basic": 145, "discretionary": 225},
+    "Vancouver": {"rent": 2100, "utilities": 142, "food": 375, "transport": 112, "phone_internet": 70, "misc_basic": 152, "discretionary": 238},
+    "Montreal": {"rent": 1400, "utilities": 138, "food": 330, "transport": 95, "phone_internet": 65, "misc_basic": 128, "discretionary": 198},
+    "Calgary": {"rent": 1500, "utilities": 152, "food": 340, "transport": 100, "phone_internet": 65, "misc_basic": 130, "discretionary": 200},
+    "Ottawa": {"rent": 1500, "utilities": 148, "food": 338, "transport": 100, "phone_internet": 65, "misc_basic": 128, "discretionary": 198},
+    "Edmonton": {"rent": 1300, "utilities": 155, "food": 325, "transport": 95, "phone_internet": 65, "misc_basic": 122, "discretionary": 188},
+    "Winnipeg": {"rent": 1150, "utilities": 145, "food": 312, "transport": 85, "phone_internet": 60, "misc_basic": 115, "discretionary": 175},
+    "Quebec City": {"rent": 1150, "utilities": 140, "food": 310, "transport": 82, "phone_internet": 60, "misc_basic": 112, "discretionary": 172},
+    "Hamilton": {"rent": 1300, "utilities": 145, "food": 320, "transport": 88, "phone_internet": 65, "misc_basic": 118, "discretionary": 182},
+    "Waterloo": {"rent": 1300, "utilities": 142, "food": 318, "transport": 85, "phone_internet": 65, "misc_basic": 116, "discretionary": 178},
+    "Kingston": {"rent": 1200, "utilities": 140, "food": 308, "transport": 80, "phone_internet": 60, "misc_basic": 112, "discretionary": 172},
+    "Halifax": {"rent": 1200, "utilities": 142, "food": 310, "transport": 82, "phone_internet": 60, "misc_basic": 112, "discretionary": 172},
+    "Victoria": {"rent": 1700, "utilities": 140, "food": 348, "transport": 88, "phone_internet": 65, "misc_basic": 130, "discretionary": 200},
+    "London": {"rent": 1150, "utilities": 140, "food": 308, "transport": 80, "phone_internet": 60, "misc_basic": 110, "discretionary": 168},
+    "Saskatoon": {"rent": 1150, "utilities": 142, "food": 305, "transport": 78, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
+    "Guelph": {"rent": 1250, "utilities": 142, "food": 315, "transport": 82, "phone_internet": 65, "misc_basic": 115, "discretionary": 175},
+    "St. Catharines": {"rent": 1200, "utilities": 140, "food": 308, "transport": 78, "phone_internet": 60, "misc_basic": 110, "discretionary": 168},
+    "Kelowna": {"rent": 1380, "utilities": 138, "food": 325, "transport": 82, "phone_internet": 65, "misc_basic": 118, "discretionary": 182},
 }
 EXPENSE_COLS = ["rent", "utilities", "food", "transport", "phone_internet", "misc_basic"]
 INFLATION_RATE = 0.035  # 3.5% annual
@@ -1370,20 +1496,7 @@ elif page == "How It Works":
             </div>
             """, unsafe_allow_html=True)
 
-    st.markdown("<div class='section-header'>Technical Architecture</div>", unsafe_allow_html=True)
-    tech_data = {
-        "Component": ["Language", "Framework", "Data Processing", "Visualisation", "Forecasting Model", "Analytics", "Deployment"],
-        "Technology": ["Python 3.11", "Streamlit", "Pandas / NumPy", "Plotly (interactive)", "Inflation-adjusted projection model", "Cost burden ratios, affordability scoring, anomaly detection", "GitHub / Streamlit Cloud"],
-        "Purpose": ["Core analytical logic", "Interactive financial dashboard", "Data transformation and aggregation", "Bloomberg-style dark finance charts", "Multi-period balance and liquidity forecasting", "Financial health indicators and behavioural alerts", "Version control and live deployment"],
-    }
-    st.dataframe(pd.DataFrame(tech_data), use_container_width=True, hide_index=True)
-
-    st.markdown("<div class='section-header'>Impact & Outcomes</div>", unsafe_allow_html=True)
-    i1, i2, i3, i4 = st.columns(4)
-    with i1: st.markdown(kpi_tile("Financial Visibility", "360°", "Full income-expense-forecast view", "kpi-teal"), unsafe_allow_html=True)
-    with i2: st.markdown(kpi_tile("Analytical Depth", "5 Modules", "CF, Cost, Health, Forecast, Scenario", "kpi-gold"), unsafe_allow_html=True)
-    with i3: st.markdown(kpi_tile("Data Realism", "18 Months", "3 cities, semester phases, inflation", "kpi-green"), unsafe_allow_html=True)
-    with i4: st.markdown(kpi_tile("Decision Support", "Real-time", "Scenario simulation & alerts", "kpi-teal"), unsafe_allow_html=True)
+    # Technical Architecture and Impact sections removed for production look.
 
     st.markdown("""
     <div class='glass-card' style='margin-top:1rem;'>
@@ -1473,8 +1586,8 @@ elif page == "Settings":
     st.markdown("<hr class='soft'>", unsafe_allow_html=True)
     st.markdown("""
     <div style='font-size:0.78rem; color:#475569; text-align:center; padding:1rem 0;'>
-        CostCompass v3.0 &nbsp;·&nbsp; Built by Joseph Amegashie &nbsp;·&nbsp;
-        <a href='mailto:amegashie@wustl.edu' style='color:#f59e0b; text-decoration:none;'>amegashie@wustl.edu</a>
+        CostCompass v3.0 &nbsp;·&nbsp; Professional Financial Intelligence for Students &nbsp;·&nbsp;
+        <a href='mailto:amegashie@wustl.edu' style='color:#f59e0b; text-decoration:none;'>Support</a>
     </div>
     """, unsafe_allow_html=True)
 

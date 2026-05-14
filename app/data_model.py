@@ -1,6 +1,6 @@
 """
 data_model.py — V2 Planning Data Structures
-Student Financial Intelligence Dashboard
+CostCompass — Plan. Manage. Thrive.
 """
 from dataclasses import dataclass, field
 from typing import Optional, List

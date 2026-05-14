@@ -1,6 +1,6 @@
 """
 decision_engine.py — V2 Decision & Recommendation Engine
-Student Financial Intelligence Dashboard
+CostCompass — Plan. Manage. Thrive.
 """
 from typing import List, Optional
 from data_model import (

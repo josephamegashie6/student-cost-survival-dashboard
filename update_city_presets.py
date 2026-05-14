@@ -54,8 +54,9 @@ content = re.sub(
 )
 
 # Replace CITY_EXPENSE_PRESETS block
+# Use a more robust regex that matches until the closing brace of the main dict
 content = re.sub(
-    r'CITY_EXPENSE_PRESETS\s*=\s*\{[^}]+\}',
+    r'CITY_EXPENSE_PRESETS\s*=\s*\{.*?\n\}',
     new_presets,
     content,
     flags=re.DOTALL
