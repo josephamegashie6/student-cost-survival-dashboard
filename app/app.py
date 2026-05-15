@@ -468,132 +468,6 @@ CITY_EXPENSE_PRESETS = {
     "Guelph": {"rent": 1250, "utilities": 142, "food": 315, "transport": 82, "phone_internet": 65, "misc_basic": 115, "discretionary": 175},
     "St. Catharines": {"rent": 1200, "utilities": 140, "food": 308, "transport": 78, "phone_internet": 60, "misc_basic": 110, "discretionary": 168},
     "Kelowna": {"rent": 1380, "utilities": 138, "food": 325, "transport": 82, "phone_internet": 65, "misc_basic": 118, "discretionary": 182},
-},
-    "Los Angeles": {"rent": 2350, "utilities": 130, "food": 400, "transport": 110, "phone_internet": 70, "misc_basic": 160, "discretionary": 260},
-    "Chicago": {"rent": 1750, "utilities": 145, "food": 380, "transport": 105, "phone_internet": 70, "misc_basic": 140, "discretionary": 220},
-    "Houston": {"rent": 1450, "utilities": 125, "food": 320, "transport": 75, "phone_internet": 65, "misc_basic": 120, "discretionary": 190},
-    "Phoenix": {"rent": 1400, "utilities": 120, "food": 310, "transport": 65, "phone_internet": 65, "misc_basic": 115, "discretionary": 185},
-    "Philadelphia": {"rent": 1700, "utilities": 140, "food": 360, "transport": 85, "phone_internet": 70, "misc_basic": 135, "discretionary": 210},
-    "San Antonio": {"rent": 1200, "utilities": 118, "food": 300, "transport": 60, "phone_internet": 65, "misc_basic": 112, "discretionary": 175},
-    "San Diego": {"rent": 2150, "utilities": 128, "food": 390, "transport": 100, "phone_internet": 70, "misc_basic": 150, "discretionary": 235},
-    "Dallas": {"rent": 1500, "utilities": 122, "food": 325, "transport": 70, "phone_internet": 65, "misc_basic": 118, "discretionary": 190},
-    "San Jose": {"rent": 2600, "utilities": 140, "food": 420, "transport": 105, "phone_internet": 75, "misc_basic": 170, "discretionary": 270},
-    "Austin": {"rent": 1700, "utilities": 135, "food": 340, "transport": 85, "phone_internet": 65, "misc_basic": 130, "discretionary": 210},
-    "Jacksonville": {"rent": 1300, "utilities": 118, "food": 295, "transport": 60, "phone_internet": 65, "misc_basic": 110, "discretionary": 170},
-    "Fort Worth": {"rent": 1300, "utilities": 120, "food": 300, "transport": 62, "phone_internet": 65, "misc_basic": 112, "discretionary": 172},
-    "Columbus": {"rent": 1300, "utilities": 118, "food": 295, "transport": 55, "phone_internet": 65, "misc_basic": 112, "discretionary": 170},
-    "Charlotte": {"rent": 1380, "utilities": 120, "food": 305, "transport": 65, "phone_internet": 65, "misc_basic": 115, "discretionary": 180},
-    "Indianapolis": {"rent": 1100, "utilities": 115, "food": 285, "transport": 55, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
-    "San Francisco": {"rent": 3100, "utilities": 140, "food": 450, "transport": 120, "phone_internet": 75, "misc_basic": 190, "discretionary": 300},
-    "Seattle": {"rent": 2100, "utilities": 150, "food": 390, "transport": 95, "phone_internet": 70, "misc_basic": 155, "discretionary": 240},
-    "Denver": {"rent": 1850, "utilities": 138, "food": 350, "transport": 80, "phone_internet": 65, "misc_basic": 135, "discretionary": 215},
-    "Nashville": {"rent": 1650, "utilities": 128, "food": 330, "transport": 70, "phone_internet": 65, "misc_basic": 125, "discretionary": 200},
-    "Oklahoma City": {"rent": 1000, "utilities": 112, "food": 275, "transport": 55, "phone_internet": 60, "misc_basic": 105, "discretionary": 160},
-    "El Paso": {"rent": 950, "utilities": 110, "food": 265, "transport": 52, "phone_internet": 60, "misc_basic": 100, "discretionary": 155},
-    "Washington DC": {"rent": 2400, "utilities": 150, "food": 410, "transport": 100, "phone_internet": 75, "misc_basic": 165, "discretionary": 255},
-    "Boston": {"rent": 2400, "utilities": 155, "food": 420, "transport": 90, "phone_internet": 75, "misc_basic": 165, "discretionary": 250},
-    "Memphis": {"rent": 1000, "utilities": 112, "food": 275, "transport": 55, "phone_internet": 60, "misc_basic": 105, "discretionary": 158},
-    "Louisville": {"rent": 1050, "utilities": 113, "food": 278, "transport": 55, "phone_internet": 60, "misc_basic": 106, "discretionary": 160},
-    "Portland": {"rent": 1700, "utilities": 140, "food": 365, "transport": 90, "phone_internet": 65, "misc_basic": 130, "discretionary": 210},
-    "Las Vegas": {"rent": 1400, "utilities": 125, "food": 315, "transport": 70, "phone_internet": 65, "misc_basic": 115, "discretionary": 182},
-    "Milwaukee": {"rent": 1150, "utilities": 118, "food": 285, "transport": 60, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
-    "Albuquerque": {"rent": 1150, "utilities": 118, "food": 285, "transport": 60, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
-    "Tucson": {"rent": 1050, "utilities": 118, "food": 278, "transport": 58, "phone_internet": 60, "misc_basic": 105, "discretionary": 160},
-    "Fresno": {"rent": 1150, "utilities": 120, "food": 285, "transport": 60, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
-    "Sacramento": {"rent": 1600, "utilities": 130, "food": 340, "transport": 78, "phone_internet": 65, "misc_basic": 125, "discretionary": 195},
-    "Mesa": {"rent": 1300, "utilities": 118, "food": 300, "transport": 62, "phone_internet": 65, "misc_basic": 112, "discretionary": 172},
-    "Kansas City": {"rent": 1200, "utilities": 118, "food": 290, "transport": 58, "phone_internet": 60, "misc_basic": 110, "discretionary": 170},
-    "Atlanta": {"rent": 1600, "utilities": 130, "food": 330, "transport": 80, "phone_internet": 65, "misc_basic": 125, "discretionary": 200},
-    "Omaha": {"rent": 1050, "utilities": 115, "food": 278, "transport": 55, "phone_internet": 60, "misc_basic": 106, "discretionary": 160},
-    "Colorado Springs": {"rent": 1300, "utilities": 120, "food": 300, "transport": 62, "phone_internet": 65, "misc_basic": 112, "discretionary": 172},
-    "Raleigh": {"rent": 1450, "utilities": 122, "food": 310, "transport": 65, "phone_internet": 65, "misc_basic": 115, "discretionary": 185},
-    "Virginia Beach": {"rent": 1380, "utilities": 120, "food": 305, "transport": 62, "phone_internet": 65, "misc_basic": 112, "discretionary": 178},
-    "Minneapolis": {"rent": 1500, "utilities": 140, "food": 320, "transport": 70, "phone_internet": 65, "misc_basic": 125, "discretionary": 195},
-    "Tampa": {"rent": 1500, "utilities": 125, "food": 320, "transport": 68, "phone_internet": 65, "misc_basic": 118, "discretionary": 185},
-    "New Orleans": {"rent": 1250, "utilities": 122, "food": 295, "transport": 62, "phone_internet": 65, "misc_basic": 112, "discretionary": 172},
-    "Miami": {"rent": 2100, "utilities": 135, "food": 380, "transport": 85, "phone_internet": 70, "misc_basic": 150, "discretionary": 240},
-    "Orlando": {"rent": 1500, "utilities": 125, "food": 320, "transport": 68, "phone_internet": 65, "misc_basic": 118, "discretionary": 185},
-    "Baltimore": {"rent": 1500, "utilities": 130, "food": 330, "transport": 70, "phone_internet": 65, "misc_basic": 120, "discretionary": 190},
-    "Pittsburgh": {"rent": 1300, "utilities": 120, "food": 300, "transport": 60, "phone_internet": 65, "misc_basic": 115, "discretionary": 175},
-    "Cincinnati": {"rent": 1150, "utilities": 115, "food": 285, "transport": 55, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
-    "Cleveland": {"rent": 1050, "utilities": 115, "food": 278, "transport": 55, "phone_internet": 60, "misc_basic": 106, "discretionary": 160},
-    "Detroit": {"rent": 1050, "utilities": 118, "food": 278, "transport": 55, "phone_internet": 60, "misc_basic": 106, "discretionary": 160},
-    "St. Louis": {"rent": 1200, "utilities": 125, "food": 310, "transport": 65, "phone_internet": 65, "misc_basic": 120, "discretionary": 180},
-    "Salt Lake City": {"rent": 1450, "utilities": 122, "food": 315, "transport": 68, "phone_internet": 65, "misc_basic": 115, "discretionary": 182},
-    "Hartford": {"rent": 1500, "utilities": 128, "food": 320, "transport": 68, "phone_internet": 65, "misc_basic": 118, "discretionary": 185},
-    "Providence": {"rent": 1450, "utilities": 125, "food": 315, "transport": 68, "phone_internet": 65, "misc_basic": 115, "discretionary": 182},
-    "Buffalo": {"rent": 1050, "utilities": 118, "food": 278, "transport": 55, "phone_internet": 60, "misc_basic": 106, "discretionary": 160},
-    "Rochester": {"rent": 1000, "utilities": 115, "food": 272, "transport": 52, "phone_internet": 60, "misc_basic": 104, "discretionary": 158},
-    "Albany": {"rent": 1200, "utilities": 118, "food": 285, "transport": 58, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
-    "Baton Rouge": {"rent": 1200, "utilities": 118, "food": 285, "transport": 58, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
-    "Des Moines": {"rent": 1050, "utilities": 115, "food": 275, "transport": 55, "phone_internet": 60, "misc_basic": 106, "discretionary": 160},
-    "Madison": {"rent": 1380, "utilities": 125, "food": 305, "transport": 55, "phone_internet": 65, "misc_basic": 115, "discretionary": 175},
-    "Ann Arbor": {"rent": 1500, "utilities": 130, "food": 315, "transport": 55, "phone_internet": 65, "misc_basic": 120, "discretionary": 185},
-    "Champaign": {"rent": 1100, "utilities": 115, "food": 280, "transport": 45, "phone_internet": 60, "misc_basic": 105, "discretionary": 160},
-    "Amherst": {"rent": 1250, "utilities": 120, "food": 290, "transport": 50, "phone_internet": 65, "misc_basic": 110, "discretionary": 170},
-    "College Station": {"rent": 1050, "utilities": 110, "food": 270, "transport": 45, "phone_internet": 60, "misc_basic": 100, "discretionary": 155},
-    "Tempe": {"rent": 1450, "utilities": 120, "food": 310, "transport": 65, "phone_internet": 65, "misc_basic": 115, "discretionary": 185},
-    "Evanston": {"rent": 1700, "utilities": 138, "food": 345, "transport": 85, "phone_internet": 70, "misc_basic": 130, "discretionary": 205},
-    "Durham": {"rent": 1500, "utilities": 122, "food": 315, "transport": 65, "phone_internet": 65, "misc_basic": 118, "discretionary": 185},
-    "Chapel Hill": {"rent": 1450, "utilities": 120, "food": 310, "transport": 62, "phone_internet": 65, "misc_basic": 115, "discretionary": 182},
-    "Charlottesville": {"rent": 1300, "utilities": 118, "food": 295, "transport": 58, "phone_internet": 65, "misc_basic": 112, "discretionary": 172},
-    "Knoxville": {"rent": 1050, "utilities": 115, "food": 275, "transport": 55, "phone_internet": 60, "misc_basic": 106, "discretionary": 160},
-    "Gainesville": {"rent": 1150, "utilities": 118, "food": 280, "transport": 58, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
-    "Tallahassee": {"rent": 1050, "utilities": 115, "food": 275, "transport": 55, "phone_internet": 60, "misc_basic": 105, "discretionary": 160},
-    "Lexington": {"rent": 1000, "utilities": 113, "food": 272, "transport": 52, "phone_internet": 60, "misc_basic": 104, "discretionary": 158},
-    "Richmond": {"rent": 1300, "utilities": 118, "food": 295, "transport": 60, "phone_internet": 65, "misc_basic": 112, "discretionary": 172},
-    "Anchorage": {"rent": 1450, "utilities": 175, "food": 380, "transport": 72, "phone_internet": 70, "misc_basic": 130, "discretionary": 195},
-    "Honolulu": {"rent": 2200, "utilities": 175, "food": 420, "transport": 85, "phone_internet": 70, "misc_basic": 160, "discretionary": 250},
-    "Birmingham": {"rent": 1000, "utilities": 112, "food": 270, "transport": 52, "phone_internet": 60, "misc_basic": 102, "discretionary": 155},
-    "Tucson": {"rent": 1050, "utilities": 118, "food": 278, "transport": 58, "phone_internet": 60, "misc_basic": 105, "discretionary": 160},
-    "Fayetteville": {"rent": 1000, "utilities": 110, "food": 268, "transport": 50, "phone_internet": 60, "misc_basic": 100, "discretionary": 155},
-    "Lincoln": {"rent": 1000, "utilities": 112, "food": 270, "transport": 52, "phone_internet": 60, "misc_basic": 102, "discretionary": 155},
-    "Sioux Falls": {"rent": 1000, "utilities": 112, "food": 268, "transport": 50, "phone_internet": 60, "misc_basic": 100, "discretionary": 155},
-    "Bismarck": {"rent": 1000, "utilities": 115, "food": 268, "transport": 50, "phone_internet": 60, "misc_basic": 100, "discretionary": 155},
-    "Cheyenne": {"rent": 1050, "utilities": 115, "food": 270, "transport": 52, "phone_internet": 60, "misc_basic": 102, "discretionary": 158},
-    "Helena": {"rent": 1050, "utilities": 115, "food": 272, "transport": 52, "phone_internet": 60, "misc_basic": 102, "discretionary": 158},
-    "Boise": {"rent": 1300, "utilities": 118, "food": 295, "transport": 58, "phone_internet": 60, "misc_basic": 110, "discretionary": 168},
-    "Portland": {"rent": 1380, "utilities": 122, "food": 305, "transport": 60, "phone_internet": 65, "misc_basic": 112, "discretionary": 175},
-    "Burlington": {"rent": 1380, "utilities": 122, "food": 305, "transport": 58, "phone_internet": 65, "misc_basic": 112, "discretionary": 175},
-    "Concord": {"rent": 1300, "utilities": 120, "food": 295, "transport": 55, "phone_internet": 65, "misc_basic": 110, "discretionary": 170},
-    "Manchester": {"rent": 1300, "utilities": 120, "food": 295, "transport": 55, "phone_internet": 65, "misc_basic": 110, "discretionary": 170},
-    "London": {"rent": 2200, "utilities": 180, "food": 400, "transport": 150, "phone_internet": 70, "misc_basic": 165, "discretionary": 260},
-    "Manchester": {"rent": 1200, "utilities": 158, "food": 330, "transport": 105, "phone_internet": 65, "misc_basic": 128, "discretionary": 198},
-    "Birmingham": {"rent": 1150, "utilities": 155, "food": 320, "transport": 100, "phone_internet": 65, "misc_basic": 125, "discretionary": 192},
-    "Edinburgh": {"rent": 1400, "utilities": 162, "food": 340, "transport": 110, "phone_internet": 65, "misc_basic": 132, "discretionary": 205},
-    "Glasgow": {"rent": 1150, "utilities": 155, "food": 320, "transport": 105, "phone_internet": 65, "misc_basic": 125, "discretionary": 192},
-    "Leeds": {"rent": 1150, "utilities": 152, "food": 315, "transport": 100, "phone_internet": 65, "misc_basic": 122, "discretionary": 188},
-    "Bristol": {"rent": 1300, "utilities": 158, "food": 330, "transport": 105, "phone_internet": 65, "misc_basic": 128, "discretionary": 198},
-    "Sheffield": {"rent": 1000, "utilities": 148, "food": 305, "transport": 95, "phone_internet": 60, "misc_basic": 118, "discretionary": 180},
-    "Nottingham": {"rent": 1000, "utilities": 148, "food": 302, "transport": 92, "phone_internet": 60, "misc_basic": 116, "discretionary": 178},
-    "Southampton": {"rent": 1150, "utilities": 152, "food": 315, "transport": 98, "phone_internet": 65, "misc_basic": 120, "discretionary": 185},
-    "Cardiff": {"rent": 1000, "utilities": 148, "food": 302, "transport": 92, "phone_internet": 60, "misc_basic": 116, "discretionary": 178},
-    "Oxford": {"rent": 1600, "utilities": 162, "food": 345, "transport": 108, "phone_internet": 70, "misc_basic": 132, "discretionary": 205},
-    "Cambridge": {"rent": 1600, "utilities": 160, "food": 342, "transport": 106, "phone_internet": 70, "misc_basic": 130, "discretionary": 202},
-    "Coventry": {"rent": 950, "utilities": 145, "food": 295, "transport": 88, "phone_internet": 60, "misc_basic": 112, "discretionary": 172},
-    "Leicester": {"rent": 950, "utilities": 145, "food": 295, "transport": 88, "phone_internet": 60, "misc_basic": 112, "discretionary": 172},
-    "Exeter": {"rent": 1050, "utilities": 150, "food": 308, "transport": 92, "phone_internet": 60, "misc_basic": 118, "discretionary": 180},
-    "Newcastle": {"rent": 1000, "utilities": 148, "food": 305, "transport": 95, "phone_internet": 60, "misc_basic": 118, "discretionary": 180},
-    "Liverpool": {"rent": 1000, "utilities": 148, "food": 305, "transport": 98, "phone_internet": 60, "misc_basic": 118, "discretionary": 180},
-    "Warwick": {"rent": 1050, "utilities": 150, "food": 308, "transport": 92, "phone_internet": 60, "misc_basic": 118, "discretionary": 180},
-    "Toronto": {"rent": 1900, "utilities": 158, "food": 360, "transport": 118, "phone_internet": 70, "misc_basic": 145, "discretionary": 225},
-    "Vancouver": {"rent": 2100, "utilities": 142, "food": 375, "transport": 112, "phone_internet": 70, "misc_basic": 152, "discretionary": 238},
-    "Montreal": {"rent": 1400, "utilities": 138, "food": 330, "transport": 95, "phone_internet": 65, "misc_basic": 128, "discretionary": 198},
-    "Calgary": {"rent": 1500, "utilities": 152, "food": 340, "transport": 100, "phone_internet": 65, "misc_basic": 130, "discretionary": 200},
-    "Ottawa": {"rent": 1500, "utilities": 148, "food": 338, "transport": 100, "phone_internet": 65, "misc_basic": 128, "discretionary": 198},
-    "Edmonton": {"rent": 1300, "utilities": 155, "food": 325, "transport": 95, "phone_internet": 65, "misc_basic": 122, "discretionary": 188},
-    "Winnipeg": {"rent": 1150, "utilities": 145, "food": 312, "transport": 85, "phone_internet": 60, "misc_basic": 115, "discretionary": 175},
-    "Quebec City": {"rent": 1150, "utilities": 140, "food": 310, "transport": 82, "phone_internet": 60, "misc_basic": 112, "discretionary": 172},
-    "Hamilton": {"rent": 1300, "utilities": 145, "food": 320, "transport": 88, "phone_internet": 65, "misc_basic": 118, "discretionary": 182},
-    "Waterloo": {"rent": 1300, "utilities": 142, "food": 318, "transport": 85, "phone_internet": 65, "misc_basic": 116, "discretionary": 178},
-    "Kingston": {"rent": 1200, "utilities": 140, "food": 308, "transport": 80, "phone_internet": 60, "misc_basic": 112, "discretionary": 172},
-    "Halifax": {"rent": 1200, "utilities": 142, "food": 310, "transport": 82, "phone_internet": 60, "misc_basic": 112, "discretionary": 172},
-    "Victoria": {"rent": 1700, "utilities": 140, "food": 348, "transport": 88, "phone_internet": 65, "misc_basic": 130, "discretionary": 200},
-    "London": {"rent": 1150, "utilities": 140, "food": 308, "transport": 80, "phone_internet": 60, "misc_basic": 110, "discretionary": 168},
-    "Saskatoon": {"rent": 1150, "utilities": 142, "food": 305, "transport": 78, "phone_internet": 60, "misc_basic": 108, "discretionary": 165},
-    "Guelph": {"rent": 1250, "utilities": 142, "food": 315, "transport": 82, "phone_internet": 65, "misc_basic": 115, "discretionary": 175},
-    "St. Catharines": {"rent": 1200, "utilities": 140, "food": 308, "transport": 78, "phone_internet": 60, "misc_basic": 110, "discretionary": 168},
-    "Kelowna": {"rent": 1380, "utilities": 138, "food": 325, "transport": 82, "phone_internet": 65, "misc_basic": 118, "discretionary": 182},
 }
 EXPENSE_COLS = ["rent", "utilities", "food", "transport", "phone_internet", "misc_basic"]
 INFLATION_RATE = 0.035  # 3.5% annual
@@ -774,7 +648,7 @@ if page == "Home":
     if not st.session_state.get("onboarding_done") and not st.session_state.get("calc_ready"):
         st.markdown("""
         <div style='background:linear-gradient(135deg,rgba(20,184,166,0.08) 0%,rgba(245,158,11,0.06) 100%);
-        border:1px solid rgba(245,158,11,0.25);border-radius:16px;padding:1.6rem 2rem;margin-bottom:1.5rem;'>
+            border-radius:16px;padding:1.8rem;margin-bottom:2rem;border:1px solid rgba(20,184,166,0.15);'>
             <div style='font-size:1.2rem;font-weight:700;color:#f59e0b;margin-bottom:0.4rem;'>👋 Welcome to CostCompass</div>
             <div style='font-size:0.92rem;color:#94a3b8;line-height:1.7;'>
             CostCompass helps you understand the real cost of studying abroad — before you arrive and after.
@@ -869,7 +743,7 @@ if page == "Home":
         else:
             for msg, lvl in alerts:
                 st.markdown(alert_html(msg, lvl), unsafe_allow_html=True)
-    # Workflow diagramm
+    # Workflow diagram
     st.markdown("<div class='section-header'>How CostCompass Works</div>", unsafe_allow_html=True)
     wf_cols = st.columns([1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1])
     steps = ["Enter Your Income", "Add Your Expenses", "See Your Budget", "Forecast Your Future", "Check Your Risk", "Make Better Decisions"]
@@ -982,221 +856,112 @@ elif page == "My Budget":
             st.metric("Projected Net Liquidity", usd(balance), delta=f"{'Surplus' if balance >= 0 else 'Deficit'}")
         with k4: st.metric("Financial Stability Indicator", f"{score}/100")
 
-        st.markdown("<div class='section-header' style='margin-top:1rem;'>Fixed vs Flexible Spending</div>", unsafe_allow_html=True)
-
-        ch1, ch2 = st.columns(2)
-        with ch1:
-            fig = go.Figure()
-            fig.add_trace(go.Bar(name="Total Inflows",  x=["Monthly Position"], y=[total_income],  marker_color=COLORS["teal"],  text=[usd(total_income)],  textposition="outside"))
-            fig.add_trace(go.Bar(name="Fixed Outflows", x=["Monthly Position"], y=[fixed_expenses], marker_color=COLORS["gold"],  text=[usd(fixed_expenses)], textposition="outside"))
-            fig.add_trace(go.Bar(name="Variable Outflows", x=["Monthly Position"], y=[variable_expenses], marker_color=COLORS["red"], text=[usd(variable_expenses)], textposition="outside"))
-            fig.update_layout(title="Inflows vs Fixed vs Variable Outflows", barmode="group", **PLOT_LAYOUT)
-            st.plotly_chart(fig, use_container_width=True)
-
-        with ch2:
-            labels = ["Rent", "Utilities", "Phone/Internet", "Food", "Transport", "Essential Misc", "Discretionary"]
-            if tuition_monthly > 0: labels.append("Tuition")
-            values = [rent, utilities, phone_internet, food, transport, misc_basic, discretionary]
-            if tuition_monthly > 0: values.append(tuition_monthly)
-            colors_pie = [COLORS["red"], COLORS["gold"], COLORS["purple"], COLORS["teal"], COLORS["blue"], COLORS["green"], COLORS["slate"]]
-            if tuition_monthly > 0: colors_pie.append("#f97316")
-            fig2 = go.Figure(go.Pie(
-                labels=labels, values=values,
-                hole=0.52,
-                marker=dict(colors=colors_pie, line=dict(color="#050a14", width=2)),
-                textinfo="label+percent", textfont=dict(size=10),
+        # Visual breakdown
+        st.markdown("<div class='section-header'>Expense Distribution</div>", unsafe_allow_html=True)
+        v1, v2 = st.columns([1, 1.2])
+        with v1:
+            labels = ["Rent", "Utilities", "Food", "Transport", "Phone/Internet", "Misc", "Discretionary", "Tuition"]
+            values = [rent, utilities, food, transport, phone_internet, misc_basic, discretionary, tuition_monthly]
+            fig_pie = px.pie(names=labels, values=values, hole=0.5, title="Monthly Outflows by Category",
+                             color_discrete_sequence=[COLORS["red"], COLORS["gold"], COLORS["teal"], COLORS["blue"], COLORS["purple"], COLORS["green"], COLORS["slate"], "#475569"])
+            fig_pie.update_layout(**PLOT_LAYOUT)
+            st.plotly_chart(fig_pie, use_container_width=True)
+        with v2:
+            # Waterfall chart
+            fig_wf = go.Figure(go.Waterfall(
+                name="Cash Flow", orientation="v",
+                measure=["absolute", "relative", "relative", "total"],
+                x=["Total Inflows", "Fixed Expenses", "Variable Expenses", "Net Liquidity"],
+                y=[total_income, -fixed_expenses, -variable_expenses, 0],
+                connector=dict(line=dict(color=COLORS["slate"])),
+                increasing=dict(marker=dict(color=COLORS["teal"])),
+                decreasing=dict(marker=dict(color=COLORS["red"])),
+                totals=dict(marker=dict(color=COLORS["gold"])),
             ))
-            fig2.update_layout(title="Expense Allocation by Category", **PLOT_LAYOUT)
-            st.plotly_chart(fig2, use_container_width=True)
-
-        # Savings trajectory
-        st.markdown("<div class='section-header'>Your Savings Over the Next 12 Months</div>", unsafe_allow_html=True)
-        months_proj = list(range(1, 13))
-        cumulative_savings = [max(0, balance) * m for m in months_proj]
-        fig3 = go.Figure()
-        fig3.add_trace(go.Scatter(x=months_proj, y=cumulative_savings, mode="lines+markers",
-                                  line=dict(color=COLORS["teal"], width=2.5),
-                                  marker=dict(size=6, color=COLORS["teal"]),
-                                  fill="tozeroy", fillcolor="rgba(20,184,166,0.08)",
-                                  name="Cumulative Cash Reserve"))
-        fig3.update_layout(title="Projected Cash Reserve Accumulation (12 Months, No Inflation Adjustment)",
-                           xaxis_title="Month", yaxis_title="Cumulative Balance (USD)", **PLOT_LAYOUT)
-        st.plotly_chart(fig3, use_container_width=True)
-
-        
+            fig_wf.update_layout(title="Monthly Cash Flow Waterfall", **PLOT_LAYOUT)
+            st.plotly_chart(fig_wf, use_container_width=True)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PAGE 3: COST INTELLIGENCE
+# PAGE 3: SPENDING BREAKDOWN
 # ─────────────────────────────────────────────────────────────────────────────
 elif page == "Spending Breakdown":
     st.markdown("<div class='page-title'>Spending Breakdown</div>", unsafe_allow_html=True)
-    st.markdown("<div class='page-subtitle'>Understand how your spending compares to safe limits — and where the pressure is building.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Detailed analysis of your fixed vs. variable spending.</div>", unsafe_allow_html=True)
 
     if not st.session_state["calc_ready"]:
-        st.info("Run Cash Flow Analysis first to activate cost intelligence modules.")
+        st.info("Run Cash Flow Analysis first to see your breakdown.")
         st.stop()
 
-    inc  = st.session_state["income"]
     rent = st.session_state["rent"]
+    util = st.session_state["utilities"]
     food = st.session_state["food"]
-    transport = st.session_state["transport"]
-    utilities = st.session_state["utilities"]
-    phone_internet = st.session_state["phone_internet"]
-    misc_basic = st.session_state["misc_basic"]
-    discretionary = st.session_state["discretionary"]
-    tuition_monthly = st.session_state["tuition_monthly"]
-    exp  = st.session_state["expenses"]
-    bal  = st.session_state["balance"]
+    tran = st.session_state["transport"]
+    phon = st.session_state["phone_internet"]
+    misc = st.session_state["misc_basic"]
+    disc = st.session_state["discretionary"]
+    tuit = st.session_state["tuition_monthly"]
+    inc  = st.session_state["income"]
 
-    # Cost burden ratios
-    st.markdown("<div class='section-header'>Where Your Money Is Going</div>", unsafe_allow_html=True)
-    burden_data = [
-        ("Rent Burden Ratio",          rent / inc if inc > 0 else 0,       0.30, 0.40, "Housing cost as % of inflows"),
-        ("Tuition Pressure Indicator", tuition_monthly / inc if inc > 0 else 0, 0.20, 0.35, "Tuition allocation as % of inflows"),
-        ("Transportation Expense Ratio", transport / inc if inc > 0 else 0, 0.08, 0.15, "Transport cost as % of inflows"),
-        ("Food Cost Ratio",            food / inc if inc > 0 else 0,        0.15, 0.25, "Food spend as % of inflows"),
-        ("Discretionary Spending Ratio", discretionary / inc if inc > 0 else 0, 0.10, 0.18, "Non-essential spend as % of inflows"),
-    ]
+    fixed = rent + util + phon + tuit
+    variable = food + tran + misc + disc
+    total = fixed + variable
 
-    b1, b2 = st.columns(2)
-    for i, (label, ratio, warn_thresh, danger_thresh, desc) in enumerate(burden_data):
-        col = b1 if i % 2 == 0 else b2
-        with col:
-            if ratio <= warn_thresh:   status, color = "Healthy",  "green"
-            elif ratio <= danger_thresh: status, color = "Elevated", "yellow"
-            else:                       status, color = "Critical", "red"
-            st.markdown(f"""
-            <div class='glass-card' style='padding:0.9rem 1.1rem; margin-bottom:0.7rem;'>
-                <div style='display:flex; justify-content:space-between; align-items:center;'>
-                    <div>
-                        <div style='font-size:0.78rem; color:#64748b; text-transform:uppercase; letter-spacing:0.06em;'>{label}</div>
-                        <div style='font-size:1.4rem; font-weight:700; color:#f8fafc; margin:0.15rem 0;'>{pct(ratio)}</div>
-                        <div style='font-size:0.78rem; color:#64748b;'>{desc}</div>
-                    </div>
-                    {pill(status, color)}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Fixed vs. Variable Analysis</div>", unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown(f"**Fixed Expenses** — {usd(fixed)} ({pct(fixed/total if total>0 else 0)} of total)")
+        st.markdown(f"- Rent: {usd(rent)}")
+        st.markdown(f"- Utilities: {usd(util)}")
+        st.markdown(f"- Phone/Internet: {usd(phon)}")
+        st.markdown(f"- Tuition: {usd(tuit)}")
+    with c2:
+        st.markdown(f"**Variable Expenses** — {usd(variable)} ({pct(variable/total if total>0 else 0)} of total)")
+        st.markdown(f"- Food: {usd(food)}")
+        st.markdown(f"- Transport: {usd(tran)}")
+        st.markdown(f"- Essential Misc: {usd(misc)}")
+        st.markdown(f"- Discretionary: {usd(disc)}")
 
-    # Financial health indicators
-    st.markdown("<div class='section-header'>Your Financial Health</div>", unsafe_allow_html=True)
-    score = st.session_state["health_score"]
-    rr    = st.session_state["rent_ratio"]
-    sr    = st.session_state["savings_rate"]
-    bm    = st.session_state["buffer_months"]
-    aff   = affordability_score(inc, rent, tuition_monthly)
-    sl, sl_color = stress_level(aff)
-
-    h1, h2, h3, h4 = st.columns(4)
-    with h1: st.metric("Emergency Fund Coverage", f"{bm:.1f} mo", help="Months of expenses covered by current net balance")
-    with h2: st.metric("Affordability Score",     f"{aff}/100",  help="Composite affordability index (higher = more affordable)")
-    with h3: st.metric("Financial Stress Level",  sl,            help="Derived from rent burden + tuition pressure")
-    with h4: st.metric("Discretionary Ratio",     pct(discretionary / inc if inc > 0 else 0), help="Non-essential spending as % of inflows")
-
-    # Spending anomaly detection
-    st.markdown("<div class='section-header'>Spending Warnings</div>", unsafe_allow_html=True)
-    hist = pd.DataFrame(st.session_state["calc_history"])
-    if len(hist) >= 3:
-        hist["balance"] = pd.to_numeric(hist["balance"], errors="coerce")
-        hist["expenses"] = pd.to_numeric(hist["expenses"], errors="coerce")
-        rolling_avg = hist["expenses"].rolling(3).mean().iloc[-1]
-        current_exp = st.session_state["expenses"]
-        deviation = (current_exp - rolling_avg) / rolling_avg if rolling_avg > 0 else 0
-        if abs(deviation) > 0.10:
-            direction = "above" if deviation > 0 else "below"
-            st.markdown(alert_html(f"Spending Anomaly Detected: Current outflows are {abs(deviation)*100:.1f}% {direction} the 3-run rolling average ({usd(rolling_avg)}). Review expense categories for unusual activity.", "warn"), unsafe_allow_html=True)
-        else:
-            st.markdown(alert_html(f"Spending within normal range. Current outflows deviate {abs(deviation)*100:.1f}% from 3-run rolling average ({usd(rolling_avg)}).", "ok"), unsafe_allow_html=True)
-
-        # Budget deviation tracking
-        fig_hist = go.Figure()
-        fig_hist.add_trace(go.Scatter(x=list(range(len(hist))), y=hist["expenses"],
-                                      mode="lines+markers", name="Monthly Outflows",
-                                      line=dict(color=COLORS["gold"], width=2), marker=dict(size=5)))
-        fig_hist.add_trace(go.Scatter(x=list(range(len(hist))), y=hist["expenses"].rolling(3, min_periods=1).mean(),
-                                      mode="lines", name="3-Run Rolling Avg",
-                                      line=dict(color=COLORS["teal"], width=1.5, dash="dash")))
-        fig_hist.update_layout(title="Outflow Trend & Rolling Average", xaxis_title="Run", yaxis_title="USD", **PLOT_LAYOUT)
-        st.plotly_chart(fig_hist, use_container_width=True)
-    else:
-        st.info("Run Cash Flow Analysis at least 3 times to activate anomaly detection and trend tracking.")
-
-    
+    # Sunburst chart
+    st.markdown("<div class='section-header'>Hierarchical Spending View</div>", unsafe_allow_html=True)
+    data = {
+        "labels": ["Total", "Fixed", "Variable", "Rent", "Utilities", "Phone", "Tuition", "Food", "Transport", "Misc", "Disc"],
+        "parents": ["", "Total", "Total", "Fixed", "Fixed", "Fixed", "Fixed", "Variable", "Variable", "Variable", "Variable"],
+        "values": [total, fixed, variable, rent, util, phon, tuit, food, tran, misc, disc]
+    }
+    fig_sun = go.Figure(go.Sunburst(labels=data["labels"], parents=data["parents"], values=data["values"], branchvalues="total"))
+    fig_sun.update_layout(margin=dict(t=0, l=0, r=0, b=0), **PLOT_LAYOUT)
+    st.plotly_chart(fig_sun, use_container_width=True)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PAGE 4: FORECASTING
+# PAGE 4: FUTURE FORECAST
 # ─────────────────────────────────────────────────────────────────────────────
 elif page == "Future Forecast":
     st.markdown("<div class='page-title'>Future Forecast</div>", unsafe_allow_html=True)
-    st.markdown("<div class='page-subtitle'>See how your finances will look 6 to 12 months from now — including inflation.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Project your financial position over the next 12 months.</div>", unsafe_allow_html=True)
 
     if not st.session_state["calc_ready"]:
-        st.info("Run Cash Flow Analysis first to activate forecasting modules.")
+        st.info("Run Cash Flow Analysis first to see your forecast.")
         st.stop()
 
-    inc = st.session_state["income"]
-    exp = st.session_state["expenses"]
     bal = st.session_state["balance"]
-    monthly_net = inc - exp
-
-    f1, f2, f3 = st.columns(3)
-    with f1:
-        forecast_months = st.slider("Forecast horizon (months)", 3, 24, 12)
-    with f2:
-        inflation_override = st.slider("Annual inflation rate (%)", 0.0, 10.0, 3.5, 0.5) / 100
-    with f3:
-        starting_balance = st.number_input("Starting cash balance ($)", min_value=0.0, value=max(0.0, float(bal)), step=100.0)
-
-    df_forecast = forecast_balance(starting_balance, monthly_net, forecast_months, inflation_override)
-
-    # Summary KPIs
-    final_bal = df_forecast["Projected Balance"].iloc[-1]
-    min_bal   = df_forecast["Projected Balance"].min()
-    avg_net   = df_forecast["Monthly Net (Inflation-Adj)"].mean()
-
-    k1, k2, k3, k4 = st.columns(4)
-    with k1: st.metric("Projected Balance (End of Period)", usd(final_bal))
-    with k2: st.metric("Minimum Projected Balance",         usd(min_bal), delta="Lowest point" if min_bal < starting_balance else None)
-    with k3: st.metric("Avg Inflation-Adjusted Monthly Net", usd(avg_net))
-    with k4:
-        semester_months = 4
-        sem_bal = forecast_balance(starting_balance, monthly_net, semester_months, inflation_override)["Projected Balance"].iloc[-1]
-        st.metric("Semester Affordability Projection", usd(sem_bal), delta=f"{semester_months}-month horizon")
-
-    # Forecast chart
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=df_forecast["Month"], y=df_forecast["Projected Balance"],
-        mode="lines+markers", name="Projected Balance",
-        line=dict(color=COLORS["teal"], width=2.5),
-        marker=dict(size=5), fill="tozeroy", fillcolor="rgba(20,184,166,0.06)",
-    ))
-    fig.add_hline(y=0, line_dash="dash", line_color=COLORS["red"], annotation_text="Zero Balance", annotation_font_color=COLORS["red"])
-    fig.add_hline(y=starting_balance, line_dash="dot", line_color=COLORS["slate"], annotation_text="Starting Balance", annotation_font_color=COLORS["slate"])
-    fig.update_layout(title=f"Inflation-Adjusted Balance Forecast ({forecast_months} Months, {inflation_override*100:.1f}% Annual Inflation)",
-                      xaxis_title="Month", yaxis_title="Projected Balance (USD)", **PLOT_LAYOUT)
-    st.plotly_chart(fig, use_container_width=True)
-
-    # Inflation-adjusted net
-    fig2 = go.Figure()
-    fig2.add_trace(go.Bar(
-        x=df_forecast["Month"], y=df_forecast["Monthly Net (Inflation-Adj)"],
-        marker_color=[COLORS["teal"] if v >= 0 else COLORS["red"] for v in df_forecast["Monthly Net (Inflation-Adj)"]],
-        name="Monthly Net (Inflation-Adj)",
-    ))
-    fig2.add_hline(y=0, line_color=COLORS["slate"], line_dash="dash")
-    fig2.update_layout(title="Inflation-Adjusted Monthly Net Liquidity Over Time",
-                       xaxis_title="Month", yaxis_title="Monthly Net (USD)", **PLOT_LAYOUT)
-    st.plotly_chart(fig2, use_container_width=True)
-
-    if min_bal < 0:
-        st.markdown(alert_html(f"Liquidity Warning: Projected balance turns negative at month {df_forecast[df_forecast['Projected Balance']<0]['Month'].iloc[0]}. Consider increasing inflows or reducing outflows to maintain positive liquidity.", "danger"), unsafe_allow_html=True)
-    else:
-        st.markdown(alert_html(f"Positive liquidity maintained throughout the {forecast_months}-month forecast horizon. Projected end balance: {usd(final_bal)}.", "ok"), unsafe_allow_html=True)
-
+    st.markdown("<div class='section-header'>12-Month Projection</div>", unsafe_allow_html=True)
+    months = st.slider("Forecast Horizon (Months)", 1, 24, 12)
     
+    # Starting balance input
+    start_bal = st.number_input("Current Savings / Starting Balance ($)", min_value=0.0, value=2000.0, step=100.0)
+    
+    df_forecast = forecast_balance(start_bal, bal, months)
+    
+    fig_forecast = px.line(df_forecast, x="Month", y="Projected Balance", title="Projected Savings Growth (Inflation-Adjusted)")
+    fig_forecast.add_hline(y=0, line_dash="dash", line_color="red")
+    fig_forecast.update_traces(line_color=COLORS["teal"], mode="lines+markers")
+    fig_forecast.update_layout(**PLOT_LAYOUT)
+    st.plotly_chart(fig_forecast, use_container_width=True)
+    
+    st.markdown("<div class='section-header'>Forecast Data</div>", unsafe_allow_html=True)
+    st.dataframe(df_forecast, use_container_width=True)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1306,8 +1071,6 @@ elif page == "What If?":
         st.markdown(f"**Variable Outflows** — {usd(var_total)} ({pct(var_total / base_inc if base_inc > 0 else 0)} of inflows)")
         for k, v in variable.items():
             st.markdown(f"- {k}: **{usd(v)}** ({pct(v / base_inc if base_inc > 0 else 0)})")
-
-    
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1420,100 +1183,68 @@ elif page == "City Guide":
             x="City", y="Transit Score",
             color="Transit Score",
             color_continuous_scale=[[0, COLORS["red"]], [0.5, COLORS["gold"]], [1, COLORS["teal"]]],
-            title="Public Transit Score (10 = best)",
+            title="Public Transit Score (10 = Best)",
         )
-        fig_ts.add_hline(y=7, line_dash="dot", line_color=COLORS["green"], annotation_text="Good Transit")
         fig_ts.update_layout(**PLOT_LAYOUT)
         st.plotly_chart(fig_ts, use_container_width=True)
 
-    # ── Full data table
-    st.markdown("<div class='section-header'>Full Benchmark Table</div>", unsafe_allow_html=True)
-    display_df = cg_df[["City", "State/Region", "Cost Tier", "Rent (Shared)", "Rent (1BR)", "Groceries", "Utilities", "Transport", "Total Monthly", "Transit Score"]].copy()
-    for col in ["Rent (Shared)", "Rent (1BR)", "Groceries", "Utilities", "Transport", "Total Monthly"]:
-        display_df[col] = display_df[col].apply(lambda x: f"${x:,.0f}")
-    st.dataframe(display_df, use_container_width=True, hide_index=True)
-
-    
-
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PAGE 7: CASE STUDY
+# PAGE 7: DECISION PLANNER
 # ─────────────────────────────────────────────────────────────────────────────
 elif page == "Decision Planner":
     page_decision_planner()
-elif page == "Compare Offers":
-    page_admit_comparison()
-elif page == "Stress Test":
-    page_stress_test()
-elif page == "Move-In Planner":
-    page_movein_shock()
-elif page == "How It Works":
-    st.markdown("<div class='page-title'>How CostCompass Works</div>", unsafe_allow_html=True)
-    st.markdown("<div class='page-subtitle'>A quick guide to getting the most out of every feature.</div>", unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class='glass-card'>
-        <div class='section-header'>What CostCompass Does</div>
-        <p style='color:#94a3b8; font-size:0.9rem; line-height:1.75;'>
-        Students navigating academic and living expenses face compounding financial pressures — rising housing costs,
-        tuition obligations, variable income streams, and limited financial planning infrastructure. Without structured
-        analytical tools, students lack visibility into their <strong style='color:#e2e8f0;'>affordability position</strong>,
-        <strong style='color:#e2e8f0;'>spending behaviour patterns</strong>, and <strong style='color:#e2e8f0;'>long-term financial sustainability</strong>.
-        This creates reactive rather than proactive financial decision-making.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class='glass-card'>
-        <div class='section-header'>How It Helps You</div>
-        <p style='color:#94a3b8; font-size:0.9rem; line-height:1.75;'>
-        Developed a <strong style='color:#14b8a6;'>financial intelligence platform</strong> combining spending analytics,
-        affordability monitoring, inflation-adjusted forecasting, and scenario simulation. The system transforms raw
-        financial inputs into structured decision-support outputs — enabling data-driven financial planning aligned
-        with institutional analytics standards.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("<div class='section-header'>System Features</div>", unsafe_allow_html=True)
-    feat_cols = st.columns(3)
-    features = [
-        ("📊", "Cash Flow Analysis",      "Monthly inflow/outflow decomposition, fixed vs variable expense categorisation, savings trajectory modelling"),
-        ("🔍", "Cost Burden Analysis",     "Rent burden ratio, tuition pressure indicator, transportation and food cost ratios with threshold-based alerts"),
-        ("💡", "Financial Health Scoring", "Composite 0–100 stability indicator covering balance position, rent burden, savings rate, and emergency fund coverage"),
-        ("📈", "Forecasting Engine",       "Inflation-adjusted 24-month balance projection, semester affordability modelling, liquidity risk detection"),
-        ("⚙️", "Scenario Simulation",     "Rent increase, tuition pressure, income reduction, and spending cut scenarios with waterfall impact analysis"),
-        ("🏙️", "City Analytics",          "Multi-city cost-of-living comparison across 18 months of realistic data with semester-phase financial analysis"),
-    ]
-    for i, (icon, title, desc) in enumerate(features):
-        with feat_cols[i % 3]:
-            st.markdown(f"""
-            <div class='glass-card' style='min-height:130px;'>
-                <div style='font-size:1.4rem; margin-bottom:0.4rem;'>{icon}</div>
-                <div style='font-size:0.88rem; font-weight:600; color:#e2e8f0; margin-bottom:0.4rem;'>{title}</div>
-                <div style='font-size:0.80rem; color:#64748b; line-height:1.55;'>{desc}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-    # Technical Architecture and Impact sections removed for production look.
-
-    st.markdown("""
-    <div class='glass-card' style='margin-top:1rem;'>
-        <div class='section-header'>How CostCompass Works</div>
-    """, unsafe_allow_html=True)
-    wf2 = st.columns([1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1])
-    steps2 = ["Enter Your Income", "Add Your Expenses", "See Your Budget", "Forecast Your Future", "Check Your Risk", "Make Better Decisions"]
-    for i, step in enumerate(steps2):
-        with wf2[i * 2]:
-            st.markdown(f"<div class='workflow-step'>{step}</div>", unsafe_allow_html=True)
-        if i < len(steps2) - 1:
-            with wf2[i * 2 + 1]:
-                st.markdown("<div class='workflow-arrow'>→</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PAGE: SETTINGS
+# PAGE 8: COMPARE OFFERS
+# ─────────────────────────────────────────────────────────────────────────────
+elif page == "Compare Offers":
+    page_admit_comparison()
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 9: STRESS TEST
+# ─────────────────────────────────────────────────────────────────────────────
+elif page == "Stress Test":
+    page_stress_test()
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 10: MOVE-IN PLANNER
+# ─────────────────────────────────────────────────────────────────────────────
+elif page == "Move-In Planner":
+    page_movein_shock()
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 11: HOW IT WORKS
+# ─────────────────────────────────────────────────────────────────────────────
+elif page == "How It Works":
+    st.markdown("<div class='page-title'>How CostCompass Works</div>", unsafe_allow_html=True)
+    st.markdown("<div class='page-subtitle'>Transparency in our data and methodology.</div>", unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class='glass-card'>
+        <div class='section-header'>Our Mission</div>
+        <p>CostCompass was built to solve a specific problem: international students often arrive in a new country with an incomplete understanding of their real daily costs. We provide data-driven transparency to help you plan with confidence.</p>
+        
+        <div class='section-header'>Data Sources</div>
+        <ul>
+            <li><strong>Cost of Living:</strong> Aggregated from Numbeo, Expatistan, and local government statistics (BLS, ONS, StatCan).</li>
+            <li><strong>Rent Benchmarks:</strong> Derived from Zillow, Rightmove, and Rentals.ca market reports.</li>
+            <li><strong>Wages:</strong> Based on statutory minimum wages for international students (20h/week limit).</li>
+        </ul>
+
+        <div class='section-header'>Financial Health Logic</div>
+        <p>Our <strong>Financial Stability Indicator</strong> (0-100) is calculated based on four weighted pillars:</p>
+        <ol>
+            <li><strong>Net Liquidity (40%):</strong> Is your monthly cash flow positive?</li>
+            <li><strong>Rent Burden (25%):</strong> Is your rent under 30% of your income?</li>
+            <li><strong>Savings Rate (20%):</strong> Are you building a buffer of at least 10%?</li>
+            <li><strong>Emergency Runway (15%):</strong> Do you have at least 3 months of coverage?</li>
+        </ol>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 12: SETTINGS
 # ─────────────────────────────────────────────────────────────────────────────
 elif page == "Settings":
     st.markdown("<div class='page-title'>Settings</div>", unsafe_allow_html=True)
@@ -1523,75 +1254,46 @@ elif page == "Settings":
         st.markdown("<div class='section-header'>Your Profile</div>", unsafe_allow_html=True)
         c1, c2 = st.columns(2)
         with c1:
-            home_country = st.selectbox(
-                "Home country",
-                ["Ghana", "Nigeria", "Kenya", "India", "China", "Pakistan", "Bangladesh", "Ethiopia", "South Africa", "Other"],
-                index=["Ghana", "Nigeria", "Kenya", "India", "China", "Pakistan", "Bangladesh", "Ethiopia", "South Africa", "Other"].index(
-                    st.session_state.get("settings_home_country", "Ghana")
-                )
-            )
+            home_country = st.selectbox("Home country", ["Ghana", "Nigeria", "India", "China", "Other"])
         with c2:
-            default_city = st.selectbox(
-                "Default city",
-                ["St. Louis, MO", "Chicago, IL", "New York, NY", "Boston, MA", "Houston, TX", "Atlanta, GA", "Los Angeles, CA", "Seattle, WA", "Austin, TX", "Other"],
-                index=0
-            )
+            default_city = st.selectbox("Default city", list(CITY_MIN_WAGE.keys()), index=list(CITY_MIN_WAGE.keys()).index("St. Louis") if "St. Louis" in CITY_MIN_WAGE else 0)
 
-        st.markdown("<div class='section-header' style='margin-top:1rem;'>Currency & FX</div>", unsafe_allow_html=True)
-        c3, c4 = st.columns(2)
-        with c3:
-            home_currency = st.selectbox(
-                "Home currency",
-                ["GHS (Ghana Cedi)", "NGN (Nigerian Naira)", "KES (Kenyan Shilling)", "INR (Indian Rupee)", "CNY (Chinese Yuan)", "PKR (Pakistani Rupee)", "USD (US Dollar)", "Other"],
-                index=["GHS (Ghana Cedi)", "NGN (Nigerian Naira)", "KES (Kenyan Shilling)", "INR (Indian Rupee)", "CNY (Chinese Yuan)", "PKR (Pakistani Rupee)", "USD (US Dollar)", "Other"].index(
-                    st.session_state.get("settings_home_currency", "GHS (Ghana Cedi)")
-                )
-            )
-        with c4:
-            fx_rate = st.number_input(
-                "Exchange rate (1 home unit = ? USD)",
-                min_value=0.0001, max_value=100.0,
-                value=float(st.session_state.get("settings_fx_rate", 0.067)),
-                step=0.001, format="%.4f"
-            )
+        st.markdown("<div class='section-header'>Currency & FX</div>", unsafe_allow_html=True)
+        f1, f2 = st.columns(2)
+        with f1:
+            home_currency = st.selectbox("Home currency", ["GHS (Ghana Cedi)", "NGN (Nigerian Naira)", "INR (Indian Rupee)", "CNY (Chinese Yuan)", "Other"])
+        with f2:
+            fx_rate = st.number_input("Exchange rate (1 home unit = ? USD)", value=0.067, format="%.4f")
 
-        st.markdown("<div class='section-header' style='margin-top:1rem;'>Display</div>", unsafe_allow_html=True)
-        c5, c6 = st.columns(2)
-        with c5:
-            show_tips = st.toggle("Show financial tips on dashboard", value=st.session_state.get("settings_show_tips", True))
-        with c6:
-            compact_mode = st.toggle("Compact mode (fewer charts)", value=st.session_state.get("settings_compact", False))
+        st.markdown("<div class='section-header'>Display</div>", unsafe_allow_html=True)
+        d1, d2 = st.columns(2)
+        with d1:
+            show_tips = st.toggle("Show financial tips on dashboard", value=True)
+        with d2:
+            compact_mode = st.toggle("Compact mode (fewer charts)", value=False)
 
-        st.markdown("<div class='section-header' style='margin-top:1rem;'>Data</div>", unsafe_allow_html=True)
-        reset_confirm = st.checkbox("I want to reset all my saved data")
+        st.markdown("<div class='section-header'>Data</div>", unsafe_allow_html=True)
+        reset_data = st.checkbox("I want to reset all my saved data")
 
-        saved = st.form_submit_button("Save Settings", use_container_width=True)
-
-    if saved:
-        st.session_state["settings_home_country"] = home_country
-        st.session_state["settings_default_city"] = default_city
-        st.session_state["settings_home_currency"] = home_currency
-        st.session_state["settings_fx_rate"] = fx_rate
-        st.session_state["settings_show_tips"] = show_tips
-        st.session_state["settings_compact"] = compact_mode
-        if reset_confirm:
-            keys_to_keep = {k for k in st.session_state if k.startswith("settings_")}
-            for k in list(st.session_state.keys()):
-                if k not in keys_to_keep:
+        save = st.form_submit_button("Save Settings", use_container_width=True)
+        if save:
+            if reset_data:
+                for k in list(st.session_state.keys()):
                     del st.session_state[k]
-            st.success("All data has been reset. Your settings have been saved.")
-        else:
-            st.success("Settings saved.")
+                st.rerun()
+            st.success("Settings saved successfully!")
 
-    st.markdown("<hr class='soft'>", unsafe_allow_html=True)
-    st.markdown("""
-    <div style='font-size:0.78rem; color:#475569; text-align:center; padding:1rem 0;'>
-        CostCompass v3.0 &nbsp;·&nbsp; Professional Financial Intelligence for Students &nbsp;·&nbsp;
-        <a href='mailto:amegashie@wustl.edu' style='color:#f59e0b; text-decoration:none;'>Support</a>
+# ─────────────────────────────────────────────────────────────────────────────
+# FOOTER
+# ─────────────────────────────────────────────────────────────────────────────
+st.markdown("<hr class='soft'>", unsafe_allow_html=True)
+st.markdown(f"""
+<div style='text-align:center; padding: 1rem 0;'>
+    <div style='font-size:0.75rem; color:#475569;'>
+        CostCompass v3.0 · Built by Joseph Amegashie · <a href='mailto:amegashie@wustl.edu' style='color:#14b8a6; text-decoration:none;'>amegashie@wustl.edu</a>
     </div>
-    """, unsafe_allow_html=True)
-
-    
-
-
-
+    <div class='disclaimer'>
+        Disclaimer: CostCompass provides estimates based on market benchmarks. Actual costs may vary significantly based on lifestyle, specific neighborhood, and inflation. This tool is for planning purposes and does not constitute professional financial advice.
+    </div>
+</div>
+""", unsafe_allow_html=True)
