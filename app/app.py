@@ -1221,27 +1221,27 @@ elif page == "How It Works":
     st.markdown("<div class='page-subtitle'>Transparency in our data and methodology.</div>", unsafe_allow_html=True)
 
     st.markdown("""
-    <div class='glass-card'>
-        <div class='section-header'>Our Mission</div>
-        <p>CostCompass was built to solve a specific problem: international students often arrive in a new country with an incomplete understanding of their real daily costs. We provide data-driven transparency to help you plan with confidence.</p>
-        
-        <div class='section-header'>Data Sources</div>
-        <ul>
-            <li><strong>Cost of Living:</strong> Aggregated from Numbeo, Expatistan, and local government statistics (BLS, ONS, StatCan).</li>
-            <li><strong>Rent Benchmarks:</strong> Derived from Zillow, Rightmove, and Rentals.ca market reports.</li>
-            <li><strong>Wages:</strong> Based on statutory minimum wages for international students (20h/week limit).</li>
-        </ul>
+<div class='glass-card'>
+    <div class='section-header'>Our Mission</div>
+    <p>CostCompass was built to solve a specific problem: international students often arrive in a new country with an incomplete understanding of their real daily costs. We provide data-driven transparency to help you plan with confidence.</p>
+    
+    <div class='section-header'>Data Sources</div>
+    <ul>
+        <li><strong>Cost of Living:</strong> Aggregated from Numbeo, Expatistan, and local government statistics (BLS, ONS, StatCan).</li>
+        <li><strong>Rent Benchmarks:</strong> Derived from Zillow, Rightmove, and Rentals.ca market reports.</li>
+        <li><strong>Wages:</strong> Based on statutory minimum wages for international students (20h/week limit).</li>
+    </ul>
 
-        <div class='section-header'>Financial Health Logic</div>
-        <p>Our <strong>Financial Stability Indicator</strong> (0-100) is calculated based on four weighted pillars:</p>
-        <ol>
-            <li><strong>Net Liquidity (40%):</strong> Is your monthly cash flow positive?</li>
-            <li><strong>Rent Burden (25%):</strong> Is your rent under 30% of your income?</li>
-            <li><strong>Savings Rate (20%):</strong> Are you building a buffer of at least 10%?</li>
-            <li><strong>Emergency Runway (15%):</strong> Do you have at least 3 months of coverage?</li>
-        </ol>
-    </div>
-    """, unsafe_allow_html=True)
+    <div class='section-header'>Financial Health Logic</div>
+    <p>Our <strong>Financial Stability Indicator</strong> (0-100) is calculated based on four weighted pillars:</p>
+    <ol>
+        <li><strong>Net Liquidity (40%):</strong> Is your monthly cash flow positive?</li>
+        <li><strong>Rent Burden (25%):</strong> Is your rent under 30% of your income?</li>
+        <li><strong>Savings Rate (20%):</strong> Are you building a buffer of at least 10%?</li>
+        <li><strong>Emergency Runway (15%):</strong> Do you have at least 3 months of coverage?</li>
+    </ol>
+</div>
+""", unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE 12: SETTINGS
