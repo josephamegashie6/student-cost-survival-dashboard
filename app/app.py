@@ -1220,28 +1220,24 @@ elif page == "How It Works":
     st.markdown("<div class='page-title'>How CostCompass Works</div>", unsafe_allow_html=True)
     st.markdown("<div class='page-subtitle'>Transparency in our data and methodology.</div>", unsafe_allow_html=True)
 
-    st.markdown("""
-<div class='glass-card'>
-    <div class='section-header'>Our Mission</div>
-    <p>CostCompass was built to solve a specific problem: international students often arrive in a new country with an incomplete understanding of their real daily costs. We provide data-driven transparency to help you plan with confidence.</p>
-    
-    <div class='section-header'>Data Sources</div>
-    <ul>
-        <li><strong>Cost of Living:</strong> Aggregated from Numbeo, Expatistan, and local government statistics (BLS, ONS, StatCan).</li>
-        <li><strong>Rent Benchmarks:</strong> Derived from Zillow, Rightmove, and Rentals.ca market reports.</li>
-        <li><strong>Wages:</strong> Based on statutory minimum wages for international students (20h/week limit).</li>
-    </ul>
+    st.markdown("<div class='section-header'>Our Mission</div>", unsafe_allow_html=True)
+    st.markdown("CostCompass was built to solve a specific problem: international students often arrive in a new country with an incomplete understanding of their real daily costs. We provide data-driven transparency to help you plan with confidence.")
 
-    <div class='section-header'>Financial Health Logic</div>
-    <p>Our <strong>Financial Stability Indicator</strong> (0-100) is calculated based on four weighted pillars:</p>
-    <ol>
-        <li><strong>Net Liquidity (40%):</strong> Is your monthly cash flow positive?</li>
-        <li><strong>Rent Burden (25%):</strong> Is your rent under 30% of your income?</li>
-        <li><strong>Savings Rate (20%):</strong> Are you building a buffer of at least 10%?</li>
-        <li><strong>Emergency Runway (15%):</strong> Do you have at least 3 months of coverage?</li>
-    </ol>
-</div>
-""", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Data Sources</div>", unsafe_allow_html=True)
+    st.markdown("""
+- **Cost of Living:** Aggregated from Numbeo, Expatistan, and local government statistics (BLS, ONS, StatCan).
+- **Rent Benchmarks:** Derived from Zillow, Rightmove, and Rentals.ca market reports.
+- **Wages:** Based on statutory minimum wages for international students (20h/week limit).
+""")
+
+    st.markdown("<div class='section-header'>Financial Health Logic</div>", unsafe_allow_html=True)
+    st.markdown("Our **Financial Stability Indicator** (0-100) is calculated based on four weighted pillars:")
+    st.markdown("""
+1. **Net Liquidity (40%):** Is your monthly cash flow positive?
+2. **Rent Burden (25%):** Is your rent under 30% of your income?
+3. **Savings Rate (20%):** Are you building a buffer of at least 10%?
+4. **Emergency Runway (15%):** Do you have at least 3 months of coverage?
+""")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE 12: SETTINGS
