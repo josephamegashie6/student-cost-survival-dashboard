@@ -930,7 +930,7 @@ elif page == "Spending Breakdown":
         "values": [total, fixed, variable, rent, util, phon, tuit, food, tran, misc, disc]
     }
     fig_sun = go.Figure(go.Sunburst(labels=data["labels"], parents=data["parents"], values=data["values"], branchvalues="total"))
-    fig_sun.update_layout(margin=dict(t=0, l=0, r=0, b=0), **PLOT_LAYOUT)
+    fig_sun.update_layout(**PLOT_LAYOUT)
     st.plotly_chart(fig_sun, use_container_width=True)
 
 
